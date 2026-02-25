@@ -251,22 +251,17 @@ namespace bq {
                                                bq::condition_value<bq::is_same<T, wchar_t>::value && sizeof(wchar_t) == 2, log_arg_type_enum, log_arg_type_enum::char16_type,
                                                    bq::condition_value<bq::is_same<T, wchar_t>::value && sizeof(wchar_t) == 4, log_arg_type_enum, log_arg_type_enum::char32_type,
                                                        bq::condition_value<bq::is_same<T, char32_t>::value, log_arg_type_enum, log_arg_type_enum::char32_type,
-                                                           bq::condition_value<bq::is_same<T, int8_t>::value, log_arg_type_enum, log_arg_type_enum::int8_type,
-                                                               bq::condition_value<bq::is_same<T, uint8_t>::value, log_arg_type_enum, log_arg_type_enum::uint8_type,
-                                                                   bq::condition_value<bq::is_same<T, int16_t>::value, log_arg_type_enum, log_arg_type_enum::int16_type,
-                                                                       bq::condition_value<bq::is_same<T, uint16_t>::value, log_arg_type_enum, log_arg_type_enum::uint16_type,
-                                                                           bq::condition_value<bq::is_same<T, int32_t>::value, log_arg_type_enum, log_arg_type_enum::int32_type,
-                                                                               bq::condition_value<bq::is_same<T, uint32_t>::value, log_arg_type_enum, log_arg_type_enum::uint32_type,
-                                                                                   bq::condition_value<bq::is_same<T, int64_t>::value, log_arg_type_enum, log_arg_type_enum::int64_type,
-                                                                                       bq::condition_value<bq::is_same<T, uint64_t>::value, log_arg_type_enum, log_arg_type_enum::uint64_type,
-                                                                                           bq::condition_value<bq::is_same<T, float>::value, log_arg_type_enum, log_arg_type_enum::float_type,
-                                                                                               bq::condition_value<bq::is_same<T, double>::value, log_arg_type_enum, log_arg_type_enum::double_type,
-                                                                                                   bq::condition_value<(bq::is_pod<T>::value && sizeof(T) == 1), log_arg_type_enum, log_arg_type_enum::int8_type,
-                                                                                                       bq::condition_value<(bq::is_pod<T>::value && sizeof(T) == 2), log_arg_type_enum, log_arg_type_enum::int16_type,
-                                                                                                           bq::condition_value<(bq::is_pod<T>::value && sizeof(T) == 4), log_arg_type_enum, log_arg_type_enum::int32_type,
-                                                                                                               bq::condition_value<(bq::is_pod<T>::value && sizeof(T) == 8), log_arg_type_enum, log_arg_type_enum::int64_type,
-                                                                                                                   log_arg_type_enum::unsupported_type>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value
-                       > ::value > ::value;
+                                                           bq::condition_value<bq::is_same<T, float>::value, log_arg_type_enum, log_arg_type_enum::float_type,
+                                                               bq::condition_value<bq::is_same<T, double>::value, log_arg_type_enum, log_arg_type_enum::double_type,
+                                                                   bq::condition_value<(sizeof(T) == 1 && bq::is_unsigned<T>::value), log_arg_type_enum, log_arg_type_enum::uint8_type,
+                                                                       bq::condition_value<(sizeof(T) == 1 && bq::is_pod<T>::value), log_arg_type_enum, log_arg_type_enum::int8_type,
+                                                                           bq::condition_value<(sizeof(T) == 2 && bq::is_unsigned<T>::value), log_arg_type_enum, log_arg_type_enum::uint16_type,
+                                                                               bq::condition_value<(sizeof(T) == 2 && bq::is_pod<T>::value), log_arg_type_enum, log_arg_type_enum::int16_type,
+                                                                                   bq::condition_value<(sizeof(T) == 4 && bq::is_unsigned<T>::value), log_arg_type_enum, log_arg_type_enum::uint32_type,
+                                                                                       bq::condition_value<(sizeof(T) == 4 && bq::is_pod<T>::value), log_arg_type_enum, log_arg_type_enum::int32_type,
+                                                                                           bq::condition_value<(sizeof(T) == 8 && bq::is_unsigned<T>::value), log_arg_type_enum, log_arg_type_enum::uint64_type,
+                                                                                               bq::condition_value<(sizeof(T) == 8 && bq::is_pod<T>::value), log_arg_type_enum, log_arg_type_enum::int64_type,
+                                                                                                   log_arg_type_enum::unsupported_type>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value;
         }
 
         template <typename FIRST, typename... REST>
