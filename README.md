@@ -73,7 +73,7 @@
 - Significant performance advantage over common open-source logging libraries (see [Benchmark](#benchmark)); suitable for server, client, and mobile.
 - Low memory usage: in the [Benchmark](#benchmark) case (10 threads, 20,000,000 log entries), BqLog itself uses about 1 MB of memory.
 - Provides a high-performance, high-compression real-time compressed log format.
-- With less than 10% performance overhead, supports strong hybrid asymmetric encryption of logs to protect log content (optional).
+- Supports strong hybrid encryption (asymmetric + symmetric) for log content protection with nearly zero performance overhead (optional).
 - Works well inside game engines (`Unity`, `Unreal`, etc.), with [Supporting of UE builtin data types and Blueprint](#5-using-bqlog-in-unreal).
 - Supports `utf8`, `utf16`, `utf32` characters and strings, as well as bool, float, double, and integer types of various sizes.
 - Supports `C++20` `std::format` style format strings (without positional index and time formatting).

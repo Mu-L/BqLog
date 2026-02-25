@@ -1,5 +1,8 @@
 # Changelog
 
+## [v2.1.1] - 2025-05-29
+- **Bug fix**: Fixed incorrect handling of unsigned long type on MSVC.  [无符号数输出为负数 #60](https://github.com/Tencent/BqLog/issues/60)
+
 ## [v2.1.0] - 2026-02-08
 
 **BqLog 2.x is a brand-new major version, rebuilt from the ground up to deliver better performance, broader platform coverage, and more robust features.**
