@@ -1,7 +1,7 @@
-# BqLog (BianQue Log) V 2.1.0
+# BqLog (BianQue Log) V 2.1.1
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.1.0-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.1.0-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.1.1-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.1.1-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -9,13 +9,13 @@
 [![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript-blue.svg?style=flat)]()
 
 > BqLog is a lightweight, high-performance, industrial-grade logging system that has been widely used in online projects such as "Honor of Kings".   
-> **BqLog 2.1.0 is officially released! With native HarmonyOS NEXT and Node.js support, ***multiple times faster than 1.x***, and asymmetric hybrid encryption.**
+> **BqLog 2.1.1 is officially released! With native HarmonyOS NEXT and Node.js support, ***multiple times faster than 1.x***, and asymmetric hybrid encryption.**
 
 > [简体中文文档](./README_CHS.md)
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_Download-Release_2.1.0-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.0)
+[![Download](https://img.shields.io/badge/⬇_Download-Release_2.1.1-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.1)
 
 ## 💡 If you have the following pain points, try BqLog
 
@@ -73,7 +73,7 @@
 - Significant performance advantage over common open-source logging libraries (see [Benchmark](#benchmark)); suitable for server, client, and mobile.
 - Low memory usage: in the [Benchmark](#benchmark) case (10 threads, 20,000,000 log entries), BqLog itself uses about 1 MB of memory.
 - Provides a high-performance, high-compression real-time compressed log format.
-- With less than 10% performance overhead, supports strong hybrid asymmetric encryption of logs to protect log content (optional).
+- Supports strong hybrid encryption (asymmetric + symmetric) for log content protection with nearly zero performance overhead (optional).
 - Works well inside game engines (`Unity`, `Unreal`, etc.), with [Supporting of UE builtin data types and Blueprint](#5-using-bqlog-in-unreal).
 - Supports `utf8`, `utf16`, `utf32` characters and strings, as well as bool, float, double, and integer types of various sizes.
 - Supports `C++20` `std::format` style format strings (without positional index and time formatting).

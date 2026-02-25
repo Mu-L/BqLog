@@ -172,6 +172,8 @@ namespace bq {
         constexpr auto uint32_params = test_make_array<uint32_t>((uint32_t)0x324242fa, (uint32_t)0xffffffff);
         constexpr auto int64_params = test_make_array<int64_t>((int64_t)288888880, (int64_t)-5);
         constexpr auto uint64_params = test_make_array<uint64_t>((uint64_t)1, (uint64_t)0xffaaeeff33333333ULL);
+        constexpr auto unsinged_int_params = test_make_array<unsigned int>((unsigned int)1, (unsigned int)0xffffffff);
+        constexpr auto unsinged_long_params = test_make_array<unsigned long>((unsigned long)1, (unsigned long)-1);
         constexpr auto float_params = test_make_array<float>((float)-484323233.323234f);
         constexpr auto double_params = test_make_array<double>((double)324248284.8, (double)-484323233.323234);
         constexpr auto utf8_params = test_make_array<const char*>(nullptr, "ab", "utf8测试代码看看呢");
@@ -195,6 +197,8 @@ namespace bq {
             uint32_params,
             int64_params,
             uint64_params,
+            unsinged_int_params,
+            unsinged_long_params,
             float_params,
             double_params,
             utf8_params,
@@ -337,9 +341,9 @@ namespace bq {
                 if (!value) {
                     return "null";
                 }
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "0x%" PRIX64, (uint64_t)value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "0x%" PRIX64, (uint64_t)value);
+                return tmp_str;
             }
             static bq::string trans(char c)
             {
@@ -373,39 +377,55 @@ namespace bq {
             }
             static bq::string trans(int16_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRId16, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRId16, value);
+                return tmp_str;
             }
             static bq::string trans(uint16_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRIu16, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRIu16, value);
+                return tmp_str;
             }
             static bq::string trans(int32_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRId32, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRId32, value);
+                return tmp_str;
             }
             static bq::string trans(uint32_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRIu32, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRIu32, value);
+                return tmp_str;
             }
             static bq::string trans(int64_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRId64, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRId64, value);
+                return tmp_str;
             }
             static bq::string trans(uint64_t value)
             {
-                char tmp[128];
-                snprintf(tmp, sizeof(tmp), "%" PRIu64, value);
-                return tmp;
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRIu64, value);
+                return tmp_str;
+            }
+            template <typename T>
+            static bq::enable_if_t<bq::is_same<T, unsigned int>::value && !bq::is_same<uint32_t, unsigned int>::value, bq::string> trans(T value)
+            {
+                uint32_t trans_value = static_cast<uint32_t>(value);
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRIu32, trans_value);
+                return tmp_str;
+            }
+            template <typename T>
+            static bq::enable_if_t<bq::is_same<T, unsigned long>::value && !(bq::is_same<uint32_t, unsigned long>::value || bq::is_same<uint64_t, unsigned long>::value), bq::string> trans(T value)
+            {
+                uint64_t trans_value = static_cast<uint64_t>(value);
+                char tmp_str[128];
+                snprintf(tmp_str, sizeof(tmp_str), "%" PRIu64, trans_value);
+                return tmp_str;
             }
             static bq::string trans(const custom_type1& value)
             {
