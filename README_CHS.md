@@ -1,7 +1,7 @@
-# BqLog (扁鹊日志) V 2.1.0
+# BqLog (扁鹊日志) V 2.1.1
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.1.0-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.1.0-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.1.1-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.1.1-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -9,13 +9,13 @@
 [![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript-blue.svg?style=flat)]()
 
 > BqLog 是一个轻量级、高性能的工业级日志系统，已在线上广泛应用于《王者荣耀》等项目。  
-> **BqLog 2.1.0 正式发布！新增纯血鸿蒙与 Node.js 支持，***性能较 1.x 实现数倍提升***，并带来非对称混合加密能力。**
+> **BqLog 2.1.1 正式发布！新增纯血鸿蒙与 Node.js 支持，***性能较 1.x 实现数倍提升***，并带来非对称混合加密能力。**
 
 > [English Document](./README.md)
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_下载-Release_2.1.0-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.0)
+[![Download](https://img.shields.io/badge/⬇_下载-Release_2.1.1-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.1)
 
 ## 💡 如果您有以下困扰，可以尝试 BqLog
 
