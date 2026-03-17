@@ -1,6 +1,9 @@
 # Changelog
 
-## [v2.1.1] - 2025-05-29
+## [v2.1.2] - 2026-03-17
+- **Bug fix**:  [Incorrect base_dir in GBox Sandbox environment on Android #61](https://github.com/Tencent/BqLog/issues/61)
+
+## [v2.1.1] - 2026-02-25
 - **Bug fix**: Fixed incorrect handling of unsigned long type on MSVC.  [无符号数输出为负数 #60](https://github.com/Tencent/BqLog/issues/60)
 
 ## [v2.1.0] - 2026-02-08
