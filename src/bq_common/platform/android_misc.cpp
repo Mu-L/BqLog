@@ -660,8 +660,7 @@ namespace bq {
             init_android_reflection_variables();
             init_android_asset_manager();
 
-            if (common_global_vars::get().base_dir_init_inst_.get_base_dir_0().is_empty()
-                || common_global_vars::get().base_dir_init_inst_.get_base_dir_1().is_empty()) {
+            {
                 auto internal_dir = get_files_dir();
                 auto external_dir = get_external_files_dir();
                 auto cache_dir = get_cache_dir();
