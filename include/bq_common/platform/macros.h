@@ -143,18 +143,17 @@
 // thread_local has use-after-free issue on MinGW GCC
 // use BQ_TLS_NON_POD instead of thread_local can avoid crash when thread exit.
 namespace bq {
-    template <size_t ID, typename T>
-    struct _bq_non_pod_holder_type { };
 }
-#define BQ_TLS_DEFINE(Type, Name, ID)                                            \
+#define BQ_TLS_CONCAT_INNER(a, b) a##b
+#define BQ_TLS_CONCAT(a, b) BQ_TLS_CONCAT_INNER(a, b)
+#define BQ_TLS_DEFINE(Type, Name)                                                \
     BQ_TLS Type* ____BQ_TLS_##Name##_ptr;                                        \
     BQ_TLS bool ____BQ_TSL_##Name##_recycled;                                    \
-    template <>                                                                  \
-    struct _bq_non_pod_holder_type<ID, Type> {                                   \
-        _bq_non_pod_holder_type()                                                \
+    struct BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__) {               \
+        BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__)()                  \
         {                                                                        \
         }                                                                        \
-        ~_bq_non_pod_holder_type()                                               \
+        ~BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__)()                 \
         {                                                                        \
             if (____BQ_TLS_##Name##_ptr) {                                       \
                 delete ____BQ_TLS_##Name##_ptr;                                  \
@@ -171,17 +170,8 @@ namespace bq {
             return *____BQ_TLS_##Name##_ptr;                                     \
         }                                                                        \
     };                                                                           \
-    thread_local _bq_non_pod_holder_type<ID, Type> Name;
-
-#if defined(BQ_CLANG)
-#define BQ_TLS_NON_POD(Type, Name)                                               \
-    _Pragma("clang diagnostic push")                                             \
-    _Pragma("clang diagnostic ignored \"-Wc2y-extensions\"")                     \
-    BQ_TLS_DEFINE(Type, Name, __COUNTER__)                                       \
-    _Pragma("clang diagnostic pop")
-#else
-#define BQ_TLS_NON_POD(Type, Name) BQ_TLS_DEFINE(Type, Name, __COUNTER__)
-#endif
+    thread_local BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__) Name;
+#define BQ_TLS_NON_POD(Type, Name) BQ_TLS_DEFINE(Type, Name)
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BQ_PACK_BEGIN __pragma(pack(push, 1))
