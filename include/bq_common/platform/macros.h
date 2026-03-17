@@ -172,7 +172,16 @@ namespace bq {
         }                                                                        \
     };                                                                           \
     thread_local _bq_non_pod_holder_type<ID, Type> Name;
+
+#if defined(BQ_CLANG)
+#define BQ_TLS_NON_POD(Type, Name)                                               \
+    _Pragma("clang diagnostic push")                                             \
+    _Pragma("clang diagnostic ignored \"-Wc2y-extensions\"")                     \
+    BQ_TLS_DEFINE(Type, Name, __COUNTER__)                                       \
+    _Pragma("clang diagnostic pop")
+#else
 #define BQ_TLS_NON_POD(Type, Name) BQ_TLS_DEFINE(Type, Name, __COUNTER__)
+#endif
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define BQ_PACK_BEGIN __pragma(pack(push, 1))
