@@ -6300,32 +6300,25 @@ jobs:
         include:
           - name: macos_universal
             runner: macos-latest
-            shell: bash
             build_cmd: |
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: linux_x86_64
             runner: ubuntu-latest
-            shell: bash
             build_cmd: |
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: linux_arm64
             runner: ubuntu-24.04-arm
-            shell: bash
             build_cmd: |
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: windows_x86_64
             runner: windows-latest
-            shell: cmd
-            build_cmd: |
-              build\wrapper\python\build_all_and_pack.bat
+            build_cmd: build\wrapper\python\build_all_and_pack.bat
           - name: windows_arm64
             runner: windows-latest
-            shell: cmd
-            build_cmd: |
-              build\wrapper\python\build_all_and_pack.bat arm64
+            build_cmd: build\wrapper\python\build_all_and_pack.bat arm64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -6336,7 +6329,6 @@ jobs:
           python-version: '3.11'
 
       - name: Build Python Wrapper
-        shell: ${{ matrix.shell }}
         run: ${{ matrix.build_cmd }}
 
       - name: Upload Artifacts
