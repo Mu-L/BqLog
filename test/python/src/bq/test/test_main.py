@@ -17,13 +17,14 @@ Aligned with Java test_main.
 import sys
 import os
 
-# Add test source to sys.path BEFORE any bq imports, so that
-# extend_path in bq/__init__.py can discover the test sub-package.
-# Directory structure: test/python/src/bq/test/test_main.py
-# We need test/python/src on sys.path.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 test_src = os.path.abspath(os.path.join(script_dir, "..", ".."))
-sys.path.insert(0, test_src)
+if test_src not in sys.path:
+    sys.path.append(test_src)
+
+import bq
+from pkgutil import extend_path
+bq.__path__ = extend_path(bq.__path__, bq.__name__)
 
 from bq.log import log
 from bq.defs.log_level import log_level

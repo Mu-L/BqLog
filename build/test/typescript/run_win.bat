@@ -19,7 +19,7 @@ popd
 
 echo ===== Building BqLog Dynamic Library (Windows) =====
 pushd "%BUILD_LIB_DIR%"
-call dont_execute_this.bat build native msvc OFF ON dynamic_lib
+call dont_execute_this.bat build native msvc OFF ON OFF dynamic_lib
 popd
 
 echo ===== Installing TypeScript Test Dependencies =====

@@ -16,7 +16,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     BUILD_LIB_DIR="${PROJECT_ROOT}/build/lib/mac"
     echo "===== Building BqLog Dynamic Library with Python Support (macOS) [${CONFIG}] ====="
     pushd "${BUILD_LIB_DIR}" >/dev/null
-    bash dont_execute_this.sh build OFF OFF ON dynamic_lib dylib "${CONFIG}"
+    zsh dont_execute_this.sh build OFF OFF ON dynamic_lib dylib "${CONFIG}"
     popd >/dev/null
 else
     BUILD_LIB_DIR="${PROJECT_ROOT}/build/lib/linux"

@@ -16,7 +16,7 @@ popd > /dev/null
 echo "===== Building BqLog Dynamic Library (macOS) ====="
 pushd "$BUILD_LIB_DIR" > /dev/null
 # dont_execute_this.sh build [java] [node] [static_lib|dynamic_lib] [framework|dylib|a]
-./dont_execute_this.sh build OFF ON dynamic_lib dylib
+./dont_execute_this.sh build OFF ON OFF dynamic_lib dylib
 popd > /dev/null
 
 echo "===== Installing TypeScript Test Dependencies ====="

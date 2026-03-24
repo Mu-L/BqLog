@@ -19,7 +19,7 @@ export NODE_MODULES_ROOT="$PROJECT_ROOT/wrapper/typescript/node_modules"
 echo "===== Building BqLog Dynamic Library (Linux) ====="
 pushd "$BUILD_LIB_DIR" > /dev/null
 # Node needs native module built with ON flag for node support
-./dont_execute_this.sh build native clang OFF ON dynamic_lib
+./dont_execute_this.sh build native clang OFF ON OFF dynamic_lib
 popd > /dev/null
 
 echo "===== Installing TypeScript Test Dependencies ====="

@@ -438,7 +438,7 @@ namespace bq {
 #elif defined(BQ_OHOS)
         {
             auto oh_level = level < bq::log_level::debug ? bq::log_level::debug : level; // There is no verbose level in OHOS
-            OH_LOG_PrintMsg(LOG_APP,
+            OH_LOG_Print(LOG_APP,
                 static_cast<LogLevel>(static_cast<int32_t>(LOG_DEBUG) + static_cast<int32_t>(oh_level) - static_cast<int32_t>(bq::log_level::debug)), 0x8527, "Bq", "%{public}s", text ? text : "");
         }
 #elif defined(BQ_IOS)

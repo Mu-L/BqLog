@@ -85,7 +85,11 @@ namespace bq {
                 BQ_PYTHON_STRINGIFY(BQ_PYTHON_MODULE_NAME),
                 "BqLog CPython C Extension bindings",
                 -1,
-                merged.begin()
+                merged.begin(),
+                nullptr,    // m_slots
+                nullptr,    // m_traverse
+                nullptr,    // m_clear
+                nullptr     // m_free
             };
             // Update m_methods pointer in case the array was reallocated
             module_def.m_methods = merged.begin();
