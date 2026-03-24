@@ -17,14 +17,16 @@ Aligned with Java test_main.
 import sys
 import os
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-test_src = os.path.abspath(os.path.join(script_dir, "..", ".."))
-if test_src not in sys.path:
-    sys.path.append(test_src)
-
+# The bq package is installed via pip (bqlog wheel).
+# We need bq.test from test/python/src/bq/test/.
+# Directly inject the test bq directory into bq.__path__
+# so Python can find bq.test subpackage.
 import bq
-from pkgutil import extend_path
-bq.__path__ = extend_path(bq.__path__, bq.__name__)
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+test_bq_dir = os.path.abspath(os.path.join(script_dir, ".."))
+if test_bq_dir not in bq.__path__:
+    bq.__path__.insert(0, test_bq_dir)
 
 from bq.log import log
 from bq.defs.log_level import log_level
