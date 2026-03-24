@@ -14,9 +14,17 @@ set "INSTALL_DIR=%PROJECT_ROOT%\install\wrapper_python"
 set "CONFIG=%~1"
 if "%CONFIG%"=="" set "CONFIG=RelWithDebInfo"
 
-echo ===== Building BqLog Dynamic Library with Python Support [%CONFIG%] =====
+rem Check if first arg is an arch (arm64) or a config
+set "ARCH=native"
+if /i "%CONFIG%"=="arm64" (
+    set "ARCH=arm64"
+    set "CONFIG=%~2"
+    if "!CONFIG!"=="" set "CONFIG=RelWithDebInfo"
+)
+
+echo ===== Building BqLog Dynamic Library with Python Support [%CONFIG%] [%ARCH%] =====
 pushd "%BUILD_LIB_DIR%"
-call dont_execute_this.bat build native msvc OFF OFF ON dynamic_lib %CONFIG%
+call dont_execute_this.bat build %ARCH% msvc OFF OFF ON dynamic_lib %CONFIG%
 popd
 
 echo ===== Preparing wheel package =====

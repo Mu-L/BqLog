@@ -12,6 +12,18 @@ project(BqLogPythonWrapper VERSION ${BQ_VERSION})
 set(ARTIFACTS_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../artifacts/wrapper/python")
 set(INSTALL_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../install/wrapper_python")
 
+# Write Version to pyproject.toml
+set(PYPROJECT_TOML "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml")
+file(READ "${PYPROJECT_TOML}" _toml_raw)
+string(REGEX REPLACE "version[ \t]*=[ \t]*\"[^\"]+\"" "version = \"${CMAKE_PROJECT_VERSION}\"" _toml_new "${_toml_raw}")
+
+if(NOT _toml_raw STREQUAL _toml_new)
+  file(WRITE "${PYPROJECT_TOML}" "${_toml_new}")
+  message(STATUS "Updated pyproject.toml version -> ${CMAKE_PROJECT_VERSION}")
+else()
+  message(STATUS "pyproject.toml version already ${CMAKE_PROJECT_VERSION}")
+endif()
+
 # Copy Python source files to artifacts
 add_custom_target(python_wrapper ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTIFACTS_OUTPUT_DIR}"

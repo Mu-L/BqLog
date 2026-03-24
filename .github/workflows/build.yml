@@ -6291,13 +6291,41 @@ jobs:
 
   #########################################################Python Wrapper Build####################################################
   build_python_wrapper:
-    name: Python Wrapper (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Python Wrapper (${{ matrix.name }})
+    runs-on: ${{ matrix.runner }}
     needs: extract_version
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - name: macos_universal
+            runner: macos-latest
+            shell: bash
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: linux_x86_64
+            runner: ubuntu-latest
+            shell: bash
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: linux_arm64
+            runner: ubuntu-24.04-arm
+            shell: bash
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: windows_x86_64
+            runner: windows-latest
+            shell: cmd
+            build_cmd: |
+              build\wrapper\python\build_all_and_pack.bat
+          - name: windows_arm64
+            runner: windows-latest
+            shell: cmd
+            build_cmd: |
+              build\wrapper\python\build_all_and_pack.bat arm64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -6307,26 +6335,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Build Python Wrapper (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          chmod +x build/wrapper/python/build_all_and_pack.sh
-          bash build/wrapper/python/build_all_and_pack.sh
-
-      - name: Build Python Wrapper (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          chmod +x build/wrapper/python/build_all_and_pack.sh
-          bash build/wrapper/python/build_all_and_pack.sh
-
-      - name: Build Python Wrapper (Windows)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          build\wrapper\python\build_all_and_pack.bat
+      - name: Build Python Wrapper
+        shell: ${{ matrix.shell }}
+        run: ${{ matrix.build_cmd }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python_wrapper_${{ matrix.os }}_${{ needs.extract_version.outputs.version }}
+          name: python_wrapper_${{ matrix.name }}_${{ needs.extract_version.outputs.version }}
           path: install/wrapper_python/
