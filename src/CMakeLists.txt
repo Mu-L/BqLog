@@ -276,7 +276,11 @@ else()
         add_library(BqLog MODULE ${SRC_LIST} ${THIRD_PARTY_LIST} ${INC_LIST})
         set_target_properties(BqLog PROPERTIES PREFIX "" SUFFIX ".node")
     elseif(PYTHON_SUPPORT)
-        add_library(BqLog SHARED ${SRC_LIST} ${THIRD_PARTY_LIST} ${INC_LIST})
+        # MODULE (not SHARED): Python C extensions are loaded at runtime
+        # by the interpreter via dlopen, not linked by other binaries.
+        # MODULE allows undefined symbols on macOS, which is required to
+        # build a universal binary without linking a single-arch libpython.
+        add_library(BqLog MODULE ${SRC_LIST} ${THIRD_PARTY_LIST} ${INC_LIST})
         # Python C Extension naming: _bqlog.pyd (Windows) or _bqlog.so (Linux/macOS)
         set_target_properties(BqLog PROPERTIES OUTPUT_NAME "_bqlog")
         if(WIN32)
@@ -411,12 +415,7 @@ elseif(TARGET_PLATFORM STREQUAL "win64")
         target_link_libraries(BqLog PRIVATE "${NODEJS_IMPORT_LIB}")
     endif()
     if(PYTHON_SUPPORT)
-        if(APPLE)
-            # macOS: do not link libpython directly so that a universal
-            # binary (x86_64 + arm64) can be built on a single-architecture
-            # host where only one arch of the Python library is available.
-            target_link_options(BqLog PRIVATE "-undefined" "dynamic_lookup")
-        else()
+        if(NOT APPLE)
             target_link_libraries(BqLog PRIVATE ${BQ_PYTHON_LINK_LIBRARIES})
         endif()
     endif()
