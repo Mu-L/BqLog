@@ -288,6 +288,14 @@ else()
         else()
             set_target_properties(BqLog PROPERTIES PREFIX "" SUFFIX ".so")
         endif()
+        # On macOS, Python C extensions must not link libpython directly.
+        # The symbols (_PyArg_ParseTuple, etc.) are resolved at runtime by
+        # the Python interpreter that loads this module via dlopen.
+        # Explicitly allow undefined symbols so the linker doesn't fail
+        # when building universal (x86_64+arm64) binaries.
+        if(APPLE)
+            target_link_options(BqLog PRIVATE "-undefined" "dynamic_lookup")
+        endif()
     else()
         add_library(BqLog SHARED ${SRC_LIST} ${THIRD_PARTY_LIST} ${INC_LIST})
     endif()
