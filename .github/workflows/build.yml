@@ -775,7 +775,7 @@ jobs:
         run: |
           cd build/lib/mac  
           chmod +x *.sh
-          ./build_all_and_pack.sh YES NO
+          ./build_all_and_pack.sh YES NO NO
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -4095,7 +4095,7 @@ jobs:
         run: |
           cd build/lib/mac
           chmod +x *.sh
-          ./build_all_and_pack.sh YES YES
+          ./build_all_and_pack.sh YES YES NO
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
