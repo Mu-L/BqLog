@@ -2359,3 +2359,41 @@ jobs:
           ${{ matrix.script_path }}
 
 
+  # Python Tests
+  python_test:
+    name: Python (${{ matrix.os }} ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.11', '3.12']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Python Tests (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          chmod +x build/test/python/run_linux.sh
+          bash build/test/python/run_linux.sh
+
+      - name: Run Python Tests (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          chmod +x build/test/python/run_mac.sh
+          bash build/test/python/run_mac.sh
+
+      - name: Run Python Tests (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          build\test\python\run_win.bat

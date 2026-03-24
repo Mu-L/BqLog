@@ -1,15 +1,15 @@
 #!/bin/zsh
 #
 # Usage (all parameters optional; missing ones will be prompted):
-#   dont_execute_this.sh all  [java] [node]
-#   dont_execute_this.sh build [java] [node] [static_lib|dynamic_lib] [framework|dylib|a]
-#   dont_execute_this.sh gen-vsproj [java] [node] [static_lib|dynamic_lib] [framework|dylib|a]
+#   dont_execute_this.sh all  [java] [node] [python]
+#   dont_execute_this.sh build [java] [node] [python] [static_lib|dynamic_lib] [framework|dylib|a]
+#   dont_execute_this.sh gen-vsproj [java] [node] [python] [static_lib|dynamic_lib] [framework|dylib|a]
 #   dont_execute_this.sh pack
 #
 # Normalized values:
-#   format    : framework | dylib | a
-#   java,node : ON | OFF
-#   lib type  : static_lib | dynamic_lib
+#   format       : framework | dylib | a
+#   java,node,python : ON | OFF
+#   lib type     : static_lib | dynamic_lib
 # ------------------------------------------------------------
 
 set -e -u -o pipefail
@@ -29,11 +29,13 @@ BuildConfigs=("Debug" "MinSizeRel" "RelWithDebInfo" "Release")
 ACTION="${1:-}"
 ARG1="${2:-}"  # java
 ARG2="${3:-}"  # node
-ARG3="${4:-}"  # build_lib_type
-ARG4="${5:-}"  # format (framework|dylib|a)
+ARG3="${4:-}"  # python
+ARG4="${5:-}"  # build_lib_type
+ARG5="${6:-}"  # format (framework|dylib|a)
 
 JAVA_SUPPORT=""
 NODE_API_SUPPORT=""
+PYTHON_SUPPORT=""
 BUILD_LIB_TYPE=""
 APPLE_LIB_FORMAT=""
 
@@ -124,6 +126,9 @@ ensure_common_params() {
   if [[ -z "${NODE_API_SUPPORT:-}" ]]; then
     NODE_API_SUPPORT="$(ask_yes_no "Enable Node-API (Node.js) support?")"
   fi
+  if [[ -z "${PYTHON_SUPPORT:-}" ]]; then
+    PYTHON_SUPPORT="$(ask_yes_no "Enable Python (CPython C Extension) support?")"
+  fi
 }
 
 determine_generator() {
@@ -139,13 +144,15 @@ determine_generator() {
 [[ -z "${ACTION:-}" ]] && ACTION="all"
 JAVA_SUPPORT="$(normalize_onoff "$ARG1")"
 NODE_API_SUPPORT="$(normalize_onoff "$ARG2")"
-BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG3")"
-APPLE_LIB_FORMAT="$(normalize_format "$ARG4")"
+PYTHON_SUPPORT="$(normalize_onoff "$ARG3")"
+BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG4")"
+APPLE_LIB_FORMAT="$(normalize_format "$ARG5")"
 
 echo "Parsed params:"
 echo "  ACTION:            ${ACTION:-}"
 echo "  JAVA_SUPPORT:      ${JAVA_SUPPORT:-<unset>}"
 echo "  NODE_API_SUPPORT:  ${NODE_API_SUPPORT:-<unset>}"
+echo "  PYTHON_SUPPORT:   ${PYTHON_SUPPORT:-<unset>}"
 echo "  BUILD_LIB_TYPE:    ${BUILD_LIB_TYPE:-<unset>}"
 echo "  APPLE_LIB_FORMAT:  ${APPLE_LIB_FORMAT:-<unset>}"
 echo "  GENERATOR:         $(determine_generator)"
@@ -171,6 +178,7 @@ build_one_pair() {
   echo "  ACTION            : build (${build_lib_type})"
   echo "  JAVA_SUPPORT      : ${JAVA_SUPPORT}"
   echo "  NODE_API_SUPPORT  : ${NODE_API_SUPPORT}"
+  echo "  PYTHON_SUPPORT    : ${PYTHON_SUPPORT}"
   echo "  APPLE_LIB_FORMAT  : ${apple_format}"
   echo "  Generator         : ${gen}"
   ((${#ARCH_ARGS[@]})) && echo "  CMake arch args   : ${ARCH_ARGS[*]}"
@@ -183,6 +191,7 @@ build_one_pair() {
       -DBUILD_LIB_TYPE="${build_lib_type}" \
       -DJAVA_SUPPORT:BOOL="${JAVA_SUPPORT}" \
       -DNODE_API_SUPPORT:BOOL="${NODE_API_SUPPORT}" \
+      -DPYTHON_SUPPORT:BOOL="${PYTHON_SUPPORT}" \
       -DAPPLE_LIB_FORMAT:STRING="${apple_format}" \
       -DCMAKE_INSTALL_PREFIX="${REPO_ROOT}/install" \
       "${ARCH_ARGS[@]}"
@@ -200,6 +209,7 @@ build_one_pair() {
         -DBUILD_LIB_TYPE="${build_lib_type}" \
         -DJAVA_SUPPORT:BOOL="${JAVA_SUPPORT}" \
         -DNODE_API_SUPPORT:BOOL="${NODE_API_SUPPORT}" \
+      -DPYTHON_SUPPORT:BOOL="${PYTHON_SUPPORT}" \
         -DCMAKE_BUILD_TYPE="${cfg}" \
         -DAPPLE_LIB_FORMAT:STRING="${apple_format}" \
         -DCMAKE_INSTALL_PREFIX="${REPO_ROOT}/install" \
@@ -228,6 +238,7 @@ gen_project_one() {
   echo "===== Project Generation ====="
   echo "  JAVA_SUPPORT      : ${JAVA_SUPPORT}"
   echo "  NODE_API_SUPPORT  : ${NODE_API_SUPPORT}"
+  echo "  PYTHON_SUPPORT    : ${PYTHON_SUPPORT}"
   echo "  BUILD_LIB_TYPE    : ${build_lib_type}"
   echo "  APPLE_LIB_FORMAT  : ${apple_format}"
   echo "  Generator         : ${gen}"
@@ -241,6 +252,7 @@ gen_project_one() {
       -DBUILD_LIB_TYPE="${build_lib_type}" \
       -DJAVA_SUPPORT:BOOL="${JAVA_SUPPORT}" \
       -DNODE_API_SUPPORT:BOOL="${NODE_API_SUPPORT}" \
+      -DPYTHON_SUPPORT:BOOL="${PYTHON_SUPPORT}" \
       -DAPPLE_LIB_FORMAT:STRING="${apple_format}" \
       "${ARCH_ARGS[@]}"
   else
@@ -249,6 +261,7 @@ gen_project_one() {
       -DBUILD_LIB_TYPE="${build_lib_type}" \
       -DJAVA_SUPPORT:BOOL="${JAVA_SUPPORT}" \
       -DNODE_API_SUPPORT:BOOL="${NODE_API_SUPPORT}" \
+      -DPYTHON_SUPPORT:BOOL="${PYTHON_SUPPORT}" \
       -DCMAKE_BUILD_TYPE=Debug \
       -DAPPLE_LIB_FORMAT:STRING="${apple_format}" \
       "${ARCH_ARGS[@]}"
@@ -321,6 +334,7 @@ case "$ACTION" in
     # If CLI provided ON/OFF, use it; otherwise prompt
     [[ -z "${JAVA_SUPPORT:-}"     ]] && JAVA_SUPPORT="$(ask_yes_no "Enable Java/JNI support?")"
     [[ -z "${NODE_API_SUPPORT:-}" ]] && NODE_API_SUPPORT="$(ask_yes_no "Enable Node-API (Node.js) support?")"
+    [[ -z "${PYTHON_SUPPORT:-}" ]] && PYTHON_SUPPORT="$(ask_yes_no "Enable Python (CPython C Extension) support?")"
     build_all_combos
     do_pack
     echo "---------"; echo "Finished!"; echo "---------"

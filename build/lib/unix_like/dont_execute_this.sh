@@ -1,16 +1,16 @@
 #!/bin/sh
 #
 # Usage (all parameters optional; missing ones will be prompted):
-#   dont_execute_this.sh all [arch] [compiler] [java] [node]
-#   dont_execute_this.sh build [arch] [compiler] [java] [node] [static_lib|dynamic_lib]
-#   dont_execute_this.sh gen-vsproj [arch] [compiler] [java] [node] [static_lib|dynamic_lib]
+#   dont_execute_this.sh all [arch] [compiler] [java] [node] [python]
+#   dont_execute_this.sh build [arch] [compiler] [java] [node] [python] [static_lib|dynamic_lib]
+#   dont_execute_this.sh gen-vsproj [arch] [compiler] [java] [node] [python] [static_lib|dynamic_lib]
 #   dont_execute_this.sh pack [arch]
 #
 # Normalized values:
-#   arch      : arm64 | x86 | x86_64 | native
-#   compiler  : gcc | clang
-#   java,node : ON | OFF
-#   lib type  : static_lib | dynamic_lib
+#   arch         : arm64 | x86 | x86_64 | native
+#   compiler     : gcc | clang
+#   java,node,python : ON | OFF
+#   lib type     : static_lib | dynamic_lib
 # ------------------------------------------------------------
 
 set -eu
@@ -25,11 +25,13 @@ ARG2="${3:-}"
 ARG3="${4:-}"
 ARG4="${5:-}"
 ARG5="${6:-}"
+ARG6="${7:-}"
 
 ARCH_PARAM=""
 COMPILER_TYPE=""
 JAVA_SUPPORT=""
 NODE_API_SUPPORT=""
+PYTHON_SUPPORT=""
 BUILD_LIB_TYPE=""
 
 to_lower() { printf "%s" "$1" | tr '[:upper:]' '[:lower:]'; }
@@ -161,12 +163,14 @@ ensure_common_params() {
   [ -z "$COMPILER_TYPE" ] && ask_compiler
   [ -z "$JAVA_SUPPORT" ] && JAVA_SUPPORT=$(ask_yes_no "Enable Java/JNI support?")
   [ -z "$NODE_API_SUPPORT" ] && NODE_API_SUPPORT=$(ask_yes_no "Enable Node-API (Node.js) support?")
+  [ -z "$PYTHON_SUPPORT" ] && PYTHON_SUPPORT=$(ask_yes_no "Enable Python (CPython C Extension) support?")
   echo
   echo "Parameters:"
   echo "  ARCH             : $ARCH_PARAM"
   echo "  COMPILER         : $COMPILER_TYPE"
   echo "  JAVA_SUPPORT     : $JAVA_SUPPORT"
   echo "  NODE_API_SUPPORT : $NODE_API_SUPPORT"
+  echo "  PYTHON_SUPPORT   : $PYTHON_SUPPORT"
   echo
 }
 ensure_arch_only() {
@@ -183,7 +187,8 @@ if [ -n "$ARG1" ]; then ARCH_PARAM="$(normalize_arch "$ARG1")"; fi
 COMPILER_TYPE="$(normalize_compiler "$ARG2")"
 JAVA_SUPPORT="$(normalize_onoff "$ARG3")"
 NODE_API_SUPPORT="$(normalize_onoff "$ARG4")"
-BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG5")"
+PYTHON_SUPPORT="$(normalize_onoff "$ARG5")"
+BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG6")"
 
 build_one() {
   BUILD_LIB_TYPE_ARG="$1"
@@ -211,6 +216,7 @@ build_one() {
       -DBUILD_LIB_TYPE="$BUILD_LIB_TYPE_ARG" \
       -DJAVA_SUPPORT:BOOL="$JAVA_SUPPORT" \
       -DNODE_API_SUPPORT:BOOL="$NODE_API_SUPPORT" \
+      -DPYTHON_SUPPORT:BOOL="$PYTHON_SUPPORT" \
       -DCMAKE_BUILD_TYPE="$cfg" \
       -DBUILD_SHARED_LIBS="$SHARED" \
       -DCMAKE_C_COMPILER="$CC" \

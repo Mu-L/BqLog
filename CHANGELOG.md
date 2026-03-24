@@ -1,5 +1,8 @@
 # Changelog
 
+## [v2.2.1] - 2026-03-17
+- **Python 3.7+ support**: Added Python 3.7+ support via CPython C Extension wrapper (Stable ABI).
+
 ## [v2.1.2] - 2026-03-17
 - **Bug fix**:  [Incorrect base_dir in GBox Sandbox environment on Android #61](https://github.com/Tencent/BqLog/issues/61)
 

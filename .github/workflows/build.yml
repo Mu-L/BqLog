@@ -6288,3 +6288,45 @@ jobs:
         with:
           name: ${{ matrix.engine }}_package_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
+
+  #########################################################Python Wrapper Build####################################################
+  build_python_wrapper:
+    name: Python Wrapper (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: extract_version
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build Python Wrapper (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x build/wrapper/python/build_all_and_pack.sh
+          bash build/wrapper/python/build_all_and_pack.sh
+
+      - name: Build Python Wrapper (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x build/wrapper/python/build_all_and_pack.sh
+          bash build/wrapper/python/build_all_and_pack.sh
+
+      - name: Build Python Wrapper (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          build\wrapper\python\build_all_and_pack.bat
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python_wrapper_${{ matrix.os }}_${{ needs.extract_version.outputs.version }}
+          path: install/wrapper_python/

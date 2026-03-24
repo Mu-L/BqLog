@@ -12,7 +12,7 @@ set -euo pipefail
 # Normalized values:
 #   arch      : arm64 | x86 | x86_64 | native
 #   compiler  : gcc | clang
-#   java,node : ON | OFF
+#   java,node,python : ON | OFF
 #   lib type  : static_lib | dynamic_lib
 # ------------------------------------------------------------
 
@@ -37,11 +37,13 @@ ARG2="${3:-}"
 ARG3="${4:-}"
 ARG4="${5:-}"
 ARG5="${6:-}"
+ARG6="${7:-}"
 
 ARCH_PARAM=""
 COMPILER_TYPE=""
 JAVA_SUPPORT=""
 NODE_API_SUPPORT=""
+PYTHON_SUPPORT=""
 BUILD_LIB_TYPE=""
 
 to_upper() { echo "$1" | tr '[:lower:]' '[:upper:]'; }
@@ -153,6 +155,9 @@ ensure_common_params() {
   if [[ -z "$NODE_API_SUPPORT" ]]; then
     NODE_API_SUPPORT="$(ask_yes_no "Enable Node-API (Node.js) support?")"
   fi
+  if [[ -z "$PYTHON_SUPPORT" ]]; then
+    PYTHON_SUPPORT="$(ask_yes_no "Enable Python (CPython C Extension) support?")"
+  fi
   ensure_resolved_toolchain
 }
 ensure_arch_only() {
@@ -171,7 +176,8 @@ ARCH_PARAM="$(normalize_arch "$ARG1")"
 COMPILER_TYPE="$(normalize_compiler "$ARG2")"
 JAVA_SUPPORT="$(normalize_onoff "$ARG3")"
 NODE_API_SUPPORT="$(normalize_onoff "$ARG4")"
-BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG5")"
+PYTHON_SUPPORT="$(normalize_onoff "$ARG5")"
+BUILD_LIB_TYPE="$(normalize_build_lib_type "$ARG6")"
 
 # Echo parsed params summary so "no output" never happens
 echo "Parsed params:"
@@ -180,6 +186,7 @@ echo "  ARCH_PARAM:    ${ARCH_PARAM:-<unset>}"
 echo "  COMPILER_TYPE: ${COMPILER_TYPE:-<unset>}"
 echo "  JAVA_SUPPORT:  ${JAVA_SUPPORT:-<unset>}"
 echo "  NODE_API:      ${NODE_API_SUPPORT:-<unset>}"
+echo "  PYTHON:        ${PYTHON_SUPPORT:-<unset>}"
 echo "  BUILD_LIB_TYPE:${BUILD_LIB_TYPE:-<unset>}"
 
 # Resolve C++ compiler and CMake cross arguments + set USER_DEF_ARCH
@@ -305,6 +312,7 @@ build_one() {
   echo "  CXX               : ${RESOLVED_CXX_BIN}"
   echo "  JAVA_SUPPORT      : ${JAVA_SUPPORT}"
   echo "  NODE_API_SUPPORT  : ${NODE_API_SUPPORT}"
+  echo "  PYTHON_SUPPORT    : ${PYTHON_SUPPORT}"
   echo "  Generator         : ${GEN}"
   ((${#ARCH_ARGS[@]})) && echo "  CMake cross args  : ${ARCH_ARGS[*]}"
   echo "  USER_DEF_ARCH     : ${USER_DEF_ARCH:-}"
@@ -323,6 +331,7 @@ build_one() {
       -DBUILD_LIB_TYPE="${BUILD_LIB_TYPE_ARG}" \
       -DJAVA_SUPPORT:BOOL="${JAVA_SUPPORT}" \
       -DNODE_API_SUPPORT:BOOL="${NODE_API_SUPPORT}" \
+      -DPYTHON_SUPPORT:BOOL="${PYTHON_SUPPORT}" \
       -DCMAKE_BUILD_TYPE="${cfg}" \
       -DBUILD_SHARED_LIBS="${SHARED}" \
       -DCMAKE_CXX_COMPILER="${RESOLVED_CXX_BIN}" \
@@ -351,6 +360,7 @@ gen_vsproj() {
   echo "  CXX               : ${RESOLVED_CXX_BIN}"
   echo "  JAVA_SUPPORT      : ${JAVA_SUPPORT}"
   echo "  NODE_API_SUPPORT  : ${NODE_API_SUPPORT}"
+  echo "  PYTHON_SUPPORT    : ${PYTHON_SUPPORT}"
   echo "  BUILD_LIB_TYPE    : ${BUILD_LIB_TYPE}"
   echo "  Generator         : ${GEN}"
   ((${#ARCH_ARGS[@]})) && echo "  CMake cross args  : ${ARCH_ARGS[*]}"

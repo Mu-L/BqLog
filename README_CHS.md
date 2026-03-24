@@ -1,21 +1,22 @@
-# BqLog (扁鹊日志) V 2.1.2
+# BqLog (扁鹊日志) V 2.2.1
+
+[English](./README.md) | **简体中文**
+
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.1.2-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.1.2-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.2.1-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.2.1-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20iOS%20%7C%20Android%20%7C%20HarmonyOS%20%7C%20Unix-lightgrey.svg?style=flat)]()
-[![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript-blue.svg?style=flat)]()
+[![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript%20%7C%20Python-blue.svg?style=flat)]()
 
-> BqLog 是一个轻量级、高性能的工业级日志系统，已在线上广泛应用于《王者荣耀》等项目。  
-> **BqLog 2.1.2 正式发布！新增纯血鸿蒙与 Node.js 支持，***性能较 1.x 实现数倍提升***，并带来非对称混合加密能力。**
-
-> [English Document](./README.md)
+> BqLog 是一个轻量级、高性能的工业级日志系统，已在线上广泛应用于《王者荣耀》等项目。
+> **BqLog 2.2.1 正式发布！新增纯血鸿蒙与 Node.js 支持，***性能较 1.x 实现数倍提升***，并带来非对称混合加密能力。**
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_下载-Release_2.1.2-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.2)
+[![Download](https://img.shields.io/badge/⬇_下载-Release_2.2.1-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.1)
 
 ## 💡 如果您有以下困扰，可以尝试 BqLog
 
@@ -24,7 +25,7 @@
   - 性能足够好（日志要少写）
   - 节约存储空间（日志最好就别写）
 - 如果您是后台服务开发者，现有日志库在**高并发场景**下性能不足，导致日志丢失或程序阻塞。
-- 如果您的编程语言是 C++、Java、C#、Kotlin、TypeScript、JavaScript 之一，或者同时使用多种语言，希望有一套**统一的跨语言日志解决方案**。
+- 如果您的编程语言是 C++、Java、C#、Kotlin、TypeScript、JavaScript、Python 之一，或者同时使用多种语言，希望有一套**统一的跨语言日志解决方案**。
 
 ---
 
@@ -47,6 +48,7 @@
 - C#（Unity、团结引擎、.NET）
 - **ArkTS / C++（HarmonyOS）**
 - **JavaScript / TypeScript（Node.js，支持 CJS 与 ESM）**
+- **Python 3.7+（CPython C Extension，Stable ABI）**
 - **Unreal Engine（UE4 & UE5）**
 
 ---
@@ -275,6 +277,22 @@ bq.log.force_flush_all_logs();
 ```
 
 更多示例可参考仓库下的 `/demo/nodejs` 目录。
+
+### Python
+
+```python
+from bq.log import log
+
+config = """
+    appenders_config.console.type=console
+    appenders_config.console.levels=[all]
+"""
+my_log = log.create_log("python_log", config)
+my_log.info("Hello from Python! params: {}, {}", "text", 123)
+log.force_flush_all_logs()
+```
+
+更多示例可参考仓库下的 `/demo/python` 目录。
 
 ### C#
 

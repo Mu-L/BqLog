@@ -1,21 +1,22 @@
-# BqLog (BianQue Log) V 2.1.2
+# BqLog (BianQue Log) V 2.2.1
+
+**English** | [简体中文](./README_CHS.md)
+
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.1.2-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.1.2-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.2.1-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.2.1-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20iOS%20%7C%20Android%20%7C%20HarmonyOS%20%7C%20Unix-lightgrey.svg?style=flat)]()
-[![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript-blue.svg?style=flat)]()
+[![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript%20%7C%20Python-blue.svg?style=flat)]()
 
-> BqLog is a lightweight, high-performance, industrial-grade logging system that has been widely used in online projects such as "Honor of Kings".   
-> **BqLog 2.1.2 is officially released! With native HarmonyOS NEXT and Node.js support, ***multiple times faster than 1.x***, and asymmetric hybrid encryption.**
-
-> [简体中文文档](./README_CHS.md)
+> BqLog is a lightweight, high-performance, industrial-grade logging system that has been widely used in online projects such as "Honor of Kings".
+> **BqLog 2.2.1 is officially released! With native HarmonyOS NEXT and Node.js support, ***multiple times faster than 1.x***, and asymmetric hybrid encryption.**
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_Download-Release_2.1.2-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.1.2)
+[![Download](https://img.shields.io/badge/⬇_Download-Release_2.2.1-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.1)
 
 ## 💡 If you have the following pain points, try BqLog
 
@@ -24,7 +25,7 @@
   - Good performance (log as little as possible)
   - Save storage space (better not log at all)
 - If you are a backend service developer and your current logging library cannot handle **high-concurrency scenarios**, causing log loss or application stalls.
-- If your programming language is one of C++, Java, C#, Kotlin, TypeScript, JavaScript, or you use multiple languages at the same time and want a **unified cross-language logging solution**.
+- If your programming language is one of C++, Java, C#, Kotlin, TypeScript, JavaScript, Python, or you use multiple languages at the same time and want a **unified cross-language logging solution**.
 
 ---
 
@@ -47,6 +48,7 @@
 - C# (Unity, Tuanjie Engine, .NET)
 - **ArkTS / C++ (HarmonyOS)**
 - **JavaScript / TypeScript (Node.js, supports CJS and ESM)**
+- **Python 3.7+ (CPython C Extension, Stable ABI)**
 - **Unreal Engine (UE4 & UE5)**
 
 ---
@@ -275,6 +277,22 @@ bq.log.force_flush_all_logs();
 ```
 
 For more examples, refer to `/demo/nodejs` directory.
+
+### Python
+
+```python
+from bq.log import log
+
+config = """
+    appenders_config.console.type=console
+    appenders_config.console.levels=[all]
+"""
+my_log = log.create_log("python_log", config)
+my_log.info("Hello from Python! params: {}, {}", "text", 123)
+log.force_flush_all_logs()
+```
+
+For more examples, refer to `/demo/python` directory.
 
 ### C#
 

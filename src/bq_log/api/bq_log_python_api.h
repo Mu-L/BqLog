@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright (C) 2025 Tencent.
+ * Copyright (C) 2026 Tencent.
  * BQLOG is licensed under the Apache License, Version 2.0.
  * You may obtain a copy of the License at
  *
@@ -9,12 +10,12 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
-#include "bq_log/global/version.h"
-namespace bq {
-    const char* const BQ_LOG_VERSION = "2.2.1";
 
-    const char* get_bq_log_version()
-    {
-        return BQ_LOG_VERSION;
-    }
-}
+#include "bq_common/bq_common_public_include.h"
+#if defined(BQ_PYTHON)
+
+// This header is intentionally minimal.
+// BqLog Python API functions are registered via
+// bq::platform::python_method_register in the .cpp file.
+
+#endif
