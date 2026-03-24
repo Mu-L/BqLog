@@ -411,7 +411,14 @@ elseif(TARGET_PLATFORM STREQUAL "win64")
         target_link_libraries(BqLog PRIVATE "${NODEJS_IMPORT_LIB}")
     endif()
     if(PYTHON_SUPPORT)
-        target_link_libraries(BqLog PRIVATE ${BQ_PYTHON_LINK_LIBRARIES})
+        if(APPLE)
+            # macOS: do not link libpython directly so that a universal
+            # binary (x86_64 + arm64) can be built on a single-architecture
+            # host where only one arch of the Python library is available.
+            target_link_options(BqLog PRIVATE "-undefined" "dynamic_lookup")
+        else()
+            target_link_libraries(BqLog PRIVATE ${BQ_PYTHON_LINK_LIBRARIES})
+        endif()
     endif()
 endif()
 
