@@ -58,7 +58,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
     echo "===== Repairing Linux wheel (auditwheel) ====="
     python3 -m pip install auditwheel patchelf
     for whl in "${INSTALL_DIR}"/*.whl; do
-        auditwheel repair "$whl" -w "${INSTALL_DIR}_repaired" --plat "manylinux_2_17_$(uname -m)"
+        auditwheel repair "$whl" -w "${INSTALL_DIR}_repaired"
     done
     rm -rf "${INSTALL_DIR}"
     mv "${INSTALL_DIR}_repaired" "${INSTALL_DIR}"
