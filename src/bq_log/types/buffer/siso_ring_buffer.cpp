@@ -101,9 +101,9 @@ namespace bq {
 #if defined(BQ_LOG_BUFFER_DEBUG)
         if (left_space > aligned_blocks_count_) {
             bq::util::log_device_console(bq::log_level::error,
-                "SISO DIAG error1: this=%p head=%p wt_read_cache=%u wt_write_cache=%u "
-                "reading_cursor=%u writing_cursor=%u aligned_blocks=%u left_space=%u "
-                "rt_read_cache=%u rt_write_cache=%u thread=%" PRIu64,
+                "SISO DIAG error1: this=%p head=%p wt_read_cache=%" PRIu32 " wt_write_cache=%" PRIu32 " "
+                "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " aligned_blocks=%" PRIu32 " left_space=%" PRIu32 " "
+                "rt_read_cache=%" PRIu32 " rt_write_cache=%" PRIu32 " thread=%" PRIu64,
                 (void*)this, (void*)head_,
                 head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
                 head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
@@ -119,9 +119,9 @@ namespace bq {
 #if defined(BQ_LOG_BUFFER_DEBUG)
             if (left_space > aligned_blocks_count_) {
                 bq::util::log_device_console(bq::log_level::error,
-                    "SISO DIAG error2: this=%p head=%p wt_read_cache=%u wt_write_cache=%u "
-                    "reading_cursor=%u writing_cursor=%u aligned_blocks=%u left_space=%u "
-                    "rt_read_cache=%u rt_write_cache=%u thread=%" PRIu64,
+                    "SISO DIAG error2: this=%p head=%p wt_read_cache=%" PRIu32 " wt_write_cache=%" PRIu32 " "
+                    "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " aligned_blocks=%" PRIu32 " left_space=%" PRIu32 " "
+                    "rt_read_cache=%" PRIu32 " rt_write_cache=%" PRIu32 " thread=%" PRIu64,
                     (void*)this, (void*)head_,
                     head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
                     head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
