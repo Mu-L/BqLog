@@ -11,6 +11,7 @@ jobs:
     uses: ./.github/workflows/build.yml
 
   release:
+    if: false  # TEMP: disabled — only publishing PyPI for now
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -142,3 +143,60 @@ jobs:
           files: release_assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish Python wheel to PyPI
+  publish_pypi:
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      id-token: write  # Required for Trusted Publisher (OIDC)
+    steps:
+      - name: Download Python wheel artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: python_wrapper_*
+          merge-multiple: true
+          path: python_dist/
+
+      - name: Collect wheel files
+        run: |
+          mkdir -p dist/
+          find python_dist/ -name "*.whl" -exec cp {} dist/ \;
+          echo "=== Wheels to publish ==="
+          ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  # Publish Node.js package to npm
+  publish_npm:
+    if: false  # TEMP: disabled — waiting for npm name approval
+    runs-on: ubuntu-latest
+    needs: [build, release]
+    steps:
+      - name: Download Node.js npm artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: nodejs_npm_*
+          merge-multiple: true
+          path: npm_dist/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          registry-url: https://registry.npmjs.org/
+
+      - name: Publish to npm
+        run: |
+          TGZ=$(find npm_dist/ -name "*.tgz" | head -n1)
+          if [[ -z "$TGZ" ]]; then
+            echo "::error::No .tgz file found in npm_dist/"
+            exit 1
+          fi
+          echo "Publishing: $TGZ"
+          npm publish "$TGZ" --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
