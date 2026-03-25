@@ -50,6 +50,17 @@ namespace bq {
 
     void siso_ring_buffer::renew()
     {
+#if defined(BQ_LOG_BUFFER_DEBUG)
+        bq::util::log_device_console(bq::log_level::info,
+            "SISO DIAG renew: this=%p head=%p BEFORE wt_read=%" PRIu32 " wt_write=%" PRIu32
+            " reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32
+            " rt_read=%" PRIu32 " rt_write=%" PRIu32 " thread=%" PRIu64,
+            (void*)this, (void*)head_,
+            head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
+            head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+            head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+            bq::platform::thread::get_current_thread_id());
+#endif
         init_cursors();
 #if defined(BQ_LOG_BUFFER_DEBUG)
         if (check_thread_) {
@@ -274,6 +285,24 @@ namespace bq {
 #endif
 
         head_->rt_reading_cursor_cache_ += block_ptr->to_chunk_head().block_num;
+#if defined(BQ_LOG_BUFFER_DEBUG)
+        {
+            uint32_t new_rt_read = head_->rt_reading_cursor_cache_;
+            uint32_t cur_writing = head_->writing_cursor().load_relaxed();
+            if (static_cast<uint32_t>(new_rt_read - cur_writing) < static_cast<uint32_t>(UINT32_MAX / 2)
+                && new_rt_read != cur_writing) {
+                // rt_reading_cursor_cache_ > writing_cursor (wrapped check)
+                bq::util::log_device_console(bq::log_level::error,
+                    "SISO DIAG return_read_chunk OVERSHOOT: this=%p head=%p "
+                    "rt_read_cache=%" PRIu32 " writing_cursor=%" PRIu32 " "
+                    "block_num=%" PRIu32 " thread=%" PRIu64,
+                    (void*)this, (void*)head_,
+                    new_rt_read, cur_writing,
+                    block_ptr->to_chunk_head().block_num,
+                    bq::platform::thread::get_current_thread_id());
+            }
+        }
+#endif
         head_->reading_cursor().store_release(head_->rt_reading_cursor_cache_);
     }
 
@@ -334,6 +363,24 @@ namespace bq {
             return;
         }
 #if defined(BQ_LOG_BUFFER_DEBUG)
+        // Check if reading_cursor has been reset (renew'd) since this handle was created
+        uint32_t current_reading = head_->reading_cursor().load_relaxed();
+        uint32_t current_writing = head_->writing_cursor().load_relaxed();
+        if (handle.start_cursor_ != current_reading
+            || head_->rt_reading_cursor_cache_ > current_writing) {
+            bq::util::log_device_console(bq::log_level::error,
+                "SISO DIAG return_batch STALE: this=%p head=%p "
+                "handle.start=%" PRIu32 " handle.end=%" PRIu32 " handle.current=%" PRIu32 " "
+                "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " "
+                "rt_read_cache=%" PRIu32 " rt_write_cache=%" PRIu32 " "
+                "wt_read_cache=%" PRIu32 " wt_write_cache=%" PRIu32 " thread=%" PRIu64,
+                (void*)this, (void*)head_,
+                handle.start_cursor_, handle.end_cursor_, handle.current_cursor_,
+                current_reading, current_writing,
+                head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+                head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
+                bq::platform::thread::get_current_thread_id());
+        }
         assert(handle.end_cursor_ == handle.current_cursor_ && "siso_buffer_batch_read_handle::return_batch_read_chunks called with not finished reading handle");
         assert(handle.start_cursor_ == head_->reading_cursor().load_relaxed() && "invalid batch handle start cursor");
         assert(handle.end_cursor_ == head_->rt_reading_cursor_cache_ && "invalid batch handle end cursor");
