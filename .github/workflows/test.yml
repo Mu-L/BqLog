@@ -197,7 +197,7 @@ jobs:
 
       - name: Upload Windows crash dumps (if any)
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: win_dumps_${{ matrix.runner.label }}_${{ matrix.cc }}_cpp${{ matrix.cpp_ver }}
           path: win_dumps/**
@@ -1968,7 +1968,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.win_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: jvm_crash_logs_win_${{ matrix.runner.label }}_${{ matrix.cc }}
           path: "**/hs_err_pid*.log"
@@ -2036,7 +2036,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.mac_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: jvm_crash_logs_mac_${{ matrix.asan.label }}
           path: "**/hs_err_pid*.log"
@@ -2104,7 +2104,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.linux_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: jvm_crash_logs_ubuntu_${{ matrix.runner.label }}_${{ matrix.asan.label }}
           path: "**/hs_err_pid*.log"

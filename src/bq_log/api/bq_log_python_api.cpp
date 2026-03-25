@@ -45,12 +45,23 @@
 
 static PyObject* py_console_callback = nullptr;
 
+// Called from C++ worker thread. Must acquire GIL before accessing any Python state.
 static void BQ_STDCALL on_console_callback(uint64_t log_id, int32_t category_idx, bq::log_level log_level, const char* content, int32_t length)
 {
-    if (!py_console_callback) {
+    // Acquire GIL first — this serializes against register/unregister
+    // which also run under GIL. Do NOT check py_console_callback before
+    // acquiring the GIL: that would be a TOCTOU race (the pointer could be
+    // cleared and DECREF'd between the check and PyGILState_Ensure).
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject* cb = py_console_callback;
+    if (!cb) {
+        PyGILState_Release(gstate);
         return;
     }
-    PyGILState_STATE gstate = PyGILState_Ensure();
+    // INCREF to prevent the callback from being freed if another thread
+    // unregisters it while we are executing (after we release the GIL or
+    // if __api_unregister_console_callbacks doesn't provide a barrier).
+    Py_INCREF(cb);
     PyObject* args = Py_BuildValue("(Kiisi)",
         (unsigned long long)log_id,
         (int)category_idx,
@@ -58,13 +69,14 @@ static void BQ_STDCALL on_console_callback(uint64_t log_id, int32_t category_idx
         content,
         (int)length);
     if (args) {
-        PyObject* ret = PyObject_CallObject(py_console_callback, args);
+        PyObject* ret = PyObject_CallObject(cb, args);
         Py_XDECREF(ret);
         if (PyErr_Occurred()) {
             PyErr_Clear();
         }
         Py_DECREF(args);
     }
+    Py_DECREF(cb);
     PyGILState_Release(gstate);
 }
 
@@ -390,8 +402,22 @@ static PyObject* py_log_write(PyObject* self, PyObject* args) {
         }
     }
 
-    // Call __api_log_write_begin
-    bq::_api_log_write_handle handle = bq::api::__api_log_write_begin(
+    // All Python objects have been converted to C types above.
+    // Release the GIL for the entire begin→write→finish sequence so that
+    // concurrent Python threads can proceed.  The ring buffer's alloc and
+    // commit must happen on the same OS thread *without* re-acquiring the
+    // GIL in between, otherwise another Python thread could alloc before
+    // this thread's commit, corrupting the cursor invariants.
+    //
+    // NOTE: Py_BEGIN_ALLOW_THREADS / Py_END_ALLOW_THREADS expand to a
+    // brace-delimited scope, so all variables used across the boundary
+    // must be declared beforehand.
+    bq::_api_log_write_handle write_handle;
+    bool write_ok = false;
+
+    Py_BEGIN_ALLOW_THREADS
+
+    write_handle = bq::api::__api_log_write_begin(
         log_id,
         level,
         category_idx,
@@ -401,40 +427,42 @@ static PyObject* py_log_write(PyObject* self, PyObject* args) {
         total_args_size
     );
 
-    if (handle.result != bq::enum_buffer_result_code::success) {
-        Py_DECREF(format_utf16);
-        if (arg_caches) {
+    if (write_handle.result == bq::enum_buffer_result_code::success) {
+        // Write format string data
+        if (fmt_byte_len > 0u) {
+            memcpy(write_handle.format_data_addr, fmt_data, fmt_byte_len);
+        }
+
+        // Write args data
+        if (extra_args_count > 0 && arg_caches) {
+            uint8_t* args_addr = write_handle.format_data_addr + align4(fmt_byte_len);
             for (Py_ssize_t i = 0; i < extra_args_count; ++i) {
+                write_arg_to_buffer(&arg_caches[i], args_addr);
+                args_addr += calc_arg_storage_size(&arg_caches[i]);
                 free_arg_cache(&arg_caches[i]);
             }
             free(arg_caches);
+            arg_caches = nullptr;
         }
-        Py_RETURN_FALSE;
+
+        bq::api::__api_log_write_finish(log_id, write_handle);
+        write_ok = true;
     }
 
-    // Write format string data
-    if (fmt_byte_len > 0u) {
-        memcpy(handle.format_data_addr, fmt_data, fmt_byte_len);
-    }
+    Py_END_ALLOW_THREADS
+
+    // Cleanup (back under GIL)
     Py_DECREF(format_utf16);
-
-    // Write args data
-    if (extra_args_count > 0 && arg_caches) {
-        uint8_t* args_addr = handle.format_data_addr + align4(fmt_byte_len);
+    if (arg_caches) {
         for (Py_ssize_t i = 0; i < extra_args_count; ++i) {
-            write_arg_to_buffer(&arg_caches[i], args_addr);
-            args_addr += calc_arg_storage_size(&arg_caches[i]);
             free_arg_cache(&arg_caches[i]);
         }
         free(arg_caches);
     }
-
-    // Finish log write - release GIL for the commit operation
-    Py_BEGIN_ALLOW_THREADS
-    bq::api::__api_log_write_finish(log_id, handle);
-    Py_END_ALLOW_THREADS
-
-    Py_RETURN_TRUE;
+    if (write_ok) {
+        Py_RETURN_TRUE;
+    }
+    Py_RETURN_FALSE;
 }
 
 // set_appender_enable(log_id: int, appender_name: str, enable: bool) -> None
@@ -721,6 +749,10 @@ struct py_fetch_ctx {
     PyObject* py_callback;
 };
 
+// Console buffer fetch callback — called SYNCHRONOUSLY by
+// __api_fetch_and_remove_console_buffer on the calling thread,
+// which already holds the GIL.  Do NOT wrap the call site in
+// Py_BEGIN_ALLOW_THREADS or this will crash.
 static void BQ_STDCALL py_console_buffer_fetch_callback(
     void* pass_through_param,
     uint64_t log_id,
@@ -814,8 +846,16 @@ static PyObject* py_is_enable_for(PyObject* self, PyObject* args) {
 }
 
 // uninit() -> None
+// Called during interpreter shutdown. Must unregister the console callback
+// to prevent the C++ worker thread from calling into Python after Py_Finalize.
 static PyObject* py_uninit(PyObject* self, PyObject* args) {
     (void)self; (void)args;
+    // Unregister console callback first (blocks until in-flight callbacks drain)
+    if (py_console_callback) {
+        bq::api::__api_unregister_console_callbacks(on_console_callback);
+        Py_DECREF(py_console_callback);
+        py_console_callback = nullptr;
+    }
     bq::api::__api_force_flush(0);
     Py_RETURN_NONE;
 }

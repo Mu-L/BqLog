@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Testing installs wheels locally — auditwheel (manylinux repair) is only
+# needed for PyPI publishing, not for local pip install.
+export SKIP_AUDITWHEEL=1
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${DIR}/../../.." && pwd)"
 BUILD_SCRIPT="${PROJECT_ROOT}/build/wrapper/python/build_all_and_pack.sh"

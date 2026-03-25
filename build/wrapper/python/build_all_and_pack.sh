@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build BqLog Python Wrapper and pack into wheel
-# Reference: build/wrapper/nodejs/build_all_and_pack.sh
+# Build BqLog Python Wrapper and pack into wheel (Linux / macOS)
+# Step 1: Build native .so/.dylib with Python support
+# Step 2: Run wrapper/python/CMakeLists.txt (version sync + artifacts staging)
+# Step 3: Copy native lib into staged artifacts
+# Step 4: Build wheel from staged artifacts
+# Step 5: (Linux only) auditwheel repair for manylinux tag
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${DIR}/../../.." && pwd)"
 WRAPPER_DIR="${PROJECT_ROOT}/wrapper/python"
+ARTIFACTS_DIR="${PROJECT_ROOT}/artifacts"
 INSTALL_DIR="${PROJECT_ROOT}/install/wrapper_python"
 
 CONFIG="${1:-RelWithDebInfo}"
 
-# Detect platform
+# ===== Step 1: Build native library =====
 if [[ "$(uname)" == "Darwin" ]]; then
     BUILD_LIB_DIR="${PROJECT_ROOT}/build/lib/mac"
     echo "===== Building BqLog Dynamic Library with Python Support (macOS) [${CONFIG}] ====="
@@ -26,11 +31,18 @@ else
     popd >/dev/null
 fi
 
-ARTIFACTS_DIR="${PROJECT_ROOT}/artifacts"
+# ===== Step 2: Run wrapper CMake (version sync + artifacts staging) =====
+echo "===== Running wrapper/python CMake (version sync + staging) ====="
+WRAPPER_BUILD_DIR="${DIR}/wrapperProj"
+rm -rf "${WRAPPER_BUILD_DIR}"
+mkdir -p "${WRAPPER_BUILD_DIR}"
+pushd "${WRAPPER_BUILD_DIR}" >/dev/null
+cmake "${WRAPPER_DIR}" -G "Unix Makefiles"
+cmake --build . --target install
+popd >/dev/null
 
-echo "===== Preparing wheel package ====="
-mkdir -p "${INSTALL_DIR}"
-
+# ===== Step 3: Copy native lib into install dir =====
+echo "===== Copying native library to wheel source ====="
 LIB_PATH="${ARTIFACTS_DIR}/dynamic_lib/lib/${CONFIG}"
 if [ ! -d "${LIB_PATH}" ]; then
     if [ -d "${ARTIFACTS_DIR}/dynamic_lib/lib/Release" ]; then
@@ -40,28 +52,34 @@ if [ ! -d "${LIB_PATH}" ]; then
     fi
 fi
 
-echo "Copying C Extension to wrapper..."
+# Copy into both the staged install dir and the source tree (for pip wheel)
 for f in "${LIB_PATH}"/_bqlog*.so "${LIB_PATH}"/_bqlog*.dylib; do
     if [ -f "$f" ]; then
+        cp "$f" "${INSTALL_DIR}/src/bq/"
         cp "$f" "${WRAPPER_DIR}/src/bq/"
         echo "Copied $(basename "$f")"
     fi
 done
 
+# ===== Step 4: Build wheel =====
 echo "===== Building wheel package ====="
-pushd "${WRAPPER_DIR}" >/dev/null
+pushd "${INSTALL_DIR}" >/dev/null
 python3 -m pip install --upgrade pip setuptools wheel
 python3 -m pip wheel . -w "${INSTALL_DIR}"
 popd >/dev/null
 
-if [[ "$(uname -s)" == "Linux" ]]; then
+# ===== Step 5: (Linux only) auditwheel repair =====
+# Only needed for PyPI publishing; skip during local testing via SKIP_AUDITWHEEL=1.
+# Other Unix-like systems (FreeBSD, etc.) should use build_all_and_pack_unix.sh.
+if [[ "$(uname -s)" == "Linux" && "${SKIP_AUDITWHEEL:-0}" != "1" ]]; then
     echo "===== Repairing Linux wheel (auditwheel) ====="
     python3 -m pip install auditwheel patchelf
     for whl in "${INSTALL_DIR}"/*.whl; do
         auditwheel repair "$whl" -w "${INSTALL_DIR}_repaired"
     done
-    rm -rf "${INSTALL_DIR}"
-    mv "${INSTALL_DIR}_repaired" "${INSTALL_DIR}"
+    rm -f "${INSTALL_DIR}"/*.whl
+    mv "${INSTALL_DIR}_repaired"/*.whl "${INSTALL_DIR}/"
+    rm -rf "${INSTALL_DIR}_repaired"
 fi
 
 echo "===== Done ====="
