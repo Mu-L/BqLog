@@ -161,9 +161,15 @@ jobs:
       - name: Collect wheel files
         run: |
           mkdir -p dist/
-          find python_dist/ -name "*.whl" -exec cp {} dist/ \;
+          # Exclude FreeBSD wheels — PyPI rejects non-whitelisted platform tags
+          find python_dist/ -name "*.whl" ! -name "*freebsd*" -exec cp {} dist/ \;
           echo "=== Wheels to publish ==="
           ls -la dist/
+          # Warn about excluded wheels
+          EXCLUDED=$(find python_dist/ -name "*freebsd*.whl" -printf '%f\n' 2>/dev/null || true)
+          if [[ -n "$EXCLUDED" ]]; then
+            echo "::warning::Excluded from PyPI upload (unsupported platform): $EXCLUDED"
+          fi
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
