@@ -25,6 +25,11 @@ if /i "%CONFIG%"=="arm64" (
 echo ===== Building BqLog Dynamic Library with Python Support [%CONFIG%] [%ARCH%] =====
 pushd "%BUILD_LIB_DIR%"
 call dont_execute_this.bat build %ARCH% msvc OFF OFF ON dynamic_lib %CONFIG%
+if %ERRORLEVEL% neq 0 (
+    popd
+    echo ERROR: Native library build failed!
+    exit /b 1
+)
 popd
 
 echo ===== Preparing wheel package =====

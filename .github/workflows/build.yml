@@ -6291,7 +6291,7 @@ jobs:
 
   #########################################################Python Wrapper Build####################################################
   build_python_wrapper:
-    name: Python Wrapper (${{ matrix.name }})
+    name: python_build_(${{ matrix.name }})
     runs-on: ${{ matrix.runner }}
     needs: extract_version
     strategy:
@@ -6317,8 +6317,8 @@ jobs:
             runner: windows-latest
             build_cmd: build\wrapper\python\build_all_and_pack.bat
           - name: windows_arm64
-            runner: windows-latest
-            build_cmd: build\wrapper\python\build_all_and_pack.bat arm64
+            runner: windows-11-arm
+            build_cmd: build\wrapper\python\build_all_and_pack.bat
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -6329,6 +6329,8 @@ jobs:
           python-version: '3.11'
 
       - name: Build Python Wrapper
+        env:
+          PY_PYTHON: '3.11'
         run: ${{ matrix.build_cmd }}
 
       - name: Upload Artifacts

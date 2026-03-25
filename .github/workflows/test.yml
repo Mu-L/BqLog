@@ -2361,7 +2361,7 @@ jobs:
 
   # Python Tests
   python_test:
-    name: Python (${{ matrix.os }} ${{ matrix.python-version }})
+    name: python_wrapper (${{ matrix.os }} ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -2395,5 +2395,7 @@ jobs:
       - name: Run Python Tests (Windows)
         if: runner.os == 'Windows'
         shell: cmd
+        env:
+          PY_PYTHON: ${{ matrix.python-version }}
         run: |
           build\test\python\run_win.bat
