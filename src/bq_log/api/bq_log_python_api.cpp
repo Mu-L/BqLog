@@ -403,19 +403,17 @@ static PyObject* py_log_write(PyObject* self, PyObject* args) {
     }
 
     // All Python objects have been converted to C types above.
-    // Release the GIL for the entire begin→write→finish sequence so that
-    // concurrent Python threads can proceed.  The ring buffer's alloc and
-    // commit must happen on the same OS thread *without* re-acquiring the
-    // GIL in between, otherwise another Python thread could alloc before
-    // this thread's commit, corrupting the cursor invariants.
-    //
-    // NOTE: Py_BEGIN_ALLOW_THREADS / Py_END_ALLOW_THREADS expand to a
-    // brace-delimited scope, so all variables used across the boundary
-    // must be declared beforehand.
+    // GIL is intentionally NOT released here to serialize all Python threads
+    // through the GIL, avoiding true multi-thread concurrency on the C++ ring
+    // buffer.  This makes the Python wrapper behave like Node.js (effectively
+    // single-threaded writes).  The performance cost is negligible because the
+    // ring buffer write (memcpy) is extremely fast.
     bq::_api_log_write_handle write_handle;
     bool write_ok = false;
 
-    Py_BEGIN_ALLOW_THREADS
+    // GIL is NOT released here — all Python threads serialize through the GIL.
+    // This eliminates true multi-thread concurrency on the C++ side, making the
+    // Python wrapper behave like Node.js (single-threaded writes).
 
     write_handle = bq::api::__api_log_write_begin(
         log_id,
@@ -448,8 +446,6 @@ static PyObject* py_log_write(PyObject* self, PyObject* args) {
         bq::api::__api_log_write_finish(log_id, write_handle);
         write_ok = true;
     }
-
-    Py_END_ALLOW_THREADS
 
     // Cleanup (back under GIL)
     Py_DECREF(format_utf16);
@@ -604,9 +600,7 @@ static PyObject* py_force_flush(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "K", &log_id_ull)) {
         return nullptr;
     }
-    Py_BEGIN_ALLOW_THREADS
     bq::api::__api_force_flush(static_cast<uint64_t>(log_id_ull));
-    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 
@@ -643,9 +637,7 @@ static PyObject* py_log_decoder_create(PyObject* self, PyObject* args) {
     }
     uint32_t handle = 0;
     bq::appender_decode_result result;
-    Py_BEGIN_ALLOW_THREADS
     result = bq::api::__api_log_decoder_create(path, priv_key, &handle);
-    Py_END_ALLOW_THREADS
     return Py_BuildValue("(iI)", static_cast<int>(result), handle);
 }
 
@@ -658,9 +650,7 @@ static PyObject* py_log_decoder_decode(PyObject* self, PyObject* args) {
     }
     bq::_api_string_def text = { nullptr, 0 };
     bq::appender_decode_result result;
-    Py_BEGIN_ALLOW_THREADS
     result = bq::api::__api_log_decoder_decode(handle, &text);
-    Py_END_ALLOW_THREADS
     const char* text_str = (result == bq::appender_decode_result::success && text.str) ? text.str : "";
     return Py_BuildValue("(is)", static_cast<int>(result), text_str);
 }
@@ -672,9 +662,7 @@ static PyObject* py_log_decoder_destroy(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "I", &handle)) {
         return nullptr;
     }
-    Py_BEGIN_ALLOW_THREADS
     bq::api::__api_log_decoder_destroy(handle);
-    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 
@@ -688,9 +676,7 @@ static PyObject* py_log_decode(PyObject* self, PyObject* args) {
         return nullptr;
     }
     bool ok;
-    Py_BEGIN_ALLOW_THREADS
     ok = bq::api::__api_log_decode(in_path, out_path, priv_key);
-    Py_END_ALLOW_THREADS
     return PyBool_FromLong(ok ? 1L : 0L);
 }
 
@@ -809,9 +795,7 @@ static PyObject* py_take_snapshot_string(PyObject* self, PyObject* args) {
     }
     bq::_api_string_def snapshot_def = { nullptr, 0 };
     uint64_t log_id = static_cast<uint64_t>(log_id_ull);
-    Py_BEGIN_ALLOW_THREADS
     bq::api::__api_take_snapshot_string(log_id, tz_config, &snapshot_def);
-    Py_END_ALLOW_THREADS
     PyObject* result = PyUnicode_FromString(snapshot_def.str ? snapshot_def.str : "");
     bq::api::__api_release_snapshot_string(log_id, &snapshot_def);
     return result;
