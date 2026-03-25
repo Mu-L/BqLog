@@ -12,7 +12,6 @@ project(BqLogPythonWrapper VERSION ${BQ_VERSION})
 set(ARTIFACTS_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../artifacts/wrapper/python")
 set(INSTALL_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../install/wrapper_python")
 
-# Write Version to pyproject.toml (in the source tree; build scripts read it from here)
 set(PYPROJECT_TOML "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml")
 file(READ "${PYPROJECT_TOML}" _toml_raw)
 string(REGEX REPLACE "version[ \t]*=[ \t]*\"[^\"]+\"" "version = \"${CMAKE_PROJECT_VERSION}\"" _toml_new "${_toml_raw}")
@@ -24,7 +23,7 @@ else()
   message(STATUS "pyproject.toml version already ${CMAKE_PROJECT_VERSION}")
 endif()
 
-# Copy Python source files to artifacts
+# Stage Python source files to artifacts (wheel build source)
 add_custom_target(python_wrapper ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTIFACTS_OUTPUT_DIR}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/src" "${ARTIFACTS_OUTPUT_DIR}/src"
@@ -34,10 +33,21 @@ add_custom_target(python_wrapper ALL
     COMMENT "Preparing Python wrapper artifacts"
 )
 
-# Install to fixed project-relative path (same pattern as Java/Node.js wrappers)
 if(POLICY CMP0177)
     cmake_policy(SET CMP0177 NEW)
 endif()
-install(DIRECTORY "${ARTIFACTS_OUTPUT_DIR}/"
+
+install(DIRECTORY "${ARTIFACTS_OUTPUT_DIR}/wheel/"
     DESTINATION "${INSTALL_OUTPUT_DIR}"
+    FILES_MATCHING PATTERN "*.whl"
+)
+
+file(GLOB MD_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../*.md")
+install(FILES ${MD_FILES}
+    DESTINATION "${INSTALL_OUTPUT_DIR}/.."
+)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../docs"
+    DESTINATION "${INSTALL_OUTPUT_DIR}/.."
+    OPTIONAL
 )
