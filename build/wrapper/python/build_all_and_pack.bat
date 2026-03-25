@@ -64,6 +64,10 @@ for %%f in ("%LIB_PATH%\_bqlog*.pyd") do (
     echo Copied %%~nxf
 )
 
+rem ===== Step 3b: Remove .pdb files from staging (keep wheel small) =====
+echo ===== Removing .pdb files from staging =====
+del /q "%STAGING_DIR%\src\bq\*.pdb" 2>nul
+
 rem ===== Step 4: Build wheel =====
 echo ===== Building wheel package =====
 if not exist "%WHEEL_DIR%" md "%WHEEL_DIR%"

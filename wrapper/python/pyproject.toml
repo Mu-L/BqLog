@@ -34,3 +34,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 bq = ["*.so", "*.pyd", "*.dylib"]
+
+[tool.setuptools.exclude-package-data]
+bq = ["*.pdb"]

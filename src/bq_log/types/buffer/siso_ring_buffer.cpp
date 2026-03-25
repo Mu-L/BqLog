@@ -99,12 +99,36 @@ namespace bq {
 
         uint32_t left_space = static_cast<uint32_t>(head_->wt_reading_cursor_cache_ + aligned_blocks_count_ - head_->wt_writing_cursor_cache_);
 #if defined(BQ_LOG_BUFFER_DEBUG)
+        if (left_space > aligned_blocks_count_) {
+            bq::util::log_device_console(bq::log_level::error,
+                "SISO DIAG error1: this=%p head=%p wt_read_cache=%u wt_write_cache=%u "
+                "reading_cursor=%u writing_cursor=%u aligned_blocks=%u left_space=%u "
+                "rt_read_cache=%u rt_write_cache=%u thread=%" PRIu64,
+                (void*)this, (void*)head_,
+                head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
+                head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+                aligned_blocks_count_, left_space,
+                head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+                bq::platform::thread::get_current_thread_id());
+        }
         assert(left_space <= aligned_blocks_count_ && "siso ring_buffer wt_reading_cursor_cache_ error 1");
 #endif
         if (left_space < need_block_count) {
             head_->wt_reading_cursor_cache_ = head_->reading_cursor().load_acquire();
             left_space = static_cast<uint32_t>(head_->wt_reading_cursor_cache_ + aligned_blocks_count_ - head_->wt_writing_cursor_cache_);
 #if defined(BQ_LOG_BUFFER_DEBUG)
+            if (left_space > aligned_blocks_count_) {
+                bq::util::log_device_console(bq::log_level::error,
+                    "SISO DIAG error2: this=%p head=%p wt_read_cache=%u wt_write_cache=%u "
+                    "reading_cursor=%u writing_cursor=%u aligned_blocks=%u left_space=%u "
+                    "rt_read_cache=%u rt_write_cache=%u thread=%" PRIu64,
+                    (void*)this, (void*)head_,
+                    head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
+                    head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+                    aligned_blocks_count_, left_space,
+                    head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+                    bq::platform::thread::get_current_thread_id());
+            }
             assert(left_space <= aligned_blocks_count_ && "siso ring_buffer wt_reading_cursor_cache_ error 2");
 #endif
             if (left_space < need_block_count) {
