@@ -2330,10 +2330,10 @@ jobs:
             done
             exit 1
           run: |
-            touch UNIT_TEST_STARTED
             set +e
             cd build/test/python
             chmod +x run_unix.sh
+            export BQ_ENABLE_ASAN=TRUE
             bash run_unix.sh clang
             EXIT_CODE=$?
             set -e
@@ -2341,61 +2341,4 @@ jobs:
               echo "Test failed with exit code $EXIT_CODE"
               exit $EXIT_CODE
             fi
-            touch ../../../UNIT_TEST_SUCCESS
 
-      - name: Check Retry
-        id: CheckRetry
-        run: |
-          if [ ! -f "UNIT_TEST_STARTED" ]; then
-            echo "retry=true" >> $GITHUB_OUTPUT
-          elif [ ! -f "UNIT_TEST_SUCCESS" ]; then
-            echo "::error::Python test script execution failed! (Not retrying)"
-            exit 1
-          fi
-
-      - name: Cleanup Before Retry
-        if: steps.CheckRetry.outputs.retry == 'true'
-        run: |
-          set +e
-          DOMAINS="$(sudo virsh list --all --name 2>/dev/null | grep -v "^$" || true)"
-          if [ -z "$DOMAINS" ]; then
-            echo "No lingering domains found."
-          else
-            for DOMAIN in $DOMAINS; do
-              sudo virsh destroy "$DOMAIN" 2>/dev/null || true
-              sudo virsh undefine "$DOMAIN" --nvram 2>/dev/null \
-                || sudo virsh undefine "$DOMAIN" 2>/dev/null || true
-            done
-          fi
-          find . -name "*.qcow2" -delete 2>/dev/null || true
-          sudo find /home/runner/work/_actions/vmactions -name "*.qcow2" -delete 2>/dev/null || true
-          sudo rm -f /var/lib/libvirt/dnsmasq/*.leases 2>/dev/null || true
-          sleep 5
-          echo "Cleanup complete."
-
-      - name: Run in FreeBSD(Attempt 2)
-        if: steps.CheckRetry.outputs.retry == 'true'
-        uses: vmactions/freebsd-vm@v1
-        with:
-          usesh: true
-          mem: 8192
-          prepare: |
-            for i in 1 2 3 4 5; do
-              pkg install -y llvm cmake bash python3 py311-pip py311-setuptools py311-wheel && exit 0
-              echo "Install failed, retrying in 60s... ($i/5)"
-              sleep 60
-            done
-            exit 1
-          run: |
-            touch UNIT_TEST_STARTED
-            set +e
-            cd build/test/python
-            chmod +x run_unix.sh
-            bash run_unix.sh clang
-            EXIT_CODE=$?
-            set -e
-            if [ $EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $EXIT_CODE"
-              exit $EXIT_CODE
-            fi
-            touch ../../../UNIT_TEST_SUCCESS
