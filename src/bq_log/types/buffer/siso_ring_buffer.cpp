@@ -126,6 +126,25 @@ namespace bq {
 #endif
         if (left_space < need_block_count) {
             head_->wt_reading_cursor_cache_ = head_->reading_cursor().load_acquire();
+#if defined(BQ_LOG_BUFFER_DEBUG)
+            {
+                uint32_t refreshed = head_->wt_reading_cursor_cache_;
+                uint32_t wt_write = head_->wt_writing_cursor_cache_;
+                uint32_t occupied = static_cast<uint32_t>(wt_write - refreshed);
+                if (occupied > aligned_blocks_count_) {
+                    bq::util::log_device_console(bq::log_level::error,
+                        "SISO DIAG refresh CORRUPT: this=%p head=%p "
+                        "refreshed_wt_read=%" PRIu32 " wt_write=%" PRIu32 " "
+                        "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " "
+                        "aligned_blocks=%" PRIu32 " thread=%" PRIu64,
+                        (void*)this, (void*)head_,
+                        refreshed, wt_write,
+                        head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+                        aligned_blocks_count_,
+                        bq::platform::thread::get_current_thread_id());
+                }
+            }
+#endif
             left_space = static_cast<uint32_t>(head_->wt_reading_cursor_cache_ + aligned_blocks_count_ - head_->wt_writing_cursor_cache_);
 #if defined(BQ_LOG_BUFFER_DEBUG)
             if (left_space > aligned_blocks_count_) {
@@ -528,6 +547,28 @@ namespace bq {
         head_->wt_reading_cursor_cache_ = 0;
         head_->reading_cursor().store_release(0);
         head_->writing_cursor().store_release(0);
+#if defined(BQ_LOG_BUFFER_DEBUG)
+        // Verify writes actually landed — detect packed struct miscompilation
+        volatile uint32_t verify_wt_read = head_->wt_reading_cursor_cache_;
+        volatile uint32_t verify_wt_write = head_->wt_writing_cursor_cache_;
+        volatile uint32_t verify_rt_read = head_->rt_reading_cursor_cache_;
+        volatile uint32_t verify_rt_write = head_->rt_writing_cursor_cache_;
+        volatile uint32_t verify_read_atomic = head_->reading_cursor().load_relaxed();
+        volatile uint32_t verify_write_atomic = head_->writing_cursor().load_relaxed();
+        if (verify_wt_read != 0 || verify_wt_write != 0
+            || verify_rt_read != 0 || verify_rt_write != 0
+            || verify_read_atomic != 0 || verify_write_atomic != 0) {
+            bq::util::log_device_console(bq::log_level::error,
+                "SISO DIAG init_cursors VERIFY FAILED: this=%p head=%p "
+                "wt_read=%" PRIu32 " wt_write=%" PRIu32 " rt_read=%" PRIu32 " rt_write=%" PRIu32 " "
+                "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " thread=%" PRIu64,
+                (void*)this, (void*)head_,
+                verify_wt_read, verify_wt_write, verify_rt_read, verify_rt_write,
+                verify_read_atomic, verify_write_atomic,
+                bq::platform::thread::get_current_thread_id());
+            assert(false && "init_cursors writes did not take effect!");
+        }
+#endif
     }
 
 }
