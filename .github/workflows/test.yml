@@ -2423,10 +2423,16 @@ jobs:
             exit 1
           run: |
             touch UNIT_TEST_STARTED
-            set -e -x
+            set +e
             cd build/test/python
             chmod +x run_unix.sh
             bash run_unix.sh clang
+            EXIT_CODE=$?
+            set -e
+            if [ $EXIT_CODE -ne 0 ]; then
+              echo "Test failed with exit code $EXIT_CODE"
+              exit $EXIT_CODE
+            fi
             touch ../../../UNIT_TEST_SUCCESS
 
       - name: Check Retry
@@ -2474,8 +2480,14 @@ jobs:
             exit 1
           run: |
             touch UNIT_TEST_STARTED
-            set -e -x
+            set +e
             cd build/test/python
             chmod +x run_unix.sh
             bash run_unix.sh clang
+            EXIT_CODE=$?
+            set -e
+            if [ $EXIT_CODE -ne 0 ]; then
+              echo "Test failed with exit code $EXIT_CODE"
+              exit $EXIT_CODE
+            fi
             touch ../../../UNIT_TEST_SUCCESS
