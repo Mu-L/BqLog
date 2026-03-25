@@ -30,15 +30,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.0.x'
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -197,7 +197,7 @@ jobs:
 
       - name: Upload Windows crash dumps (if any)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: win_dumps_${{ matrix.runner.label }}_${{ matrix.cc }}_cpp${{ matrix.cpp_ver }}
           path: win_dumps/**
@@ -230,10 +230,10 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -276,7 +276,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/${{ matrix.arch.runs_on }}debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install necessary tools (Attempt 1)
         continue-on-error: true
@@ -336,10 +336,10 @@ jobs:
           xcode-version: latest-stable
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -362,7 +362,7 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -464,7 +464,7 @@ jobs:
         cc: [ gcc, clang ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -632,7 +632,7 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -814,7 +814,7 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -961,7 +961,7 @@ jobs:
             cpp_ver: 23
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1131,7 +1131,7 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1375,7 +1375,7 @@ jobs:
         cpp_ver: [ 11, 14, 17, 20, 23 ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1489,7 +1489,7 @@ jobs:
             cpp_ver: 23
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1615,7 +1615,7 @@ jobs:
         cc: [ clang, gcc ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1750,7 +1750,7 @@ jobs:
             api-level: 33
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -1764,13 +1764,13 @@ jobs:
           swap-storage: true
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - id: setup-android
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Enable KVM
         run: |
@@ -1906,10 +1906,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -1968,7 +1968,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.win_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jvm_crash_logs_win_${{ matrix.runner.label }}_${{ matrix.cc }}
           path: "**/hs_err_pid*.log"
@@ -1996,10 +1996,10 @@ jobs:
           xcode-version: latest-stable
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -2036,7 +2036,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.mac_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jvm_crash_logs_mac_${{ matrix.asan.label }}
           path: "**/hs_err_pid*.log"
@@ -2064,10 +2064,10 @@ jobs:
             assan_switch: FALSE
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -2104,7 +2104,7 @@ jobs:
 
       - name: Upload JVM crash logs
         if: steps.linux_run_tests.outputs.exitcode != '0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jvm_crash_logs_ubuntu_${{ matrix.runner.label }}_${{ matrix.asan.label }}
           path: "**/hs_err_pid*.log"
@@ -2119,7 +2119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -2216,10 +2216,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.0.x' # Keep 8.0 installed to run tools, even if targeting 3.1
 
@@ -2293,10 +2293,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -2371,10 +2371,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -2399,3 +2399,47 @@ jobs:
           PY_PYTHON: ${{ matrix.python-version }}
         run: |
           build\test\python\run_win.bat
+
+  # Python Tests (FreeBSD - requires VM)
+  python_test_freebsd_x86_64:
+    name: python_wrapper (freebsd_x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run in FreeBSD
+        id: RunInFreeBSD
+        continue-on-error: true
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          mem: 8192
+          prepare: |
+            pkg install -y llvm cmake bash python3 py311-pip py311-setuptools py311-wheel
+          run: |
+            set -e -x
+            cd build/test/python
+            chmod +x run_unix.sh
+            bash run_unix.sh clang
+
+      - name: "Retry: Run in FreeBSD"
+        id: RunInFreeBSD_retry
+        if: steps.RunInFreeBSD.outcome == 'failure'
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          mem: 8192
+          prepare: |
+            pkg install -y llvm cmake bash python3 py311-pip py311-setuptools py311-wheel
+          run: |
+            set -e -x
+            cd build/test/python
+            chmod +x run_unix.sh
+            bash run_unix.sh clang
+
+      - name: "Verify: Run in FreeBSD"
+        if: steps.RunInFreeBSD.outcome == 'failure' && steps.RunInFreeBSD_retry.outcome == 'failure'
+        run: |
+          echo "::error::FreeBSD Python test failed after retry"
+          exit 1

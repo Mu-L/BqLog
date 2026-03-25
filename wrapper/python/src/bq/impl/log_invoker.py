@@ -13,7 +13,24 @@ Internal log invoker that wraps the _bqlog C Extension module.
 All functions use snake_case and map 1:1 to the C extension functions.
 """
 
-from bq import _bqlog
+import platform
+import sys
+
+try:
+    from bq import _bqlog
+except ImportError:
+    raise ImportError(
+        "BqLog native extension (_bqlog) not found.\n"
+        "  Your platform: {} {} (Python {})\n"
+        "  Pre-built wheels are available for:\n"
+        "    - Windows x86_64 / ARM64\n"
+        "    - Linux x86_64 / ARM64 (manylinux)\n"
+        "    - macOS x86_64 / ARM64 (universal2)\n"
+        "    - FreeBSD x86_64 \n"
+        "  To build from source, see: https://github.com/Tencent/BqLog".format(
+            platform.system(), platform.machine(), sys.version.split()[0]
+        )
+    )
 
 
 def get_log_version():
