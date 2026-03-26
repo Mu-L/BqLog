@@ -211,6 +211,8 @@ build_one() {
   echo
   for cfg in $BuildConfigs; do
     echo "  BUILD FOR CONFIG $BUILD_LIB_TYPE_ARG : $cfg"
+    CFG_DIR="build_${cfg}"
+    rm -rf "$CFG_DIR"; mkdir "$CFG_DIR"; cd "$CFG_DIR" || exit 1
     cmake "$SRC_DIR" -G "Unix Makefiles" \
       -DTARGET_PLATFORM:STRING=unix \
       -DBUILD_LIB_TYPE="$BUILD_LIB_TYPE_ARG" \
@@ -223,6 +225,7 @@ build_one() {
       -DCMAKE_CXX_COMPILER="$CXX"
     cmake --build . -- -j 4 || exit 1
     cmake --install . || exit 1
+    cd ..
   done
   cd ..
 }
