@@ -326,6 +326,8 @@ build_one() {
 
   for cfg in "${BuildConfigs[@]}"; do
     echo "  BUILD FOR CONFIG ${BUILD_LIB_TYPE_ARG} : ${cfg}"
+    local CFG_DIR="build_${cfg}"
+    rm -rf "${CFG_DIR}"; mkdir "${CFG_DIR}"; cd "${CFG_DIR}" || exit 1
     cmake "${SRC_DIR}" -G "${GEN}" \
       -DTARGET_PLATFORM:STRING=linux \
       -DBUILD_LIB_TYPE="${BUILD_LIB_TYPE_ARG}" \
@@ -340,6 +342,7 @@ build_one() {
 
     cmake --build . -- -j "${BUILD_JOBS}"
     cmake --install .
+    cd ..
   done
 
   popd >/dev/null

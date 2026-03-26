@@ -204,6 +204,8 @@ build_one_pair() {
   else
     for cfg in "${BuildConfigs[@]}"; do
       echo "  BUILD FOR CONFIG ${build_lib_type} / ${apple_format} : ${cfg}"
+      local CFG_DIR="build_${cfg}"
+      rm -rf "${CFG_DIR}"; mkdir "${CFG_DIR}"; cd "${CFG_DIR}" || exit 1
       cmake "${SRC_DIR}" -G "Unix Makefiles" \
         -DTARGET_PLATFORM:STRING=mac \
         -DBUILD_LIB_TYPE="${build_lib_type}" \
@@ -216,6 +218,7 @@ build_one_pair() {
         "${ARCH_ARGS[@]}"
       cmake --build . -- -j "${BUILD_JOBS}"
       cmake --install .
+      cd ..
     done
   fi
 
