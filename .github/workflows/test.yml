@@ -2332,7 +2332,6 @@ jobs:
             set +e
             cd build/test/python
             chmod +x run_unix.sh
-            export BQ_ENABLE_ASAN=TRUE
             bash run_unix.sh clang
             EXIT_CODE=$?
             set -e

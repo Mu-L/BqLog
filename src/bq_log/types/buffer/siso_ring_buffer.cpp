@@ -51,15 +51,27 @@ namespace bq {
     void siso_ring_buffer::renew()
     {
 #if defined(BQ_LOG_BUFFER_DEBUG)
-        bq::util::log_device_console(bq::log_level::info,
-            "SISO DIAG renew: this=%p head=%p BEFORE wt_read=%" PRIu32 " wt_write=%" PRIu32
-            " reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32
-            " rt_read=%" PRIu32 " rt_write=%" PRIu32 " thread=%" PRIu64,
-            (void*)this, (void*)head_,
-            head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
-            head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
-            head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
-            bq::platform::thread::get_current_thread_id());
+        {
+            const char* stack_str = nullptr;
+            uint32_t stack_len = 0;
+            bq::platform::get_stack_trace(0, stack_str, stack_len);
+            bq::util::log_device_console(bq::log_level::info,
+                "SISO DIAG renew: this=%p head=%p BEFORE wt_read=%" PRIu32 " wt_write=%" PRIu32
+                " reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32
+                " rt_read=%" PRIu32 " rt_write=%" PRIu32
+                " shadow_wt_read=%" PRIu32 " shadow_wt_write=%" PRIu32
+                " alloc_count=%" PRIu64 " thread=%" PRIu64,
+                (void*)this, (void*)head_,
+                head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
+                head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+                head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+                shadow_wt_reading_cursor_cache_, shadow_wt_writing_cursor_cache_,
+                alloc_write_count_,
+                bq::platform::thread::get_current_thread_id());
+            if (stack_str && stack_len > 0) {
+                bq::util::log_device_console(bq::log_level::info, "SISO DIAG renew stack: %.*s", (int)stack_len, stack_str);
+            }
+        }
 #endif
         init_cursors();
 #if defined(BQ_LOG_BUFFER_DEBUG)
@@ -81,6 +93,34 @@ namespace bq {
                 bq::util::log_device_console(bq::log_level::error, "only single thread writing is supported for siso_ring_buffer! expected:%" PRIu64 ", but:%" PRIu64 "", write_thread_id_, current_thread_id);
                 assert(false && "only single thread writing is supported for siso_ring_buffer!");
             }
+        }
+        ++alloc_write_count_;
+        // ===== SHADOW CHECK: detect external corruption of head_ =====
+        if (shadow_wt_reading_cursor_cache_ != head_->wt_reading_cursor_cache_
+            || shadow_wt_writing_cursor_cache_ != head_->wt_writing_cursor_cache_) {
+            const char* stack_str = nullptr;
+            uint32_t stack_len = 0;
+            bq::platform::get_stack_trace(0, stack_str, stack_len);
+            bq::util::log_device_console(bq::log_level::error,
+                "SISO DIAG SHADOW MISMATCH: this=%p head=%p alloc_count=%" PRIu64 " "
+                "shadow_wt_read=%" PRIu32 " actual_wt_read=%" PRIu32 " "
+                "shadow_wt_write=%" PRIu32 " actual_wt_write=%" PRIu32 " "
+                "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " "
+                "rt_read=%" PRIu32 " rt_write=%" PRIu32 " "
+                "aligned_blocks=%" PRIu32 " cur_thread=%" PRIu64 " "
+                "write_thread=%" PRIu64 " renew_thread=%" PRIu64 " renew_epoch=%" PRIu64,
+                (void*)this, (void*)head_, alloc_write_count_,
+                shadow_wt_reading_cursor_cache_, head_->wt_reading_cursor_cache_,
+                shadow_wt_writing_cursor_cache_, head_->wt_writing_cursor_cache_,
+                head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
+                head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
+                aligned_blocks_count_,
+                bq::platform::thread::get_current_thread_id(),
+                write_thread_id_, renew_thread_id_, renew_epoch_ms_);
+            if (stack_str && stack_len > 0) {
+                bq::util::log_device_console(bq::log_level::error, "SISO DIAG SHADOW MISMATCH stack: %.*s", (int)stack_len, stack_str);
+            }
+            assert(false && "siso_ring_buffer shadow mismatch — head_ memory was corrupted externally!");
         }
 #endif
         log_buffer_write_handle handle;
@@ -114,19 +154,24 @@ namespace bq {
             bq::util::log_device_console(bq::log_level::error,
                 "SISO DIAG error1: this=%p head=%p wt_read_cache=%" PRIu32 " wt_write_cache=%" PRIu32 " "
                 "reading_cursor=%" PRIu32 " writing_cursor=%" PRIu32 " aligned_blocks=%" PRIu32 " left_space=%" PRIu32 " "
-                "rt_read_cache=%" PRIu32 " rt_write_cache=%" PRIu32 " thread=%" PRIu64,
+                "rt_read_cache=%" PRIu32 " rt_write_cache=%" PRIu32 " thread=%" PRIu64
+                " shadow_wt_read=%" PRIu32 " shadow_wt_write=%" PRIu32
+                " renew_thread=%" PRIu64 " renew_epoch=%" PRIu64 " alloc_count=%" PRIu64,
                 (void*)this, (void*)head_,
                 head_->wt_reading_cursor_cache_, head_->wt_writing_cursor_cache_,
                 head_->reading_cursor().load_relaxed(), head_->writing_cursor().load_relaxed(),
                 aligned_blocks_count_, left_space,
                 head_->rt_reading_cursor_cache_, head_->rt_writing_cursor_cache_,
-                bq::platform::thread::get_current_thread_id());
+                bq::platform::thread::get_current_thread_id(),
+                shadow_wt_reading_cursor_cache_, shadow_wt_writing_cursor_cache_,
+                renew_thread_id_, renew_epoch_ms_, alloc_write_count_);
         }
         assert(left_space <= aligned_blocks_count_ && "siso ring_buffer wt_reading_cursor_cache_ error 1");
 #endif
         if (left_space < need_block_count) {
             head_->wt_reading_cursor_cache_ = head_->reading_cursor().load_acquire();
 #if defined(BQ_LOG_BUFFER_DEBUG)
+            shadow_wt_reading_cursor_cache_ = head_->wt_reading_cursor_cache_;
             {
                 uint32_t refreshed = head_->wt_reading_cursor_cache_;
                 uint32_t wt_write = head_->wt_writing_cursor_cache_;
@@ -199,6 +244,7 @@ namespace bq {
         head_->wt_writing_cursor_cache_ += block_ptr->to_chunk_head().block_num;
         head_->writing_cursor().store_release(head_->wt_writing_cursor_cache_);
 #if defined(BQ_LOG_BUFFER_DEBUG)
+        shadow_wt_writing_cursor_cache_ = head_->wt_writing_cursor_cache_;
         total_write_bytes_ += block_ptr->to_chunk_head().block_num * sizeof(block);
 #endif
     }
@@ -548,6 +594,11 @@ namespace bq {
         head_->reading_cursor().store_release(0);
         head_->writing_cursor().store_release(0);
 #if defined(BQ_LOG_BUFFER_DEBUG)
+        shadow_wt_reading_cursor_cache_ = 0;
+        shadow_wt_writing_cursor_cache_ = 0;
+        renew_thread_id_ = bq::platform::thread::get_current_thread_id();
+        renew_epoch_ms_ = bq::platform::high_performance_epoch_ms();
+        alloc_write_count_ = 0;
         // Verify writes actually landed — detect packed struct miscompilation
         volatile uint32_t verify_wt_read = head_->wt_reading_cursor_cache_;
         volatile uint32_t verify_wt_write = head_->wt_writing_cursor_cache_;
