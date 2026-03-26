@@ -111,16 +111,6 @@ namespace bq {
         bq::platform::atomic<uint64_t> total_write_bytes_;
         bq::platform::atomic<uint64_t> total_read_bytes_;
         bool is_read_chunk_waiting_for_return_ = false;
-        // Shadow copies of wt_* fields, stored on the siso_ring_buffer object
-        // (NOT in head_ shared memory). If these diverge from head_->wt_*,
-        // something external is corrupting head_.
-        uint32_t shadow_wt_reading_cursor_cache_ = 0;
-        uint32_t shadow_wt_writing_cursor_cache_ = 0;
-        // Record who last called renew() and when
-        bq::platform::thread::thread_id renew_thread_id_ = 0;
-        uint64_t renew_epoch_ms_ = 0;
-        // Record the alloc_write_chunk call count for this buffer
-        uint64_t alloc_write_count_ = 0;
 #endif
     public:
         struct siso_buffer_batch_read_handle {
