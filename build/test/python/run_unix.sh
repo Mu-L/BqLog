@@ -12,11 +12,12 @@ TEST_MAIN="${PROJECT_ROOT}/test/python/src/bq/test/test_main.py"
 
 COMPILER="${1:-clang}"
 
-# If ASan is enabled, _bqlog.so is compiled with -shared-libasan so it
-# dynamically links libclang_rt.asan.  We need to ensure the ASan shared
-# library is findable at runtime via LD_LIBRARY_PATH (LD_PRELOAD of ASan
-# into a vanilla Python interpreter causes BUS errors on FreeBSD).
-ASAN_LIB_DIR=""
+# If ASan is enabled, find the runtime library for LD_PRELOAD.
+# When _bqlog.so is compiled with -fsanitize=address but loaded into a
+# vanilla Python interpreter via dlopen, ASan symbols are missing.
+# We LD_PRELOAD the ASan runtime and set verify_asan_link_order=0 to
+# suppress the "ASan runtime does not come first" error.
+ASAN_PRELOAD=""
 BQ_ENABLE_ASAN_UPPER=""
 if [ -n "${BQ_ENABLE_ASAN:-}" ]; then
     BQ_ENABLE_ASAN_UPPER="$(echo "$BQ_ENABLE_ASAN" | tr '[:lower:]' '[:upper:]')"
@@ -34,9 +35,10 @@ if [ "$BQ_ENABLE_ASAN_UPPER" = "TRUE" ] || [ "$BQ_ENABLE_ASAN_UPPER" = "ON" ] ||
             -name 'libclang_rt.asan*.so' -print -quit 2>/dev/null || true)
     fi
     if [ -f "${ASAN_LIB:-}" ]; then
-        ASAN_LIB_DIR="$(dirname "${ASAN_LIB}")"
-        export LD_LIBRARY_PATH="${ASAN_LIB_DIR}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-        echo "ASan enabled: LD_LIBRARY_PATH includes ${ASAN_LIB_DIR}"
+        ASAN_PRELOAD="${ASAN_LIB}"
+        export ASAN_OPTIONS="${ASAN_OPTIONS:+${ASAN_OPTIONS}:}verify_asan_link_order=0"
+        echo "ASan enabled: LD_PRELOAD=${ASAN_PRELOAD}"
+        echo "ASan options: ASAN_OPTIONS=${ASAN_OPTIONS}"
     else
         echo "WARNING: BQ_ENABLE_ASAN is set but ASan runtime library not found. Tests may fail."
     fi
@@ -55,7 +57,11 @@ for BUILD_TYPE in Debug Release RelWithDebInfo MinSizeRel; do
     pip3 install --force-reinstall "${INSTALL_DIR}"/*.whl
 
     echo "----- Running tests [${BUILD_TYPE}] -----"
-    python3 "${TEST_MAIN}"
+    if [ -n "${ASAN_PRELOAD}" ]; then
+        LD_PRELOAD="${ASAN_PRELOAD}" python3 "${TEST_MAIN}"
+    else
+        python3 "${TEST_MAIN}"
+    fi
     echo "Tests PASSED for ${BUILD_TYPE}"
 done
 
