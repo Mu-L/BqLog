@@ -63,8 +63,9 @@ jobs:
         run: |
           choco install -y llvm
 
-      - name: Install MSYS2
+      - name: Install MSYS2 (Attempt 1)
         if: ${{ matrix.cc == 'mingw_gcc' }}
+        continue-on-error: true
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -72,15 +73,6 @@ jobs:
           path-type: inherit
           update: true
 
-      - name: Ensure MSYS2 packages (Attempt 1)
-        if: ${{ matrix.cc == 'mingw_gcc' }}
-        continue-on-error: true
-        shell: msys2 {0}
-        run: |
-          pacman -S --noconfirm --needed --overwrite '*' mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-make
-          echo "MSYS2 Root: $MSYSTEM_CARCH"
-          which gcc
-          which mingw32-make
       - name: Ensure MSYS2 packages (Attempt 2)
         if: ${{ matrix.cc == 'mingw_gcc' }}
         continue-on-error: true
@@ -91,6 +83,15 @@ jobs:
           which gcc
           which mingw32-make
       - name: Ensure MSYS2 packages (Attempt 3)
+        if: ${{ matrix.cc == 'mingw_gcc' }}
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          pacman -S --noconfirm --needed --overwrite '*' mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils mingw-w64-x86_64-make
+          echo "MSYS2 Root: $MSYSTEM_CARCH"
+          which gcc
+          which mingw32-make
+      - name: Ensure MSYS2 packages (Attempt 4)
         if: ${{ matrix.cc == 'mingw_gcc' }}
         continue-on-error: true
         shell: msys2 {0}
