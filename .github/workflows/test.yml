@@ -2316,8 +2316,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run in FreeBSD(Attempt 1)
-        continue-on-error: true
+      - name: Run in FreeBSD
         uses: vmactions/freebsd-vm@v1
         with:
           usesh: true

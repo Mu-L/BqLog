@@ -12,17 +12,16 @@ TEST_MAIN="${PROJECT_ROOT}/test/python/src/bq/test/test_main.py"
 
 COMPILER="${1:-clang}"
 
-# If ASan is enabled, find the runtime library for LD_PRELOAD.
-# When _bqlog.so is compiled with -fsanitize=address but loaded into a
-# vanilla Python interpreter, the ASan runtime symbols are missing.
-# LD_PRELOAD of the shared ASan runtime fixes this.
-ASAN_PRELOAD=""
+# If ASan is enabled, _bqlog.so is compiled with -shared-libasan so it
+# dynamically links libclang_rt.asan.  We need to ensure the ASan shared
+# library is findable at runtime via LD_LIBRARY_PATH (LD_PRELOAD of ASan
+# into a vanilla Python interpreter causes BUS errors on FreeBSD).
+ASAN_LIB_DIR=""
 BQ_ENABLE_ASAN_UPPER=""
 if [ -n "${BQ_ENABLE_ASAN:-}" ]; then
     BQ_ENABLE_ASAN_UPPER="$(echo "$BQ_ENABLE_ASAN" | tr '[:lower:]' '[:upper:]')"
 fi
 if [ "$BQ_ENABLE_ASAN_UPPER" = "TRUE" ] || [ "$BQ_ENABLE_ASAN_UPPER" = "ON" ] || [ "$BQ_ENABLE_ASAN_UPPER" = "1" ]; then
-    # Try clang's ASan shared lib first, then gcc's
     ASAN_LIB=""
     if command -v "${COMPILER}" >/dev/null 2>&1; then
         ASAN_LIB=$("${COMPILER}" -print-file-name=libclang_rt.asan-x86_64.so 2>/dev/null || true)
@@ -31,13 +30,13 @@ if [ "$BQ_ENABLE_ASAN_UPPER" = "TRUE" ] || [ "$BQ_ENABLE_ASAN_UPPER" = "ON" ] ||
         fi
     fi
     if [ ! -f "${ASAN_LIB:-}" ]; then
-        # Fallback: search common paths
         ASAN_LIB=$(find /usr/local/lib/clang /usr/lib/clang /usr/local/llvm* 2>/dev/null \
             -name 'libclang_rt.asan*.so' -print -quit 2>/dev/null || true)
     fi
     if [ -f "${ASAN_LIB:-}" ]; then
-        ASAN_PRELOAD="${ASAN_LIB}"
-        echo "ASan enabled: LD_PRELOAD=${ASAN_PRELOAD}"
+        ASAN_LIB_DIR="$(dirname "${ASAN_LIB}")"
+        export LD_LIBRARY_PATH="${ASAN_LIB_DIR}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+        echo "ASan enabled: LD_LIBRARY_PATH includes ${ASAN_LIB_DIR}"
     else
         echo "WARNING: BQ_ENABLE_ASAN is set but ASan runtime library not found. Tests may fail."
     fi
@@ -56,11 +55,7 @@ for BUILD_TYPE in Debug Release RelWithDebInfo MinSizeRel; do
     pip3 install --force-reinstall "${INSTALL_DIR}"/*.whl
 
     echo "----- Running tests [${BUILD_TYPE}] -----"
-    if [ -n "${ASAN_PRELOAD}" ]; then
-        LD_PRELOAD="${ASAN_PRELOAD}" python3 "${TEST_MAIN}"
-    else
-        python3 "${TEST_MAIN}"
-    fi
+    python3 "${TEST_MAIN}"
     echo "Tests PASSED for ${BUILD_TYPE}"
 done
 
