@@ -2,6 +2,11 @@
 
 ## [v2.2.1] - 2026-03-17
 - **Python 3.7+ support**: Added Python 3.7+ support via CPython C Extension wrapper (Stable ABI).
+- **npm publishing**: Node.js wrapper is now published to npm as [`@pippocao/bqlog`](https://www.npmjs.com/package/@pippocao/bqlog), installable via `npm install @pippocao/bqlog`.
+- **PyPI publishing**: Python wrapper is now published to PyPI as [`bqlog`](https://pypi.org/project/bqlog/), installable via `pip install bqlog`.
+- **Python category log generator**: The `BqLog_CategoryLogGenerator` tool now generates Python category log wrappers (`.py`).
+- **TypeScript dual-target generation**: The generator now produces separate TypeScript outputs for Node.js (`_nodejs.ts`, imports `@pippocao/bqlog`) and HarmonyOS (`_ohos.ts`, imports `bqlog`).
+- **Category log test coverage**: Added category log test suites for Python, Java, C#, and TypeScript, covering category output, hierarchy, format parameters, and category mask filtering.
 
 ## [v2.1.2] - 2026-03-17
 - **Bug fix**:  [Incorrect base_dir in GBox Sandbox environment on Android #61](https://github.com/Tencent/BqLog/issues/61)
