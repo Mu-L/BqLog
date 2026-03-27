@@ -82,7 +82,18 @@ class demo_category_log_category_root:
 
 
 class demo_category_log(category_log):
-    _category_names = ["", "node_2", "node_2.node_5", "node_3", "node_3.node_6", "node_3.node_10", "node_4", "node_4.node_7", "node_4.node_7.node_8", "node_4.node_7.node_9"]
+    _category_names = [
+                            ""
+                          , "node_2"
+                          , "node_2.node_5"
+                          , "node_3"
+                          , "node_3.node_6"
+                          , "node_3.node_10"
+                          , "node_4"
+                          , "node_4.node_7"
+                          , "node_4.node_7.node_8"
+                          , "node_4.node_7.node_9"
+                          ]
     _categories_count = len(_category_names)
 
     def __init__(self, log_id=0):

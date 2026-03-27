@@ -25,12 +25,14 @@ namespace bq {
 
     bq::string category_log_template_python::get_category_names_code_recursive(const category_node& node) const
     {
-        bq::string code;
+        bq::string code = "    ";
         if (node.parent()) // empty means it is root node, first value
         {
             code += ", ";
+        } else {
+            code += "  ";
         }
-        code += "\"" + node.full_name() + "\"";
+        code += "\"" + node.full_name() + "\"\n";
         for (const auto& child : node.get_all_children()) {
             code += get_category_names_code_recursive(*child);
         }
@@ -58,9 +60,9 @@ namespace bq {
 
     bq::string category_log_template_python::get_category_names_code(const category_node& root_node) const
     {
-        bq::string code = "[";
+        bq::string code = "[\n";
         code += get_category_names_code_recursive(root_node);
-        code += "]";
+        code += "    ]";
         return code;
     }
 

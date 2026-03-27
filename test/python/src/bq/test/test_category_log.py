@@ -57,7 +57,13 @@ class test_category_log_category_root:
 
 
 class test_category_log(category_log):
-    _category_names = ["", "ModuleA", "ModuleA.SystemA", "ModuleA.SystemA.ClassA", "ModuleB"]
+    _category_names = [
+                            ""
+                          , "ModuleA"
+                          , "ModuleA.SystemA"
+                          , "ModuleA.SystemA.ClassA"
+                          , "ModuleB"
+                          ]
     _categories_count = len(_category_names)
 
     def __init__(self, log_id=0):
