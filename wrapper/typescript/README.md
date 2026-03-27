@@ -1,27 +1,36 @@
 # @pippocao/bqlog
 
-**The fastest industrial-grade logging engine** for Node.js — powered by a native C++ lock-free ring-buffer core, battle-tested at Tencent across large-scale game engines and backend services.
+> **The fastest industrial-grade logging engine** for Node.js — powered by a native C++ lock-free ring-buffer core, battle-tested at Tencent across large-scale game engines and backend services.
+
+[![npm version](https://img.shields.io/npm/v/@pippocao/bqlog)](https://www.npmjs.com/package/@pippocao/bqlog)
+[![license](https://img.shields.io/npm/l/@pippocao/bqlog)](https://www.apache.org/licenses/LICENSE-2.0)
 
 Part of the [BqLog](https://github.com/Tencent/BqLog) project.
 
-## Why BqLog?
+---
 
-- **Fastest in class** — lock-free MISO ring-buffer delivers ~80% higher throughput than comparable loggers for UTF-8, and >500% for UTF-16 environments
-- **Industrial grade** — production-proven at Tencent, designed for game engines (Unity, Unreal), mobile apps, and high-concurrency server workloads
-- **Compressed & Encrypted appender** — `compressed_file` produces the smallest log files with near-zero overhead, and supports **hybrid asymmetric encryption** (RSA + AES) for secure log storage at virtually no performance cost
-- **Sync & Async modes** — choose per-log thread model to balance latency vs throughput
-- **Category logging** — attach categories to log entries, filter with category masks
-- **Crash-safe recovery** — memory-mapped buffers survive process crashes; unflushed logs are recovered on restart
-- **Cross-platform native binaries** — prebuilt for Windows, macOS, Linux, FreeBSD, OpenBSD, NetBSD, DragonflyBSD, Solaris/OmniOS (x64 & ARM64)
-- **ESM + CommonJS** — dual module support, works everywhere
+## 🚀 Why BqLog?
 
-## Installation
+- ⚡ **Fastest in class** — lock-free MISO ring-buffer delivers ~80% higher throughput than comparable loggers for UTF-8, and >500% for UTF-16 environments
+- 🏭 **Industrial grade** — production-proven at Tencent, designed for game engines (Unity, Unreal), mobile apps, and high-concurrency server workloads
+- 🔐 **Compressed & Encrypted appender** — `compressed_file` produces the smallest log files with near-zero overhead, and supports **hybrid asymmetric encryption** (RSA + AES) for secure log storage at virtually no performance cost
+- 🔄 **Sync & Async modes** — choose per-log thread model to balance latency vs throughput
+- 🏷️ **Category logging** — attach categories to log entries, filter with category masks
+- 🛡️ **Crash-safe recovery** — memory-mapped buffers survive process crashes; unflushed logs are recovered on restart
+- 🌍 **Cross-platform native binaries** — prebuilt for Windows, macOS, Linux, FreeBSD, OpenBSD, NetBSD, DragonflyBSD, Solaris/OmniOS (x64 & ARM64)
+- 📦 **ESM + CommonJS** — dual module support, works everywhere
+
+---
+
+## 📥 Installation
 
 ```bash
 npm install @pippocao/bqlog
 ```
 
-## Quick Start
+---
+
+## ⚡ Quick Start
 
 ### ESM
 
@@ -50,21 +59,25 @@ const log = bq.log.create_log("my_log", `
 log.info("Hello from CJS!");
 ```
 
-## Appender Types
+---
+
+## 📋 Appender Types
 
 | Type | Description |
 |------|-------------|
-| `console` | Output to stdout/stderr |
-| `text_file` | Plain text log files, human-readable |
-| `compressed_file` | **Binary compressed format — smallest file size, highest write performance, optional RSA+AES hybrid encryption.** Decode with the BqLog decoder tool. |
+| `console` | 🖥️ Output to stdout/stderr |
+| `text_file` | 📄 Plain text log files, human-readable |
+| `compressed_file` | 🔒 **Binary compressed — smallest size, fastest writes, optional RSA+AES encryption.** Decode with the BqLog decoder tool. |
 
-## Compressed & Encrypted Appender
+---
 
-The `compressed_file` appender is the recommended choice for production:
+## 🔐 Compressed & Encrypted Appender
 
-- **Smallest output** — proprietary binary format produces files significantly smaller than plain text or gzip
-- **Fastest writes** — compression is integrated into the write path with near-zero overhead
-- **Hybrid encryption** — optional RSA + AES encryption protects log content at rest; encryption adds virtually no performance penalty
+The `compressed_file` appender is the **recommended choice for production**:
+
+- 📉 **Smallest output** — proprietary binary format produces files significantly smaller than plain text or gzip
+- ⚡ **Fastest writes** — compression is integrated into the write path with near-zero overhead
+- 🔑 **Hybrid encryption** — optional RSA + AES encryption protects log content at rest; encryption adds virtually no performance penalty
 
 ```typescript
 const config = `
@@ -84,7 +97,9 @@ const log = bq.log.create_log("secure_log", config);
 log.info("This log is compressed and optionally encrypted");
 ```
 
-## Configuration Example
+---
+
+## ⚙️ Configuration Example
 
 ```typescript
 const config = `
@@ -104,7 +119,9 @@ const config = `
 const log = bq.log.create_log("app", config);
 ```
 
-## Category Logging
+---
+
+## 🏷️ Category Logging
 
 Use the [BqLog Category Generator](https://github.com/Tencent/BqLog/tree/main/tools/category_log_generator) tool to generate type-safe category wrappers:
 
@@ -115,35 +132,54 @@ const log = my_category_log.create_log("cat_log", config);
 log.info(log.cat.ModuleA.SystemA, "categorized message: {}", value);
 ```
 
-## Log Levels
+---
 
-`verbose` · `debug` · `info` · `warning` · `error` · `fatal`
+## 📊 Log Levels
 
-## Supported Platforms
+| Level | Usage |
+|-------|-------|
+| `verbose` | Fine-grained tracing |
+| `debug` | Debugging information |
+| `info` | General operational messages |
+| `warning` | Potential issues |
+| `error` | Error conditions |
+| `fatal` | Critical failures |
 
-Prebuilt native binaries are included for all of the following — no compiler needed at install time.
+---
+
+## 🌍 Supported Platforms
+
+Prebuilt native binaries are included — **no compiler needed** at install time.
 
 | OS | Architectures |
 |----|--------------|
-| Windows | x64, ARM64 |
-| macOS | x64, ARM64 (Universal Binary) |
-| Linux | x64, ARM64, x86 (ia32) |
-| FreeBSD | x64, ARM64 |
-| OpenBSD | x64, ARM64 |
-| NetBSD | x64, ARM64 |
-| DragonflyBSD | x64 |
-| Solaris / OmniOS (SunOS) | x64 |
+| 🪟 Windows | x64, ARM64 |
+| 🍎 macOS | x64, ARM64 (Universal Binary) |
+| 🐧 Linux | x64, ARM64, x86 (ia32) |
+| 😈 FreeBSD | x64, ARM64 |
+| 🐡 OpenBSD | x64, ARM64 |
+| 🏁 NetBSD | x64, ARM64 |
+| 🐉 DragonflyBSD | x64 |
+| ☀️ Solaris / OmniOS (SunOS) | x64 |
 
-## Benchmark
+---
+
+## 📈 Benchmark
 
 BqLog consistently outperforms popular logging libraries. See [full benchmark results](https://github.com/Tencent/BqLog#benchmark) in the main repository.
 
-## Documentation
+---
 
-Full documentation and examples for all supported languages (C++, Java, C#, Python, TypeScript, Unreal Engine, Unity, HarmonyOS):
+## 📚 Documentation
 
-**[github.com/Tencent/BqLog](https://github.com/Tencent/BqLog)**
+Full documentation and examples for all supported languages:
 
-## License
+**C++ · Java · C# · Python · TypeScript · Unreal Engine · Unity · HarmonyOS**
 
-[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+👉 **[github.com/Tencent/BqLog](https://github.com/Tencent/BqLog)**
+
+---
+
+## 📄 License
+
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) — free for commercial use.
