@@ -54,7 +54,8 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "postbuild:cjs": "node -e \"const fs=require('fs');const p='src/bq/utils/lib_loader.ts',bak='src/bq/utils/lib_loader.bak';if(fs.existsSync(bak)){fs.copyFileSync(bak,p);fs.unlinkSync(bak)}\" && node -e \"const fs=require('fs');fs.mkdirSync('dist/cjs',{recursive:true});fs.writeFileSync('dist/cjs/package.json',JSON.stringify({type:'commonjs'},null,2))\"",
     "build": "npm run build:esm && npm run build:cjs",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "node -e \"require('fs').copyFileSync('README.nodejs.md','README.md')\" && npm run build",
+    "postpublish": "node -e \"try{require('fs').unlinkSync('README.md')}catch(e){}\""
   },
   "devDependencies": {
     "@types/node": "^22.18.6",
