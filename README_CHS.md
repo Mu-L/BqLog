@@ -213,10 +213,10 @@
 ### Node.js
 
 - 支持 CommonJS 与 ES Module。
-- 从 Releases 下载 `nodejs_npm_{version}` 包，解压后找到其中的 `bqlog-{version}.tgz`，通过 npm 安装：
+- 从 Releases 下载 `nodejs_npm_{version}` 包，解压后找到其中的 `pippocao-bqlog-{version}.tgz`，通过 npm 安装：
 
 ```bash
-npm install ./bqlog-{version}.tgz
+npm install ./pippocao-bqlog-{version}.tgz
 ```
 
 可参考仓库下 `/demo/nodejs` 目录。
@@ -260,11 +260,11 @@ int main() {
 
 更多示例可参考仓库下的 `/demo/cpp` 目录。
 
-### Typescript (Node.js, 鸿蒙ArkTS)
+### Typescript — Node.js
 
-```javascript
-import { bq } from "bqlog"; // ESM 写法
-// const { bq } = require("bqlog"); // CommonJS 写法
+```typescript
+import { bq } from "@pippocao/bqlog"; // ESM 写法
+// const { bq } = require("@pippocao/bqlog"); // CommonJS 写法
 
 const config = `
     appenders_config.console.type=console
@@ -277,6 +277,21 @@ bq.log.force_flush_all_logs();
 ```
 
 更多示例可参考仓库下的 `/demo/nodejs` 目录。
+
+### Typescript — 鸿蒙 ArkTS
+
+```typescript
+import { bq } from "bqlog"; // ohpm 包名
+
+const config = `
+    appenders_config.console.type=console
+    appenders_config.console.levels=[all]
+`;
+const log = bq.log.create_log("ohos_log", config);
+
+log.info("Hello from HarmonyOS! params: {}, {}", "text", 123);
+bq.log.force_flush_all_logs();
+```
 
 ### Python
 

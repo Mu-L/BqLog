@@ -33,6 +33,7 @@ from bq.defs.log_level import log_level
 from bq.test.test_manager import test_manager
 from bq.test.test_log_1 import test_log_1
 from bq.test.test_log_2 import test_log_2
+from bq.test.test_log_category import test_log_category
 
 
 def main():
@@ -46,6 +47,7 @@ def main():
 
         test_manager.add_test(test_log_1("Test Log Basic"))
         test_manager.add_test(test_log_2("Test Log MultiThread"))
+        test_manager.add_test(test_log_category("Test Log Category"))
         success = test_manager.test()
 
         if success:

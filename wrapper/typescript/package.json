@@ -1,5 +1,5 @@
 {
-  "name": "bqlog",
+  "name": "@pippocao/bqlog",
   "version": "1.0.0",
   "description": "BQ Log Node.js binding",
   "license": "Apache-2.0",

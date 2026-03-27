@@ -213,10 +213,10 @@
 ### Node.js
 
 - Supports CommonJS and ES Modules.
-- From Releases download `nodejs_npm_{version}` package, unzip to find `bqlog-{version}.tgz` inside, install via npm:
+- From Releases download `nodejs_npm_{version}` package, unzip to find `pippocao-bqlog-{version}.tgz` inside, install via npm:
 
 ```bash
-npm install ./bqlog-{version}.tgz
+npm install ./pippocao-bqlog-{version}.tgz
 ```
 
 Refer to `/demo/nodejs` directory under the repository.
@@ -260,11 +260,11 @@ int main() {
 
 For more examples, refer to `/demo/cpp` directory.
 
-### Typescript (Node.js, ArkTS on HarmonyOS)
+### Typescript — Node.js
 
 ```typescript
-import { bq } from "bqlog"; // ESM style
-// const { bq } = require("bqlog"); // CommonJS style
+import { bq } from "@pippocao/bqlog"; // ESM style
+// const { bq } = require("@pippocao/bqlog"); // CommonJS style
 
 const config = `
     appenders_config.console.type=console
@@ -277,6 +277,21 @@ bq.log.force_flush_all_logs();
 ```
 
 For more examples, refer to `/demo/nodejs` directory.
+
+### Typescript — ArkTS on HarmonyOS
+
+```typescript
+import { bq } from "bqlog"; // ohpm package name
+
+const config = `
+    appenders_config.console.type=console
+    appenders_config.console.levels=[all]
+`;
+const log = bq.log.create_log("ohos_log", config);
+
+log.info("Hello from HarmonyOS! params: {}, {}", "text", 123);
+bq.log.force_flush_all_logs();
+```
 
 ### Python
 
