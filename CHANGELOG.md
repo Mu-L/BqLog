@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.2.1] - 2026-03-17
+## [v2.2.2] - 2026-03-27
 - **Python 3.7+ support**: Added Python 3.7+ support via CPython C Extension wrapper (Stable ABI).
 - **npm publishing**: Node.js wrapper is now published to npm as [`@pippocao/bqlog`](https://www.npmjs.com/package/@pippocao/bqlog), installable via `npm install @pippocao/bqlog`.
 - **PyPI publishing**: Python wrapper is now published to PyPI as [`bqlog`](https://pypi.org/project/bqlog/), installable via `pip install bqlog`.
