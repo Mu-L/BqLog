@@ -11,6 +11,8 @@ package bq.test;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 
+import bq.test_category_log;
+
 public class test_log_category extends test_base {
     public test_log_category(String name) {
         super(name);
