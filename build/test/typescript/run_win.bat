@@ -63,7 +63,7 @@ if "%NODE_LIB_PATH%"=="" (
 
 echo ===== Packing @pippocao/bqlog into tgz =====
 pushd "%PROJECT_ROOT%\wrapper\typescript"
-call npm pack --pack-destination "%TEST_SRC_DIR%\"
+call npm pack --pack-destination "%TEST_SRC_DIR%"
 popd
 
 echo ===== Installing @pippocao/bqlog tgz into test project =====
