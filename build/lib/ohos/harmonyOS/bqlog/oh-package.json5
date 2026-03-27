@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "BqLog HarmonyOS Library.",
   "main": "./src/main/ets/wrapper/index.ts",
-  "author": "",
+  "author": "pippocao",
   "license": "Apache-2.0",
   "dependencies": {
   }
