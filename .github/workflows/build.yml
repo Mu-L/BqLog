@@ -5732,7 +5732,7 @@ jobs:
           path: ${{ github.workspace }}/dist
           
       - name: Delete intermediate artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: tmp_node_* 
           failOnError: false
