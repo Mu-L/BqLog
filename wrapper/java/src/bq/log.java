@@ -10,7 +10,12 @@ package bq;
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.ArrayList;
 import bq.def.*;
@@ -23,15 +28,86 @@ import bq.impl.*;
 public class log {
 	static {
 		try {
-			System.loadLibrary(bq.lib_def.lib_name);
+			// On Android the .so is extracted by the OS installer from the AAR,
+			// so the standard loadLibrary path always works.
+			boolean isAndroid = System.getProperty("java.vm.name", "").contains("Dalvik")
+					|| System.getProperty("java.vendor", "").toLowerCase().contains("android");
+			if (isAndroid) {
+				System.loadLibrary(bq.lib_def.lib_name);
+			} else {
+				// For fat-JAR (Maven) distribution: try to locate the bundled native
+				// library under /natives/<osToken>-<archToken>/<libFileName> inside
+				// the JAR, extract it to a temp file, and load it from there.
+				// Falls back to System.loadLibrary so that developers who build
+				// locally and manage java.library.path themselves are unaffected.
+				boolean loaded = false;
+				String osName  = System.getProperty("os.name",  "").toLowerCase();
+				String osArch  = System.getProperty("os.arch",  "").toLowerCase();
+
+				// Normalise arch to match CI staging directory names
+				String archToken;
+				if      (osArch.equals("amd64")   || osArch.equals("x86_64"))                   archToken = "x86_64";
+				else if (osArch.equals("aarch64") || osArch.equals("arm64"))                     archToken = "arm64";
+				else if (osArch.equals("x86")     || osArch.equals("i386") || osArch.equals("i686")) archToken = "x86";
+				else                                                                              archToken = osArch;
+
+				// Normalise OS and choose the library file name
+				String osToken;
+				String libFileName;
+				if (osName.contains("win")) {
+					osToken     = "windows";
+					libFileName = bq.lib_def.lib_name + ".dll";
+				} else if (osName.contains("mac") || osName.contains("darwin")) {
+					osToken     = "macos";
+					libFileName = "lib" + bq.lib_def.lib_name + ".dylib";
+				} else if (osName.contains("freebsd")) {
+					osToken     = "freebsd";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (osName.contains("openbsd")) {
+					osToken     = "openbsd";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (osName.contains("netbsd")) {
+					osToken     = "netbsd";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (osName.contains("dragonfly")) {
+					osToken     = "dragonfly";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (osName.contains("sunos") || osName.contains("solaris")) {
+					osToken     = "sunos";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				} else {
+					// Linux and any other POSIX-like system
+					osToken     = "linux";
+					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				}
+
+				// Suffix for the temp file so the OS links the right extension
+				String libSuffix = libFileName.substring(libFileName.lastIndexOf('.'));
+				String resourcePath = "/natives/" + osToken + "-" + archToken + "/" + libFileName;
+
+				try (InputStream in = log.class.getResourceAsStream(resourcePath)) {
+					if (in != null) {
+						File tmp = File.createTempFile(bq.lib_def.lib_name + "_", libSuffix);
+						tmp.deleteOnExit();
+						Files.copy(in, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
+						System.load(tmp.getAbsolutePath());
+						loaded = true;
+					}
+				} catch (IOException e) {
+					// Extraction failed; fall through to loadLibrary
+				}
+
+				if (!loaded) {
+					System.loadLibrary(bq.lib_def.lib_name);
+				}
+			}
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				@Override
 				public void run() {
 					log_invoker.__api_mark_jvm_destroyed();
 				}
-			}); 
-		}catch(Exception e)
-		{
+			});
+		} catch(Exception e) {
 			System.err.println("Failed to Load " + bq.lib_def.lib_name);
 			System.err.println(e.getMessage());
 		}

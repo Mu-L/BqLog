@@ -6423,3 +6423,175 @@ jobs:
         with:
           name: python_wrapper_freebsd_x86_64_${{ needs.extract_version.outputs.version }}
           path: install/wrapper_python/
+
+  ####################################################### Java Fat JAR (Maven Central) ########################################
+  java_maven_fat_jar_collect:
+    runs-on: ubuntu-latest
+    needs:
+      - extract_version
+      - build_windows_java11_wrapper
+      - build_windows_x86_64_lib_MSVC
+      - build_windows_arm64_lib_MSVC
+      - build_ubuntu_x86_64_lib_Clang
+      - build_ubuntu_arm64_lib_Clang
+      - build_debian_x86_lib_Clang
+      - build_mac_lib
+      - build_freebsd_x86_64_libs_Clang
+      - build_freebsd_arm64_libs_Clang
+      - build_openbsd_x86_64_libs_Clang
+      - build_openbsd_arm64_libs_Clang
+      - build_netbsd_x86_64_libs_Clang
+      - build_netbsd_arm64_libs_Clang
+      - build_dragonflybsd_x86_64_libs_Clang
+      - build_solaris_x86_64_libs_GCC
+      - build_omnios_x86_64_libs_gcc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Download all needed artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: downloaded_artifacts
+
+      - name: List downloaded artifacts
+        run: ls -l downloaded_artifacts
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y unzip zip
+
+      - name: Stage natives and inject into fat JAR
+        shell: bash
+        env:
+          VERSION: ${{ needs.extract_version.outputs.version }}
+        run: |
+          set -euo pipefail
+          : "${VERSION:?VERSION env not set}"
+          BASE="downloaded_artifacts"
+          NATIVES_STAGE="$(pwd)/fat_jar_natives"
+
+          # ── helpers ─────────────────────────────────────────────────────
+          find_lib() {
+            # find_lib <artifact_base_dir> <filename> [preferred_build_type]
+            local base="$1" name="$2" prefer="${3:-RelWithDebInfo}"
+            local result
+            result=$(find "$base" -type f -name "$name" 2>/dev/null | grep "$prefer" | head -n1 || true)
+            [[ -z "$result" ]] && result=$(find "$base" -type f -name "$name" 2>/dev/null | head -n1 || true)
+            echo "$result"
+          }
+
+          copy_native() {
+            local src="$1" dst_dir="$2"
+            if [[ -f "$src" ]]; then
+              mkdir -p "$dst_dir"
+              cp -Lf "$src" "$dst_dir/"
+              echo "  staged: $(basename "$src")  →  $dst_dir/"
+            else
+              echo "  WARN: not found: $src" >&2
+            fi
+          }
+
+          # ── locate JARs from java_wrapper artifact ───────────────────────
+          JAVA_BASE="$BASE/java_wrapper_${VERSION}"
+          BINARY_JAR=$(find "$JAVA_BASE" -type f -name "BqLogWrapper_Java-*.jar" \
+                         ! -name "*sources*" ! -name "*javadoc*" | head -n1 || true)
+          SOURCES_JAR=$(find "$JAVA_BASE" -type f -name "*-sources.jar" | head -n1 || true)
+          JAVADOC_JAR=$(find "$JAVA_BASE" -type f -name "*-javadoc.jar" | head -n1 || true)
+
+          for v in BINARY_JAR SOURCES_JAR JAVADOC_JAR; do
+            eval "p=\$$v"
+            if [[ -z "$p" ]]; then
+              echo "ERROR: $v not found under $JAVA_BASE" >&2; exit 1
+            fi
+            echo "Found $v: $p"
+          done
+
+          # ── locate native libraries ──────────────────────────────────────
+          WIN_X64_DLL=$(find_lib    "$BASE/windows_x86_64_libs_${VERSION}"         "BqLog.dll")
+          WIN_ARM64_DLL=$(find_lib  "$BASE/windows_arm64_libs_${VERSION}"           "BqLog.dll")
+          LINUX_X64_SO=$(find_lib   "$BASE/linux_x86_64_libs_${VERSION}"           "libBqLog.so")
+          LINUX_ARM64_SO=$(find_lib "$BASE/linux_arm64_libs_${VERSION}"             "libBqLog.so")
+          LINUX_X86_SO=$(find_lib   "$BASE/linux_x86_libs_${VERSION}"              "libBqLog.so")
+          MAC_DYLIB=$(find_lib      "$BASE/macos_universal_binary_libs_${VERSION}"  "libBqLog.dylib")
+          FREEBSD_X64=$(find_lib    "$BASE/freebsd_x86_64_libs_${VERSION}"         "libBqLog.so")
+          FREEBSD_ARM64=$(find_lib  "$BASE/freebsd_arm64_libs_${VERSION}"           "libBqLog.so")
+          OPENBSD_X64=$(find_lib    "$BASE/openbsd_x86_64_libs_${VERSION}"         "libBqLog.so")
+          OPENBSD_ARM64=$(find_lib  "$BASE/openbsd_arm64_libs_${VERSION}"           "libBqLog.so")
+          NETBSD_X64=$(find_lib     "$BASE/netbsd_x86_64_libs_${VERSION}"          "libBqLog.so")
+          NETBSD_ARM64=$(find_lib   "$BASE/netbsd_arm64_libs_${VERSION}"            "libBqLog.so")
+          DRAGONFLY_X64=$(find_lib  "$BASE/dragonflybsd_x86_64_libs_${VERSION}"    "libBqLog.so")
+          SOLARIS_X64=$(find_lib    "$BASE/solaris_x86_64_libs_${VERSION}"         "libBqLog.so")
+          OMNIOS_X64=$(find_lib     "$BASE/omnios_x86_64_libs_${VERSION}"          "libBqLog.so")
+
+          # Mandatory platforms — fail fast if missing
+          for v in WIN_X64_DLL WIN_ARM64_DLL LINUX_X64_SO LINUX_ARM64_SO MAC_DYLIB; do
+            eval "p=\$$v"
+            [[ -z "$p" ]] && { echo "ERROR: $v not found" >&2; exit 1; }
+          done
+
+          # ── copy into staging directory ──────────────────────────────────
+          mkdir -p "$NATIVES_STAGE"
+          copy_native "$WIN_X64_DLL"    "$NATIVES_STAGE/windows-x86_64"
+          copy_native "$WIN_ARM64_DLL"  "$NATIVES_STAGE/windows-arm64"
+          copy_native "$LINUX_X64_SO"   "$NATIVES_STAGE/linux-x86_64"
+          copy_native "$LINUX_ARM64_SO" "$NATIVES_STAGE/linux-arm64"
+          [[ -n "$LINUX_X86_SO"    ]] && copy_native "$LINUX_X86_SO"    "$NATIVES_STAGE/linux-x86"
+          # macOS universal binary covers both archs
+          copy_native "$MAC_DYLIB"      "$NATIVES_STAGE/macos-x86_64"
+          copy_native "$MAC_DYLIB"      "$NATIVES_STAGE/macos-arm64"
+          [[ -n "$FREEBSD_X64"    ]] && copy_native "$FREEBSD_X64"    "$NATIVES_STAGE/freebsd-x86_64"
+          [[ -n "$FREEBSD_ARM64"  ]] && copy_native "$FREEBSD_ARM64"  "$NATIVES_STAGE/freebsd-arm64"
+          [[ -n "$OPENBSD_X64"    ]] && copy_native "$OPENBSD_X64"    "$NATIVES_STAGE/openbsd-x86_64"
+          [[ -n "$OPENBSD_ARM64"  ]] && copy_native "$OPENBSD_ARM64"  "$NATIVES_STAGE/openbsd-arm64"
+          [[ -n "$NETBSD_X64"     ]] && copy_native "$NETBSD_X64"     "$NATIVES_STAGE/netbsd-x86_64"
+          [[ -n "$NETBSD_ARM64"   ]] && copy_native "$NETBSD_ARM64"   "$NATIVES_STAGE/netbsd-arm64"
+          [[ -n "$DRAGONFLY_X64"  ]] && copy_native "$DRAGONFLY_X64"  "$NATIVES_STAGE/dragonfly-x86_64"
+          # solaris and omnios both map to sunos-x86_64; omnios written last (either is fine)
+          [[ -n "$SOLARIS_X64"    ]] && copy_native "$SOLARIS_X64"    "$NATIVES_STAGE/sunos-x86_64"
+          [[ -n "$OMNIOS_X64"     ]] && copy_native "$OMNIOS_X64"     "$NATIVES_STAGE/sunos-x86_64"
+
+          echo "Staged native layout:"
+          find "$NATIVES_STAGE" -type f | sort
+
+          # ── build a temp inject tree: natives/<target>/<file> ────────────
+          TMP_INJECT="$(mktemp -d)"
+          while IFS= read -r f; do
+            rel="${f#$NATIVES_STAGE/}"           # e.g. linux-x86_64/libBqLog.so
+            dst="$TMP_INJECT/natives/$rel"
+            mkdir -p "$(dirname "$dst")"
+            cp -Lf "$f" "$dst"
+          done < <(find "$NATIVES_STAGE" -type f)
+
+          # ── copy binary JAR and inject natives/ ──────────────────────────
+          FAT_JAR="$(pwd)/BqLogWrapper_Java-${VERSION}.jar"
+          cp -f "$BINARY_JAR" "$FAT_JAR"
+          pushd "$TMP_INJECT" >/dev/null
+          jar uf "$FAT_JAR" natives
+          popd >/dev/null
+          rm -rf "$TMP_INJECT"
+
+          echo "Fat JAR natives/ layout:"
+          jar tf "$FAT_JAR" | grep "^natives/" | sort
+
+          # ── collect all three JARs into dist ─────────────────────────────
+          mkdir -p dist/maven/java
+          cp -f "$FAT_JAR"    "dist/maven/java/BqLogWrapper_Java-${VERSION}.jar"
+          cp -f "$SOURCES_JAR" "dist/maven/java/BqLogWrapper_Java-${VERSION}-sources.jar"
+          cp -f "$JAVADOC_JAR" "dist/maven/java/BqLogWrapper_Java-${VERSION}-javadoc.jar"
+
+          echo "dist/maven/java:"
+          ls -lh dist/maven/java/
+
+      - name: Upload fat JAR artifact
+        uses: actions/upload-artifact@v8
+        with:
+          name: java_maven_fat_jar_${{ needs.extract_version.outputs.version }}
+          path: ${{ github.workspace }}/dist/maven/java
