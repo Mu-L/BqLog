@@ -1,15 +1,16 @@
 #!/bin/zsh
 #
 # Usage (all parameters optional; missing ones will be prompted):
-#   dont_execute_this.sh all  [java] [node] [python]
-#   dont_execute_this.sh build [java] [node] [python] [static_lib|dynamic_lib] [framework|dylib|a]
-#   dont_execute_this.sh gen-vsproj [java] [node] [python] [static_lib|dynamic_lib] [framework|dylib|a]
+#   dont_execute_this.sh all  [java] [node] [python] [dynamic_lib|static_lib|both]
+#   dont_execute_this.sh build [java] [node] [python] [dynamic_lib|static_lib|both] [framework|dylib|a]
+#   dont_execute_this.sh gen-vsproj [java] [node] [python] [dynamic_lib|static_lib|both] [framework|dylib|a]
 #   dont_execute_this.sh pack
 #
 # Normalized values:
 #   format       : framework | dylib | a
 #   java,node,python : ON | OFF
 #   lib type     : static_lib | dynamic_lib
+#   all lib type : dynamic_lib | static_lib | both  (default: both)
 # ------------------------------------------------------------
 
 set -e -u -o pipefail
@@ -55,6 +56,7 @@ normalize_build_lib_type() {
   local v="${1:-}"; v="${v:l}"
   case "$v" in
     static_lib|dynamic_lib) echo "$v" ;;
+    both) echo "both" ;;
     *) echo "" ;;
   esac
 }
@@ -338,7 +340,23 @@ case "$ACTION" in
     [[ -z "${JAVA_SUPPORT:-}"     ]] && JAVA_SUPPORT="$(ask_yes_no "Enable Java/JNI support?")"
     [[ -z "${NODE_API_SUPPORT:-}" ]] && NODE_API_SUPPORT="$(ask_yes_no "Enable Node-API (Node.js) support?")"
     [[ -z "${PYTHON_SUPPORT:-}" ]] && PYTHON_SUPPORT="$(ask_yes_no "Enable Python (CPython C Extension) support?")"
-    build_all_combos
+    BUILD_LIB_TYPE_ALL="${BUILD_LIB_TYPE:-both}"
+    if [[ "$BUILD_LIB_TYPE_ALL" == "dynamic_lib" ]]; then
+      # dynamic only: respect NODE_API rule (same logic as build_all_combos)
+      if [[ "${NODE_API_SUPPORT:-}" == "ON" ]]; then
+        build_one_pair "dynamic_lib" "dylib"
+      else
+        build_one_pair "dynamic_lib" "framework"
+        build_one_pair "dynamic_lib" "dylib"
+      fi
+    elif [[ "$BUILD_LIB_TYPE_ALL" == "static_lib" ]]; then
+      # static only: framework + a
+      build_one_pair "static_lib" "framework"
+      build_one_pair "static_lib" "a"
+    else
+      # both: original full combo
+      build_all_combos
+    fi
     do_pack
     echo "---------"; echo "Finished!"; echo "---------"
     ;;

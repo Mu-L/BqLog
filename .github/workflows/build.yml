@@ -3737,7 +3737,7 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat native msvc YES YES NO
+          .\build_all_and_pack.bat native msvc YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -3772,7 +3772,7 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat native clang YES YES NO
+          .\build_all_and_pack.bat native clang YES YES NO dynamic_lib
 
   nodejs_build_windows_arm64_lib_MSVC:
     runs-on: windows-latest
@@ -3801,7 +3801,7 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat arm64 msvc YES YES NO
+          .\build_all_and_pack.bat arm64 msvc YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -3836,7 +3836,7 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat arm64 clang YES YES NO
+          .\build_all_and_pack.bat arm64 clang YES YES NO dynamic_lib
 
   #Linux-ubuntu-x86_64
   nodejs_build_ubuntu_x86_64_lib_Clang:
@@ -3866,7 +3866,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES NO
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -3902,7 +3902,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES NO
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
   #Linux-ubuntu-arm64
   nodejs_build_ubuntu_arm64_lib_Clang:
@@ -3932,7 +3932,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES NO
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -3967,7 +3967,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES NO
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
   #Linux-debian-x86
   nodejs_build_debian_x86_lib_Clang:
@@ -4016,7 +4016,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES NO
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -4070,7 +4070,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES NO
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
   #Mac
@@ -4095,7 +4095,7 @@ jobs:
         run: |
           cd build/lib/mac
           chmod +x *.sh
-          ./build_all_and_pack.sh YES YES NO
+          ./build_all_and_pack.sh YES YES NO dynamic_lib
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
@@ -4136,7 +4136,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4164,7 +4164,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4211,7 +4211,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
             
 
       - name: "Retry: Run in FreeBSD"
@@ -4239,7 +4239,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
             
 
       - name: "Verify: Run in FreeBSD"
@@ -4279,7 +4279,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4307,7 +4307,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4353,7 +4353,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4381,7 +4381,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4421,7 +4421,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OpenBSD"
@@ -4449,7 +4449,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OpenBSD"
@@ -4496,7 +4496,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OpenBSD"
@@ -4525,7 +4525,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OpenBSD"
@@ -4616,7 +4616,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in Solaris (GCC)"
@@ -4689,7 +4689,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in Solaris (GCC)"
@@ -4764,7 +4764,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OmniOS (GCC only)"
@@ -4815,7 +4815,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OmniOS (GCC only)"
@@ -4864,7 +4864,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -4895,7 +4895,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -4944,7 +4944,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -4975,7 +4975,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -5056,7 +5056,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Retry: Run in NetBSD (Clang, x86_64)"
         id: vm_step_9_retry
@@ -5125,7 +5125,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Verify: Run in NetBSD (Clang, x86_64)"
         if: steps.vm_step_9.outcome == 'failure' && steps.vm_step_9_retry.outcome == 'failure'
@@ -5208,7 +5208,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in NetBSD (GCC, x86_64)"
@@ -5275,7 +5275,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in NetBSD (GCC, x86_64)"
@@ -5355,7 +5355,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Retry: Run in NetBSD (Clang, arm64)"
         id: vm_step_11_retry
@@ -5423,7 +5423,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES NO
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Verify: Run in NetBSD (Clang, arm64)"
         if: steps.vm_step_11.outcome == 'failure' && steps.vm_step_11_retry.outcome == 'failure'
@@ -5507,7 +5507,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in NetBSD (GCC, arm64)"
@@ -5575,7 +5575,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES NO
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in NetBSD (GCC, arm64)"

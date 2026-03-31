@@ -5,9 +5,9 @@ rem ------------------------------------------------------------
 rem Unified build/generate/pack driver for Windows
 rem
 rem Usage patterns (all parameters optional; missing ones will be prompted):
-rem   Dont_Execute_This.bat all [arch] [compiler] [java] [node] [python]
-rem   Dont_Execute_This.bat build [arch] [compiler] [java] [node] [python] [static_lib|dynamic_lib]
-rem   Dont_Execute_This.bat gen-vsproj [arch] [msvc|clang] [java] [node] [python] [static_lib|dynamic_lib]
+rem   Dont_Execute_This.bat all [arch] [compiler] [java] [node] [python] [dynamic_lib|static_lib|both]
+rem   Dont_Execute_This.bat build [arch] [compiler] [java] [node] [python] [dynamic_lib|static_lib|both]
+rem   Dont_Execute_This.bat gen-vsproj [arch] [msvc|clang] [java] [node] [python] [dynamic_lib|static_lib|both]
 rem   Dont_Execute_This.bat pack [arch]
 rem
 rem Legacy compatibility:
@@ -19,6 +19,7 @@ rem   arch         : x86_64 | x86 | arm64 | native
 rem   compiler     : msvc | clang | mingw
 rem   java,node,python : ON | OFF
 rem   lib type     : static_lib | dynamic_lib
+rem   all lib type : dynamic_lib | static_lib | both  (default: both)
 rem ------------------------------------------------------------
 
 set "BUILD_JOBS=10"
@@ -54,8 +55,15 @@ if exist "..\..\..\install" rmdir /s /q "..\..\..\install"
 
 if /I "%ACTION%"=="all" (
   call :ensure_common_params
-  call :build_one dynamic_lib || exit /b 1
-  call :build_one static_lib  || exit /b 1
+  if not defined BUILD_LIB_TYPE set "BUILD_LIB_TYPE=both"
+  if /I "%BUILD_LIB_TYPE%"=="dynamic_lib" (
+    call :build_one dynamic_lib || exit /b 1
+  ) else if /I "%BUILD_LIB_TYPE%"=="static_lib" (
+    call :build_one static_lib  || exit /b 1
+  ) else (
+    call :build_one dynamic_lib || exit /b 1
+    call :build_one static_lib  || exit /b 1
+  )
   call :do_pack               || exit /b 1
   goto :success
 ) else if /I "%ACTION%"=="build" (
@@ -165,6 +173,7 @@ set "OUTVAR=%~2"
 set "%OUTVAR%="
 if /I "%VAL%"=="static_lib"  set "%OUTVAR%=static_lib"
 if /I "%VAL%"=="dynamic_lib" set "%OUTVAR%=dynamic_lib"
+if /I "%VAL%"=="both"        set "%OUTVAR%=both"
 goto :eof
 
 :ask_build_lib_type

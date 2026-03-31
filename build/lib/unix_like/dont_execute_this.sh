@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # Usage (all parameters optional; missing ones will be prompted):
-#   dont_execute_this.sh all [arch] [compiler] [java] [node] [python]
-#   dont_execute_this.sh build [arch] [compiler] [java] [node] [python] [static_lib|dynamic_lib]
-#   dont_execute_this.sh gen-vsproj [arch] [compiler] [java] [node] [python] [static_lib|dynamic_lib]
+#   dont_execute_this.sh all [arch] [compiler] [java] [node] [python] [dynamic_lib|static_lib|both]
+#   dont_execute_this.sh build [arch] [compiler] [java] [node] [python] [dynamic_lib|static_lib|both]
+#   dont_execute_this.sh gen-vsproj [arch] [compiler] [java] [node] [python] [dynamic_lib|static_lib|both]
 #   dont_execute_this.sh pack [arch]
 #
 # Normalized values:
@@ -11,6 +11,7 @@
 #   compiler     : gcc | clang
 #   java,node,python : ON | OFF
 #   lib type     : static_lib | dynamic_lib
+#   all lib type : dynamic_lib | static_lib | both  (default: both)
 # ------------------------------------------------------------
 
 set -eu
@@ -72,6 +73,7 @@ normalize_build_lib_type() {
   case "$(to_lower "$1")" in
     static_lib|static|s) echo "static_lib" ;;
     dynamic_lib|shared|dynamic|d) echo "dynamic_lib" ;;
+    both|b) echo "both" ;;
     *) echo "" ;;
   esac
 }
@@ -279,8 +281,15 @@ rm -rf "../../../install"
 
 if [ "$ACTION" = "all" ]; then
   ensure_common_params
-  build_one dynamic_lib
-  build_one static_lib
+  BUILD_LIB_TYPE_ALL="${BUILD_LIB_TYPE:-both}"
+  if [ "$BUILD_LIB_TYPE_ALL" = "dynamic_lib" ]; then
+    build_one dynamic_lib
+  elif [ "$BUILD_LIB_TYPE_ALL" = "static_lib" ]; then
+    build_one static_lib
+  else
+    build_one dynamic_lib
+    build_one static_lib
+  fi
   do_pack
   echo "---------"; echo "Finished!"; echo "---------"
   exit 0
