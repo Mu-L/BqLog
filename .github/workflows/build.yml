@@ -1837,7 +1837,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   # DragonFlyBSD
-  build_dragonflybsd_x86_64_libs_clang:
+  build_dragonflybsd_x86_64_libs_Clang:
     runs-on: ubuntu-latest
     needs: extract_version
     steps:
@@ -6591,7 +6591,7 @@ jobs:
           ls -lh dist/maven/java/
 
       - name: Upload fat JAR artifact
-        uses: actions/upload-artifact@v8
+        uses: actions/upload-artifact@v6
         with:
           name: java_maven_fat_jar_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist/maven/java
