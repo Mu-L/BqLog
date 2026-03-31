@@ -79,10 +79,10 @@
   **C++（NDK）通过 Prefab 使用** — 在 `CMakeLists.txt` 中添加：
 
   ```cmake
-  find_package(bqlog REQUIRED CONFIG)
+  find_package(BqLog REQUIRED CONFIG)
 
   target_link_libraries(your_native_lib
-      bqlog::bqlog
+      bqlog::BqLog
       android
       log)
   ```

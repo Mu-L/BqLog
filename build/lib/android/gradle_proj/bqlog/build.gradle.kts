@@ -11,7 +11,7 @@ android {
     }
 
     prefab {
-        create("bqlog") {
+        create("BqLog") {
             headers = "../../../../../artifacts/dynamic_lib/include"
             libraryName = "libBqLog"
         }
