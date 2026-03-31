@@ -5,6 +5,7 @@ on:
 
 permissions:
   id-token: write  # Required for OIDC
+  contents: write
 
 jobs:
   build:
