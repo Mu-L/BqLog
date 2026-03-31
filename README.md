@@ -75,6 +75,10 @@ Your program accesses the core engine through `BqLog Wrapper` (C++, Java, C#, Ty
 
 ## 🚀 Quick Start
 
+> Before calling any API, you need to integrate BqLog into your project first:
+> - **Standard environments** (C++, Java, C#, Python, Node.js, etc.) → [Integration Guide](docs/INTEGRATION_GUIDE.md)
+> - **Game engines** (Unity, Tuanjie Engine, Unreal Engine) → [Game Engine Integration Guide](docs/ENGINE_INTEGRATION.md)
+
 ### C++
 
 ```cpp
@@ -154,7 +158,7 @@ log.info("Hello from HarmonyOS! params: {}, {}", "text", 123);
 bq.log.force_flush_all_logs();
 ```
 
-> For full integration steps for all platforms, see [Integration Guide](docs/INTEGRATION_GUIDE.md).
+> For full integration steps for all platforms, see [Integration Guide](docs/INTEGRATION_GUIDE.md) and [Game Engine Integration Guide](docs/ENGINE_INTEGRATION.md).
 
 ---
 
@@ -203,7 +207,7 @@ Test: 1–10 threads, each writing 2,000,000 log entries. Environment: i9-13900K
 5. Android no longer must be used together with Java.
 6. Removed the `is_in_sandbox` config and replaced it with `base_dir_type`; added filters for snapshots and support for opening a new log file on each startup. See [Configuration](docs/CONFIGURATION.md).
 7. Added high-performance hybrid asymmetric encryption, ***almost zero overhead***; see [Advanced Usage — Encryption](docs/ADVANCED_USAGE.md#6-log-encryption-and-decryption).
-8. Provides Unity, Tuanjie Engine, and Unreal Engine plugins, making it easy to use in game engines; provides ConsoleAppender redirection to game-engine editors and Blueprint support for Unreal. See [Advanced Usage — Unreal](docs/ADVANCED_USAGE.md#5-using-bqlog-in-unreal).
+8. Provides Unity, Tuanjie Engine, and Unreal Engine plugins, making it easy to use in game engines; provides ConsoleAppender redirection to game-engine editors and Blueprint support for Unreal. See [Game Engine Integration Guide](docs/ENGINE_INTEGRATION.md).
 9. The repository no longer ships binaries. From 2.x on, please download platform- and language-specific packages from the [Releases page](https://github.com/Tencent/BqLog/releases).
 10. The size of a single log entry is not limited by `log.buffer_size` anymore;
 11. The timezone can be specified manually.
@@ -217,9 +221,10 @@ Test: 1–10 threads, each writing 2,000,000 log entries. Environment: i9-13900K
 | Document | Description |
 |----------|-------------|
 | [Integration Guide](docs/INTEGRATION_GUIDE.md) | Full integration steps for all platforms + all language demos |
+| [Game Engine Integration](docs/ENGINE_INTEGRATION.md) | Unity, Tuanjie Engine, Unreal Engine plugins and Blueprint usage |
 | [API Reference](docs/API_REFERENCE.md) | Core APIs, sync/async logging, Appender overview, build & tools |
 | [Configuration](docs/CONFIGURATION.md) | Full configuration reference (appenders, log, snapshot) |
-| [Advanced Usage](docs/ADVANCED_USAGE.md) | No Heap Alloc, Category, crash recovery, custom types, Unreal, encryption |
+| [Advanced Usage](docs/ADVANCED_USAGE.md) | No Heap Alloc, Category, crash recovery, custom types, encryption |
 | [Benchmark](docs/BENCHMARK.md) | Full benchmark code (C++, Java, Log4j) and results |
 
 ---

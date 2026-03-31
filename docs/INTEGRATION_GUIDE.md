@@ -30,15 +30,8 @@
 
 ## C# (Unity / Tuanjie Engine / .NET)
 
-- **Unity**
-  - Download `unity_package_{version}`;
-  - Unzip and in Unity Package Manager select "Install from tarball", pointing to the `.tar` file inside to import;
-  - Official Unity does not support HarmonyOS yet; if you need HarmonyOS support, you can integrate it yourself as needed.
-
-- **Tuanjie Engine**
-  - Download `tuanjie_package_{version}`;
-  - Unzip and import via Unity Package Manager as tarball similarly;
-  - The main difference from Unity is that HarmonyOS related support is already integrated.
+- **Unity / Tuanjie Engine**
+  For full engine integration steps, see [Game Engine Integration Guide](./ENGINE_INTEGRATION.md).
 
 - **.NET**
   - Download the dynamic library package `{os}_{arch}_libs_{version}` for the corresponding platform, and import the dynamic libraries within;
@@ -161,7 +154,13 @@
 ## Node.js
 
 - Supports CommonJS and ES Modules.
-- From Releases download `nodejs_npm_{version}` package, unzip to find `pippocao-bqlog-{version}.tgz` inside, install via npm:
+- **npm (recommended)**:
+
+```bash
+npm install @pippocao/bqlog
+```
+
+- **Manual install** — From Releases download `nodejs_npm_{version}` package, unzip to find `pippocao-bqlog-{version}.tgz` inside, install via npm:
 
 ```bash
 npm install ./pippocao-bqlog-{version}.tgz
@@ -174,7 +173,13 @@ Refer to `/demo/nodejs` directory under the repository.
 ## Python
 
 - Supports Python 3.7+ (CPython C Extension, Stable ABI).
-- From Releases download `python_wrapper_{version}` package, unzip to find `.whl` file inside, install via pip:
+- **pip (recommended)**:
+
+```bash
+pip install bqlog
+```
+
+- **Manual install** — From Releases download `python_wrapper_{version}` package, unzip to find `.whl` file inside, install via pip:
 
 ```bash
 pip install ./bqlog-{version}-cp37-abi3-{platform}.whl
@@ -184,15 +189,14 @@ Refer to `/demo/python` directory under the repository.
 
 ---
 
-## Unreal Engine
+## Unity / Tuanjie Engine / Unreal Engine
 
-- **Prebuilt**
-  - Download `unreal_plugin_prebuilt_{version}` from Releases;
-  - Unzip and according to your engine version, select the corresponding compressed package, unzip to the `Plugins` directory of your game project.
-
-- **Source**
-  - Download `unreal_plugin_source_{version}` from Releases;
-  - Unzip and according to your engine version, select the corresponding compressed package, unzip to the `Plugins` directory of your game project, to be recompiled by the engine.
+See the dedicated **[Game Engine Integration Guide](./ENGINE_INTEGRATION.md)** for:
+- Unity and Tuanjie Engine package import
+- Unreal Engine plugin (prebuilt or source)
+- `FString` / `FName` / `FText` support
+- Redirect BqLog output to Unreal's Output Log window
+- Blueprint usage
 
 ---
 
@@ -302,4 +306,5 @@ For more examples, refer to `/demo/java` directory.
 
 - [API Reference](./API_REFERENCE.md) — Core APIs for creating logs, writing logs, and more
 - [Configuration](./CONFIGURATION.md) — Full configuration reference
-- [Advanced Usage](./ADVANCED_USAGE.md) — Category, encryption, Unreal, custom types, and more
+- [Advanced Usage](./ADVANCED_USAGE.md) — Category, encryption, custom types, and more
+- [Game Engine Integration](./ENGINE_INTEGRATION.md) — Unity, Tuanjie Engine, Unreal Engine

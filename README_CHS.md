@@ -75,6 +75,10 @@
 
 ## 🚀 快速上手
 
+> 调用 API 前，请先将 BqLog 集成到您的项目：
+> - **常规编程环境**（C++、Java、C#、Python、Node.js 等）→ [集成指南](docs/INTEGRATION_GUIDE_CHS.md)
+> - **游戏引擎**（Unity、团结引擎、Unreal Engine）→ [游戏引擎集成指南](docs/ENGINE_INTEGRATION_CHS.md)
+
 ### C++
 
 ```cpp
@@ -154,7 +158,7 @@ log.info("Hello from HarmonyOS! params: {}, {}", "text", 123);
 bq.log.force_flush_all_logs();
 ```
 
-> 各平台完整集成步骤请见 [集成指南](docs/INTEGRATION_GUIDE_CHS.md)。
+> 各平台完整集成步骤请见 [集成指南](docs/INTEGRATION_GUIDE_CHS.md) 和 [游戏引擎集成指南](docs/ENGINE_INTEGRATION_CHS.md)。
 
 ---
 
@@ -203,7 +207,7 @@ bq.log.force_flush_all_logs();
 5. Android 不再强制要求与 Java 一起使用。
 6. 移除 `is_in_sandbox` 配置，改用 `base_dir_type`；对 snapshot 增加过滤配置，支持每次启动新开日志文件。详见 [配置说明](docs/CONFIGURATION_CHS.md)。
 7. 支持高性能非对称混合加密，几乎无额外性能损耗，详见 [高级用法 — 加密](docs/ADVANCED_USAGE_CHS.md#6-日志加密和解密)。
-8. 提供 Unity、团结引擎、Unreal 引擎插件，方便在游戏引擎中使用；提供 ConsoleAppender 对游戏引擎编辑器日志输出重定向，提供 Unreal 蓝图支持。详见 [高级用法 — Unreal](docs/ADVANCED_USAGE_CHS.md#5-在-unreal-中使用-bqlog)。
+8. 提供 Unity、团结引擎、Unreal 引擎插件，方便在游戏引擎中使用；提供 ConsoleAppender 对游戏引擎编辑器日志输出重定向，提供 Unreal 蓝图支持。详见 [游戏引擎集成指南](docs/ENGINE_INTEGRATION_CHS.md)。
 9. 仓库不再包含二进制产物，从 2.x 版本起请从 [Releases 页面](https://github.com/Tencent/BqLog/releases)下载对应平台和语言的二进制包。
 10. 单条日志长度不再受log.buffer_size限制。
 11. 可以精确手动设置时区。
@@ -217,9 +221,10 @@ bq.log.force_flush_all_logs();
 | 文档 | 说明 |
 |------|------|
 | [集成指南](docs/INTEGRATION_GUIDE_CHS.md) | 所有平台完整集成步骤 + 各语言 Demo |
+| [游戏引擎集成](docs/ENGINE_INTEGRATION_CHS.md) | Unity、团结引擎、Unreal Engine 插件与蓝图使用 |
 | [API 参考](docs/API_REFERENCE_CHS.md) | 核心 API、同步/异步日志、Appender 介绍、构建与工具 |
 | [配置说明](docs/CONFIGURATION_CHS.md) | 完整配置参考（appenders、log、snapshot） |
-| [高级用法](docs/ADVANCED_USAGE_CHS.md) | 无 Heap Alloc、Category、崩溃恢复、自定义类型、Unreal、加密 |
+| [高级用法](docs/ADVANCED_USAGE_CHS.md) | 无 Heap Alloc、Category、崩溃恢复、自定义类型、加密 |
 | [Benchmark](docs/BENCHMARK_CHS.md) | 完整 Benchmark 代码（C++、Java、Log4j）和结果 |
 
 ---

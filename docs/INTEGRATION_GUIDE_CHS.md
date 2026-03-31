@@ -30,15 +30,8 @@
 
 ## C#（Unity / 团结引擎 / .NET）
 
-- **Unity**
-  - 下载 `unity_package_{version}`；
-  - 解压后在 Unity Package Manager 中选择「从 tarball 安装」，指向其中的 `.tar` 文件导入；
-  - 官方 Unity 暂不支持鸿蒙，如需鸿蒙支持可按需自行集成。
-
-- **团结引擎**
-  - 下载 `tuanjie_package_{version}`；
-  - 解压后同样通过 Unity Package Manager 以 tarball 方式导入；
-  - 与 Unity 的主要差异是已集成鸿蒙相关支持。
+- **Unity / 团结引擎**
+  完整引擎集成步骤请见 [游戏引擎集成指南](./ENGINE_INTEGRATION_CHS.md)。
 
 - **.NET**
   - 下载对应平台的动态库包 `{os}_{arch}_libs_{version}`，引入其中动态库；
@@ -162,7 +155,13 @@
 ## Node.js
 
 - 支持 CommonJS 与 ES Module。
-- 从 Releases 下载 `nodejs_npm_{version}` 包，解压后找到其中的 `pippocao-bqlog-{version}.tgz`，通过 npm 安装：
+- **npm（推荐）**：
+
+```bash
+npm install @pippocao/bqlog
+```
+
+- **手动安装** — 从 Releases 下载 `nodejs_npm_{version}` 包，解压后找到其中的 `pippocao-bqlog-{version}.tgz`，通过 npm 安装：
 
 ```bash
 npm install ./pippocao-bqlog-{version}.tgz
@@ -175,7 +174,13 @@ npm install ./pippocao-bqlog-{version}.tgz
 ## Python
 
 - 支持 Python 3.7+（CPython C Extension，Stable ABI）。
-- 从 Releases 下载 `python_wrapper_{version}` 包，解压后找到 `.whl` 文件，通过 pip 安装：
+- **pip（推荐）**：
+
+```bash
+pip install bqlog
+```
+
+- **手动安装** — 从 Releases 下载 `python_wrapper_{version}` 包，解压后找到 `.whl` 文件，通过 pip 安装：
 
 ```bash
 pip install ./bqlog-{version}-cp37-abi3-{platform}.whl
@@ -185,15 +190,14 @@ pip install ./bqlog-{version}-cp37-abi3-{platform}.whl
 
 ---
 
-## Unreal Engine
+## Unity / 团结引擎 / Unreal Engine
 
-- **预编译版（Prebuilt）**
-  - 从 Releases 下载 `unreal_plugin_prebuilt_{version}`；
-  - 解压后根据自己的引擎版本，选择对应压缩包，解压到游戏项目的 `Plugins` 目录下。
-
-- **源码版（Source）**
-  - 从 Releases 下载 `unreal_plugin_source_{version}`；
-  - 解压后根据自己的引擎版本，选择对应压缩包，解压到游戏项目的 `Plugins` 目录下，由引擎进行二次编译。
+完整引擎集成步骤请见 **[游戏引擎集成指南](./ENGINE_INTEGRATION_CHS.md)**，包括：
+- Unity 和团结引擎 Package 导入
+- Unreal Engine 插件（预编译版或源码版）
+- `FString` / `FName` / `FText` 支持
+- BqLog 输出重定向到 Unreal Output Log 窗口
+- 蓝图使用方式
 
 ---
 
@@ -303,4 +307,5 @@ log.info("Hello Java! value: {}", 3.14);
 
 - [API 参考](./API_REFERENCE_CHS.md) — 创建日志、写日志等核心 API
 - [配置说明](./CONFIGURATION_CHS.md) — 完整配置参考
-- [高级用法](./ADVANCED_USAGE_CHS.md) — Category、加密、Unreal、自定义类型等
+- [高级用法](./ADVANCED_USAGE_CHS.md) — Category、加密、自定义类型等
+- [游戏引擎集成](./ENGINE_INTEGRATION_CHS.md) — Unity、团结引擎、Unreal Engine
