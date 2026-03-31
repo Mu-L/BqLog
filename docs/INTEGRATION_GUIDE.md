@@ -48,13 +48,105 @@
 
 ## Java / Kotlin (Android / Server)
 
-- **Android**
-  - Download `android_libs_{version}`;
-  - You can directly import the `.aar` package within(The AAR follows standard AGP packaging conventions, with native headers and prebuilt libraries exported via Prefab.), or manually import `/src` + `/wrapper/java/src` source code under the repository.
+### Android
 
-- **Server**
-  - Download the dynamic library `{os}_{arch}_libs_{version}` for the corresponding platform and import it;
-  - Then download `java_wrapper_{version}`, import the jar package or directly add `/wrapper/java/src` source code under the repository.
+- **Maven Central (recommended)**
+
+  Add to your `app/build.gradle.kts`:
+
+  ```kotlin
+  android {
+      buildFeatures {
+          prefab = true   // required for C++ native header access via Prefab
+      }
+  }
+
+  dependencies {
+      implementation("com.tencent.bqlog:android:2.+")
+  }
+  ```
+  ```java
+  import bq.log;
+
+  bq.log myLog = bq.log.create_log("myApp", """
+      appenders_config.console.type=console
+      appenders_config.console.levels=[all]
+  """);
+  myLog.info("Hello from Android Java!");
+  ```
+
+  **C++ (NDK) usage via Prefab** — add to your `CMakeLists.txt`:
+
+  ```cmake
+  find_package(bqlog REQUIRED CONFIG)
+
+  target_link_libraries(your_native_lib
+      bqlog::bqlog
+      android
+      log)
+  ```
+
+  Then include in C++:
+
+  ```cpp
+  #include <bq_log/bq_log.h>
+  ```
+
+- **Manual AAR**
+
+  Download `android_libs_{version}` from the [Releases page](https://github.com/Tencent/BqLog/releases), copy `bqlog-release.aar` into your project's `libs/` directory, then add to `app/build.gradle.kts`:
+
+  ```kotlin
+  android {
+      buildFeatures {
+          prefab = true
+      }
+  }
+
+  dependencies {
+      implementation(files("libs/bqlog-release.aar"))
+  }
+  ```
+
+  Java/Kotlin and C++ usage are identical to the Maven approach above.
+
+### Java (Server / Desktop)
+
+- **Maven Central (recommended)**
+
+  The fat JAR bundles native libraries for all platforms (Windows x86_64/arm64, Linux x86_64/arm64/x86, macOS universal, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, SunOS). No extra configuration needed — the correct `.so`/`.dll`/`.dylib` is extracted and loaded automatically at runtime.
+
+  **Maven (`pom.xml`)**:
+
+  ```xml
+  <dependency>
+      <groupId>com.tencent.bqlog</groupId>
+      <artifactId>java</artifactId>
+      <version>[2.0,3.0)</version>
+  </dependency>
+  ```
+
+  **Gradle (`build.gradle.kts`)**:
+
+  ```kotlin
+  dependencies {
+      implementation("com.tencent.bqlog:java:2.+")
+  }
+  ```
+
+  ```java
+  import bq.log;
+
+  bq.log myLog = bq.log.create_log("myApp", """
+      appenders_config.console.type=console
+      appenders_config.console.levels=[all]
+  """);
+  myLog.info("Hello from Java! value: {}", 3.14);
+  ```
+
+- **Manual JAR**
+
+  Download the dynamic library `{os}_{arch}_libs_{version}` for your platform from the [Releases page](https://github.com/Tencent/BqLog/releases), then download `java_wrapper_{version}` and add the JAR to your classpath. When running, pass the native library directory via `-Djava.library.path=/path/to/lib`.
 
 ---
 

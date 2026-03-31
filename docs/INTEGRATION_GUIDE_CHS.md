@@ -48,13 +48,106 @@
 
 ## Java / Kotlin（Android / Server）
 
-- **Android**
-  - 下载 `android_libs_{version}`；
-  - 可以直接引入其中的 `.aar` 包(AAR 基于 AGP 标准打包，内含 Prefab Native 头文件及动态库），或手动引入仓库下 `/src` 和 `/wrapper/java/src` 源码。
+### Android
 
-- **Server**
-  - 下载对应平台动态库 `{os}_{arch}_libs_{version}` 并引入；
-  - 再下载 `java_wrapper_{version}`，引入 jar 包或直接加入仓库下 `/wrapper/java/src` 源码。
+- **Maven Central（推荐）**
+
+  在 `app/build.gradle.kts` 中添加：
+
+  ```kotlin
+  android {
+      buildFeatures {
+          prefab = true   // 启用 Prefab，C++ 侧才能通过 find_package 找到头文件和 .so
+      }
+  }
+
+  dependencies {
+      implementation("com.tencent.bqlog:android:2.+")
+  }
+  ```
+
+  ```java
+  import bq.log;
+
+  bq.log myLog = bq.log.create_log("myApp", """
+      appenders_config.console.type=console
+      appenders_config.console.levels=[all]
+  """);
+  myLog.info("Hello from Android Java!");
+  ```
+
+  **C++（NDK）通过 Prefab 使用** — 在 `CMakeLists.txt` 中添加：
+
+  ```cmake
+  find_package(bqlog REQUIRED CONFIG)
+
+  target_link_libraries(your_native_lib
+      bqlog::bqlog
+      android
+      log)
+  ```
+
+  C++ 代码中直接包含：
+
+  ```cpp
+  #include <bq_log/bq_log.h>
+  ```
+
+- **手动引入 AAR**
+
+  从 [Releases 页面](https://github.com/Tencent/BqLog/releases) 下载 `android_libs_{version}`，将其中的 `bqlog-release.aar` 复制到项目的 `libs/` 目录，然后在 `app/build.gradle.kts` 中添加：
+
+  ```kotlin
+  android {
+      buildFeatures {
+          prefab = true
+      }
+  }
+
+  dependencies {
+      implementation(files("libs/bqlog-release.aar"))
+  }
+  ```
+
+  Java / Kotlin 与 C++ 的使用方式与 Maven 方式完全相同。
+
+### Java（Server / Desktop）
+
+- **Maven Central（推荐）**
+
+  fat JAR 内已打包全平台 native 库（Windows x86_64/arm64、Linux x86_64/arm64/x86、macOS universal、FreeBSD、OpenBSD、NetBSD、DragonFlyBSD、SunOS），运行时自动解压并加载对应平台的库文件，无需额外配置。
+
+  **Maven (`pom.xml`)**：
+
+  ```xml
+  <dependency>
+      <groupId>com.tencent.bqlog</groupId>
+      <artifactId>java</artifactId>
+      <version>[2.0,3.0)</version>
+  </dependency>
+  ```
+
+  **Gradle (`build.gradle.kts`)**：
+
+  ```kotlin
+  dependencies {
+      implementation("com.tencent.bqlog:java:2.+")
+  }
+  ```
+
+  ```java
+  import bq.log;
+
+  bq.log myLog = bq.log.create_log("myApp", """
+      appenders_config.console.type=console
+      appenders_config.console.levels=[all]
+  """);
+  myLog.info("Hello from Java! value: {}", 3.14);
+  ```
+
+- **手动引入 JAR**
+
+  从 [Releases 页面](https://github.com/Tencent/BqLog/releases) 下载对应平台的动态库 `{os}_{arch}_libs_{version}`，再下载 `java_wrapper_{version}`，将 JAR 加入 classpath，运行时通过 `-Djava.library.path=/path/to/lib` 指定 native 库目录。
 
 ---
 

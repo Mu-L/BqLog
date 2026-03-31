@@ -30,64 +30,64 @@ public class log {
 		try {
 			// On Android the .so is extracted by the OS installer from the AAR,
 			// so the standard loadLibrary path always works.
-			boolean isAndroid = System.getProperty("java.vm.name", "").contains("Dalvik")
+			boolean is_android = System.getProperty("java.vm.name", "").contains("Dalvik")
 					|| System.getProperty("java.vendor", "").toLowerCase().contains("android");
-			if (isAndroid) {
+			if (is_android) {
 				System.loadLibrary(bq.lib_def.lib_name);
 			} else {
 				// For fat-JAR (Maven) distribution: try to locate the bundled native
-				// library under /natives/<osToken>-<archToken>/<libFileName> inside
+				// library under /natives/<os_token>-<arch_token>/<lib_file_name> inside
 				// the JAR, extract it to a temp file, and load it from there.
 				// Falls back to System.loadLibrary so that developers who build
 				// locally and manage java.library.path themselves are unaffected.
 				boolean loaded = false;
-				String osName  = System.getProperty("os.name",  "").toLowerCase();
-				String osArch  = System.getProperty("os.arch",  "").toLowerCase();
+				String os_name  = System.getProperty("os.name",  "").toLowerCase();
+				String os_arch  = System.getProperty("os.arch",  "").toLowerCase();
 
 				// Normalise arch to match CI staging directory names
-				String archToken;
-				if      (osArch.equals("amd64")   || osArch.equals("x86_64"))                   archToken = "x86_64";
-				else if (osArch.equals("aarch64") || osArch.equals("arm64"))                     archToken = "arm64";
-				else if (osArch.equals("x86")     || osArch.equals("i386") || osArch.equals("i686")) archToken = "x86";
-				else                                                                              archToken = osArch;
+				String arch_token;
+				if      (os_arch.equals("amd64")   || os_arch.equals("x86_64"))                      arch_token = "x86_64";
+				else if (os_arch.equals("aarch64") || os_arch.equals("arm64"))                        arch_token = "arm64";
+				else if (os_arch.equals("x86")     || os_arch.equals("i386") || os_arch.equals("i686")) arch_token = "x86";
+				else                                                                                   arch_token = os_arch;
 
 				// Normalise OS and choose the library file name
-				String osToken;
-				String libFileName;
-				if (osName.contains("win")) {
-					osToken     = "windows";
-					libFileName = bq.lib_def.lib_name + ".dll";
-				} else if (osName.contains("mac") || osName.contains("darwin")) {
-					osToken     = "macos";
-					libFileName = "lib" + bq.lib_def.lib_name + ".dylib";
-				} else if (osName.contains("freebsd")) {
-					osToken     = "freebsd";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
-				} else if (osName.contains("openbsd")) {
-					osToken     = "openbsd";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
-				} else if (osName.contains("netbsd")) {
-					osToken     = "netbsd";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
-				} else if (osName.contains("dragonfly")) {
-					osToken     = "dragonfly";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
-				} else if (osName.contains("sunos") || osName.contains("solaris")) {
-					osToken     = "sunos";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+				String os_token;
+				String lib_file_name;
+				if (os_name.contains("win")) {
+					os_token      = "windows";
+					lib_file_name = bq.lib_def.lib_name + ".dll";
+				} else if (os_name.contains("mac") || os_name.contains("darwin")) {
+					os_token      = "macos";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".dylib";
+				} else if (os_name.contains("freebsd")) {
+					os_token      = "freebsd";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (os_name.contains("openbsd")) {
+					os_token      = "openbsd";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (os_name.contains("netbsd")) {
+					os_token      = "netbsd";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (os_name.contains("dragonfly")) {
+					os_token      = "dragonfly";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
+				} else if (os_name.contains("sunos") || os_name.contains("solaris")) {
+					os_token      = "sunos";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
 				} else {
 					// Linux and any other POSIX-like system
-					osToken     = "linux";
-					libFileName = "lib" + bq.lib_def.lib_name + ".so";
+					os_token      = "linux";
+					lib_file_name = "lib" + bq.lib_def.lib_name + ".so";
 				}
 
 				// Suffix for the temp file so the OS links the right extension
-				String libSuffix = libFileName.substring(libFileName.lastIndexOf('.'));
-				String resourcePath = "/natives/" + osToken + "-" + archToken + "/" + libFileName;
+				String lib_suffix = lib_file_name.substring(lib_file_name.lastIndexOf('.'));
+				String resource_path = "/natives/" + os_token + "-" + arch_token + "/" + lib_file_name;
 
-				try (InputStream in = log.class.getResourceAsStream(resourcePath)) {
+				try (InputStream in = log.class.getResourceAsStream(resource_path)) {
 					if (in != null) {
-						File tmp = File.createTempFile(bq.lib_def.lib_name + "_", libSuffix);
+						File tmp = File.createTempFile(bq.lib_def.lib_name + "_", lib_suffix);
 						tmp.deleteOnExit();
 						Files.copy(in, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
 						System.load(tmp.getAbsolutePath());

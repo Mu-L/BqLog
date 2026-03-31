@@ -205,8 +205,6 @@ jobs:
           fi
           echo "Publishing: $TGZ"
           npm publish "$TGZ" --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # Publish Java fat JAR to Maven Central
   publish_java_maven:
@@ -366,13 +364,18 @@ jobs:
           merge-multiple: true
           path: android_libs/
 
-      - name: Locate AAR
+      - name: Locate AAR and javadoc JAR
         id: aar
         run: |
           AAR=$(find android_libs -type f -name "bqlog-release.aar" | head -n1 || true)
           if [[ -z "$AAR" ]]; then echo "::error::bqlog-release.aar not found" >&2; exit 1; fi
           echo "path=$AAR" >> "$GITHUB_OUTPUT"
           echo "Found AAR: $AAR"
+
+          JAVADOC_JAR=$(find android_libs -type f -name "*-javadoc.jar" | head -n1 || true)
+          if [[ -z "$JAVADOC_JAR" ]]; then echo "::error::javadoc jar not found" >&2; exit 1; fi
+          echo "javadoc_path=$JAVADOC_JAR" >> "$GITHUB_OUTPUT"
+          echo "Found javadoc JAR: $JAVADOC_JAR"
 
       - name: Import GPG key
         run: echo "${{ secrets.GPG_SIGNING_KEY }}" | gpg --batch --import
@@ -381,13 +384,14 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           AAR_PATH: ${{ steps.aar.outputs.path }}
+          JAVADOC_JAR_PATH: ${{ steps.aar.outputs.javadoc_path }}
           GPG_SIGNING_KEY_ID: ${{ secrets.GPG_SIGNING_KEY_ID }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: |
           set -euo pipefail
-          : "${VERSION:?}" "${AAR_PATH:?}" "${GPG_SIGNING_KEY_ID:?}" "${GPG_SIGNING_PASSWORD:?}"
+          : "${VERSION:?}" "${AAR_PATH:?}" "${JAVADOC_JAR_PATH:?}" "${GPG_SIGNING_KEY_ID:?}" "${GPG_SIGNING_PASSWORD:?}"
           : "${MAVEN_CENTRAL_USERNAME:?}" "${MAVEN_CENTRAL_PASSWORD:?}"
 
           BUNDLE_DIR="$(pwd)/bundle_android"
@@ -405,10 +409,8 @@ jobs:
           jar cf "$BUNDLE_PKG/${BASE_NAME}-sources.jar" -C wrapper/java/src .
           rm -rf "$EMPTY_DIR"
 
-          # ── javadoc JAR (empty placeholder — required by Central Portal) ──
-          EMPTY_DIR2="$(mktemp -d)"
-          (cd "$EMPTY_DIR2" && jar cf "$BUNDLE_PKG/${BASE_NAME}-javadoc.jar" .)
-          rm -rf "$EMPTY_DIR2"
+          # ── javadoc JAR (built by Gradle during android AAR build) ────────
+          cp -f "$JAVADOC_JAR_PATH" "$BUNDLE_PKG/${BASE_NAME}-javadoc.jar"
 
           # ── generate POM ─────────────────────────────────────────────────
           cat > "$BUNDLE_PKG/${BASE_NAME}.pom" <<EOF
