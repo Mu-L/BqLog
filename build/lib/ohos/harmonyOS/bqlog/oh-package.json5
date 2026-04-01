@@ -7,16 +7,15 @@
   "license": "Apache-2.0",
   "keywords": [
     "log",
-    "logging",
-    "logger",
-    "bqlog",
     "high-performance",
-    "cross-platform",
-    "harmonyos",
-    "arkts",
     "compressed-log",
     "encryption",
-    "tencent"
+    "tencent",
+    "日志",
+    "高性能",
+    "压缩",
+    "加密",
+    "腾讯"
   ],
   "homepage": "https://github.com/Tencent/BqLog",
   "repository": "https://github.com/Tencent/BqLog",

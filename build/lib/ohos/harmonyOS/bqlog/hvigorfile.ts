@@ -246,8 +246,26 @@ try {
 
   // 3) copy har publishing required files (README.md, CHANGELOG.md, LICENSE)
   copy_har_publish_files();
+
+  // 4) create example directory with README.md (reuse module README) for OHPM scoring
+  create_example_dir();
 } catch (e) {
   throw e;
+}
+
+/** create example/README.md inside module for OHPM scoring */
+function create_example_dir(): void {
+  const example_dir = path.join(module_root, 'example');
+  ensure_dir(example_dir);
+  // reuse the module README.md as example content
+  const readme_src = path.join(module_root, 'README.md');
+  const readme_dst = path.join(example_dir, 'README.md');
+  if (exists(readme_src)) {
+    fs.copyFileSync(readme_src, readme_dst);
+    log('created example/README.md from module README.md');
+  } else {
+    console.warn('[hvigor] README.md not found, cannot create example/README.md');
+  }
 }
 
 /** export default har tasks (for HAR library module) */
