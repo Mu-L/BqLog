@@ -18,6 +18,18 @@
 
 [![Download](https://img.shields.io/badge/⬇_下载-Release_2.2.7-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.7)
 
+## 📋 v2.2.7 更新亮点
+
+- **Python 3.7+ 支持** — 通过 CPython C Extension（Stable ABI）新增 Python 包装层。
+- **包仓库发布** — 已发布至 [npm](https://www.npmjs.com/package/@pippocao/bqlog)（`npm install @pippocao/bqlog`）、[PyPI](https://pypi.org/project/bqlog/)（`pip install bqlog`）、[Maven Central](https://central.sonatype.com/namespace/com.tencent.bqlog)（Gradle/Maven）、[OHPM](https://ohpm.openharmony.cn/#/cn/detail/bqlog)（`ohpm install bqlog`）。
+- **Python Category Log 生成器** — `BqLog_CategoryLogGenerator` 工具现可生成 Python 分类日志包装（`.py`）。
+- **TypeScript 双目标生成** — 分别为 Node.js（`_nodejs.ts`）和 HarmonyOS（`_ohos.ts`）生成独立输出。
+- **分类日志测试覆盖** — 新增 Python、Java、C#、TypeScript 的分类日志测试用例。
+
+> 完整更新日志 → [CHANGELOG.md](CHANGELOG.md)
+
+---
+
 ## 💡 如果您有以下困扰，可以尝试 BqLog
 
 - 如果您的客户端产品（尤其是游戏）希望同时满足以下「不可能三角」：

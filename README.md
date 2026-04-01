@@ -18,6 +18,18 @@
 
 [![Download](https://img.shields.io/badge/⬇_Download-Release_2.2.7-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.7)
 
+## 📋 What's New in v2.2.7
+
+- **Python 3.7+ support** — Added Python wrapper via CPython C Extension (Stable ABI).
+- **Package registry publishing** — Now available on [npm](https://www.npmjs.com/package/@pippocao/bqlog) (`npm install @pippocao/bqlog`), [PyPI](https://pypi.org/project/bqlog/) (`pip install bqlog`), [Maven Central](https://central.sonatype.com/namespace/com.tencent.bqlog) (Gradle/Maven), and [OHPM](https://ohpm.openharmony.cn/#/en/detail/bqlog) (`ohpm install bqlog`).
+- **Python category log generator** — `BqLog_CategoryLogGenerator` now generates Python category log wrappers (`.py`).
+- **TypeScript dual-target generation** — Separate outputs for Node.js (`_nodejs.ts`) and HarmonyOS (`_ohos.ts`).
+- **Category log test coverage** — Added test suites for Python, Java, C#, and TypeScript.
+
+> Full changelog → [CHANGELOG.md](CHANGELOG.md)
+
+---
+
 ## 💡 If you have the following pain points, try BqLog
 
 - If your client product (especially games) wants to satisfy this "impossible triangle" at the same time:
