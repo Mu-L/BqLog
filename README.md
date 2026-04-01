@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="BqLog Banner" width="100%">
+</p>
+
 # BqLog (BianQue Log) V 2.2.7
 
 **English** | [简体中文](./README_CHS.md)

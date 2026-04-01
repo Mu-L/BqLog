@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="BqLog Banner" width="100%">
+</p>
+
 # BqLog (扁鹊日志) V 2.2.7
 
 [English](./README.md) | **简体中文**
