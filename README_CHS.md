@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.png" alt="BqLog Banner" width="100%">
+  <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
 # BqLog (扁鹊日志) V 2.2.7
