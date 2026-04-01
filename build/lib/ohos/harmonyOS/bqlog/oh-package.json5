@@ -5,6 +5,21 @@
   "main": "./src/main/ets/wrapper/index.ts",
   "author": "pippocao",
   "license": "Apache-2.0",
+  "keywords": [
+    "log",
+    "logging",
+    "logger",
+    "bqlog",
+    "high-performance",
+    "cross-platform",
+    "harmonyos",
+    "arkts",
+    "compressed-log",
+    "encryption",
+    "tencent"
+  ],
+  "homepage": "https://github.com/Tencent/BqLog",
+  "repository": "https://github.com/Tencent/BqLog",
   "dependencies": {
   }
 }

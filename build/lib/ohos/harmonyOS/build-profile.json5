@@ -37,6 +37,18 @@
           ]
         }
       ]
+    },
+    {
+      "name": "example",
+      "srcPath": "./example",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     }
   ]
 }

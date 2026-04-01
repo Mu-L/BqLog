@@ -1,0 +1,11 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "BqLog usage example for HarmonyOS",
+  "main": "",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "bqlog": "*"
+  }
+}
