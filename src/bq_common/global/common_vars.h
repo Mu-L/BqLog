@@ -182,6 +182,12 @@ namespace bq {
         bq::array<bq::platform::napi_callback_dispatcher*> napi_dispatchers_;
 #endif
 #endif
+#if defined(BQ_PYTHON)
+        // Each entry is a pointer to a null-terminated PyMethodDef array
+        // (stored as void* to avoid pulling in Python.h).
+        // Registered via bq::platform::python_method_register before module init.
+        bq::array<void*> python_registered_method_arrays_;
+#endif
 #if defined(BQ_ANDROID)
         jobject android_asset_manager_java_instance_ = nullptr;
         AAssetManager* android_asset_manager_inst_ = nullptr;

@@ -18,7 +18,7 @@ jobs:
       version: ${{ steps.extract.outputs.version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extract version
         id: extract
@@ -38,10 +38,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -49,10 +49,10 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64  
-          .\build_all_and_pack.bat native msvc YES NO
+          .\build_all_and_pack.bat native msvc YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -62,10 +62,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -73,17 +73,17 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64  
-          .\build_all_and_pack.bat native clang YES NO
+          .\build_all_and_pack.bat native clang YES NO NO
 
   build_windows_x86_64_lib_MinGW:
     runs-on: windows-latest
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java (JDK 11)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -126,10 +126,10 @@ jobs:
         shell: cmd
         run: |
           cd build\lib\win64
-          call build_all_and_pack.bat native mingw YES NO
+          call build_all_and_pack.bat native mingw YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_mingw_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -139,10 +139,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -153,7 +153,7 @@ jobs:
           .\build_all_and_pack.bat
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -163,10 +163,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -174,10 +174,10 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64  
-          .\build_all_and_pack.bat arm64 msvc YES NO
+          .\build_all_and_pack.bat arm64 msvc YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -187,10 +187,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -198,17 +198,17 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64  
-          .\build_all_and_pack.bat arm64 clang YES NO
+          .\build_all_and_pack.bat arm64 clang YES NO NO
 
   build_windows_arm64_lib_MinGW:
     runs-on: windows-11-arm
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java (JDK 21)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'adopt'
@@ -251,10 +251,10 @@ jobs:
         shell: cmd
         run: |
           cd build\lib\win64
-          call build_all_and_pack.bat native mingw YES NO
+          call build_all_and_pack.bat native mingw YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_mingw_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -264,10 +264,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -278,7 +278,7 @@ jobs:
           .\build_all_and_pack.bat arm64
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows_arm64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -289,17 +289,17 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Android SDK (with NDK)
         id: setup-android
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Set up NDK
         uses: nttld/setup-ndk@v1
@@ -320,17 +320,17 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Android SDK (with NDK)
         id: setup-android
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Set up NDK
         uses: nttld/setup-ndk@v1
@@ -352,17 +352,17 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Set up Android SDK (with NDK)
         id: setup-android
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Set up NDK
         uses: nttld/setup-ndk@v1
@@ -380,7 +380,7 @@ jobs:
           ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -392,10 +392,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -404,10 +404,10 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES NO
+          ./build_all_and_pack.sh native clang YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -417,10 +417,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -429,17 +429,17 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES NO
+          ./build_all_and_pack.sh native gcc YES NO NO
 
   build_ubuntu_x86_64_tools_Clang:
     runs-on: ubuntu-latest
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -453,7 +453,7 @@ jobs:
           ./build_all_and_pack_clang.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -463,10 +463,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -486,10 +486,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -498,10 +498,10 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES NO
+          ./build_all_and_pack.sh native clang YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -511,10 +511,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -523,17 +523,17 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES NO
+          ./build_all_and_pack.sh native gcc YES NO NO
 
   build_ubuntu_arm64_tools_Clang:
     runs-on: ubuntu-24.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -547,7 +547,7 @@ jobs:
           ./build_all_and_pack_clang.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_arm64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -557,10 +557,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -581,7 +581,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -615,10 +615,10 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES NO
+          ./build_all_and_pack.sh native clang YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_x86_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -630,7 +630,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -664,7 +664,7 @@ jobs:
         run: |
           cd build/lib/linux  
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES NO
+          ./build_all_and_pack.sh native gcc YES NO NO
 
   build_debian_x86_tools_Clang:
     runs-on: ubuntu-latest
@@ -673,7 +673,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -712,7 +712,7 @@ jobs:
           ./build_all_and_pack_clang.sh 
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux_x86_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -724,7 +724,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -769,16 +769,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build for Mac
         run: |
           cd build/lib/mac  
           chmod +x *.sh
-          ./build_all_and_pack.sh YES NO
+          ./build_all_and_pack.sh YES NO NO
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: macos_universal_binary_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -788,7 +788,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build for Mac
         run: |
@@ -799,7 +799,7 @@ jobs:
           ./build_all_and_pack.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: macos_universal_binary_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -811,7 +811,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -834,7 +834,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Retry: Run in FreeBSD"
@@ -858,7 +858,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Verify: Run in FreeBSD"
@@ -867,7 +867,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: freebsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -877,7 +877,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -901,7 +901,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in FreeBSD"
@@ -926,7 +926,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in FreeBSD"
@@ -939,7 +939,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -999,7 +999,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: freebsd_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1009,7 +1009,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -1076,7 +1076,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -1100,7 +1100,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Retry: Run in FreeBSD"
@@ -1125,7 +1125,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Verify: Run in FreeBSD"
@@ -1134,7 +1134,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: freebsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1144,7 +1144,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -1169,7 +1169,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in FreeBSD"
@@ -1195,7 +1195,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in FreeBSD"
@@ -1208,7 +1208,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -1270,7 +1270,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: freebsd_arm64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1280,7 +1280,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -1351,7 +1351,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSD
@@ -1376,7 +1376,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Retry: Run in OpenBSD"
@@ -1402,7 +1402,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Verify: Run in OpenBSD"
@@ -1411,7 +1411,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openbsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1421,7 +1421,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSD
@@ -1483,7 +1483,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openbsd_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1494,7 +1494,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSD
@@ -1521,7 +1521,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Retry: Run in OpenBSD"
@@ -1549,7 +1549,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Verify: Run in OpenBSD"
@@ -1558,7 +1558,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openbsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1568,7 +1568,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSD
@@ -1634,7 +1634,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openbsd_arm64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1645,7 +1645,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in Solaris (GCC)
         id: RunInSolarisGcc
@@ -1697,7 +1697,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in Solaris (GCC)"
@@ -1750,7 +1750,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in Solaris (GCC)"
@@ -1759,7 +1759,7 @@ jobs:
           echo "::error::Run in Solaris (GCC) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: solaris_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1769,7 +1769,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in Solaris (GCC)
         id: RunInSolarisToolsGcc
@@ -1831,18 +1831,18 @@ jobs:
           echo "::error::Run in Solaris (GCC) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: solaris_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
 
   # DragonFlyBSD
-  build_dragonflybsd_x86_64_libs_clang:
+  build_dragonflybsd_x86_64_libs_Clang:
     runs-on: ubuntu-latest
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibs
@@ -1872,7 +1872,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -1903,7 +1903,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -1912,7 +1912,7 @@ jobs:
           echo "::error::Run in DragonFlyBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dragonflybsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -1922,7 +1922,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibs
@@ -1952,7 +1952,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -1983,7 +1983,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -1996,7 +1996,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDTools
@@ -2066,7 +2066,7 @@ jobs:
           echo "::error::Run in DragonFlyBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dragonflybsd_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -2076,7 +2076,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDTools
@@ -2151,7 +2151,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Resolve pkg.omnios.org on host
         run: |
@@ -2206,7 +2206,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in OmniOS (GCC only)"
@@ -2255,7 +2255,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in OmniOS (GCC only)"
@@ -2264,7 +2264,7 @@ jobs:
           echo "::error::Run in OmniOS (GCC only) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: omnios_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -2274,7 +2274,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Resolve pkg.omnios.org on host
         run: |
@@ -2388,7 +2388,7 @@ jobs:
           echo "::error::Run in OmniOS (GCC only) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: omnios_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -2399,7 +2399,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_1
         continue-on-error: true
@@ -2466,7 +2466,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
       - name: "Retry: Run in NetBSD (Clang, x86_64)"
         id: vm_step_1_retry
@@ -2534,7 +2534,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
       - name: "Verify: Run in NetBSD (Clang, x86_64)"
         if: steps.vm_step_1.outcome == 'failure' && steps.vm_step_1_retry.outcome == 'failure'
@@ -2542,7 +2542,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, x86_64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: netbsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -2552,7 +2552,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_2
         continue-on-error: true
@@ -2615,7 +2615,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in NetBSD (GCC, x86_64)"
@@ -2680,7 +2680,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in NetBSD (GCC, x86_64)"
@@ -2693,7 +2693,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_3
         continue-on-error: true
@@ -2834,7 +2834,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, x86_64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: netbsd_x86_64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -2844,7 +2844,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_4
         continue-on-error: true
@@ -2990,7 +2990,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_5
         continue-on-error: true
@@ -3055,7 +3055,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
       - name: "Retry: Run in NetBSD (Clang, arm64)"
         id: vm_step_5_retry
@@ -3121,7 +3121,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES NO
+            ./build_all_and_pack.sh native clang YES NO NO
 
       - name: "Verify: Run in NetBSD (Clang, arm64)"
         if: steps.vm_step_5.outcome == 'failure' && steps.vm_step_5_retry.outcome == 'failure'
@@ -3129,7 +3129,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, arm64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: netbsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3139,7 +3139,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_6
         continue-on-error: true
@@ -3203,7 +3203,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Retry: Run in NetBSD (GCC, arm64)"
@@ -3269,7 +3269,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES NO
+            ./build_all_and_pack.sh native gcc YES NO NO
 
 
       - name: "Verify: Run in NetBSD (GCC, arm64)"
@@ -3282,7 +3282,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_7
         continue-on-error: true
@@ -3425,7 +3425,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, arm64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: netbsd_arm64_tools_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3435,7 +3435,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_8
         continue-on-error: true
@@ -3583,7 +3583,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build for Mac
         run: |
@@ -3592,7 +3592,7 @@ jobs:
           ./build_all_and_pack.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3610,11 +3610,11 @@ jobs:
       INSTALL_DIR: ${{ github.workspace }}/.toolcache/ohos/commandline-tools/6.0.0.858
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Restore extracted dir cache
         id: cache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ${{ env.INSTALL_DIR }}
           key: macos-arm64-${{ env.TOOL_NAME }}-${{ env.TOOL_VERSION }}
@@ -3650,7 +3650,7 @@ jobs:
           ./mac_build_all_and_pack.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: harmony_os_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3661,10 +3661,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -3675,7 +3675,7 @@ jobs:
           .\build_all_and_pack.bat
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: java_wrapper_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3686,7 +3686,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install and Pack
         run: |
@@ -3701,7 +3701,7 @@ jobs:
           cd ..
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: csharp_wrapper_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3715,16 +3715,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3737,10 +3737,10 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat native msvc YES YES
+          .\build_all_and_pack.bat native msvc YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_windows_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3750,16 +3750,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3772,23 +3772,23 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat native clang YES YES
+          .\build_all_and_pack.bat native clang YES YES NO dynamic_lib
 
   nodejs_build_windows_arm64_lib_MSVC:
     runs-on: windows-latest
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3801,10 +3801,10 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat arm64 msvc YES YES
+          .\build_all_and_pack.bat arm64 msvc YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_windows_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3814,16 +3814,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3836,7 +3836,7 @@ jobs:
       - name: Build for Windows
         run: |
           cd build\lib\win64
-          .\build_all_and_pack.bat arm64 clang YES YES
+          .\build_all_and_pack.bat arm64 clang YES YES NO dynamic_lib
 
   #Linux-ubuntu-x86_64
   nodejs_build_ubuntu_x86_64_lib_Clang:
@@ -3844,16 +3844,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3866,10 +3866,10 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_linux_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3880,16 +3880,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3902,7 +3902,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
   #Linux-ubuntu-arm64
   nodejs_build_ubuntu_arm64_lib_Clang:
@@ -3910,16 +3910,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3932,10 +3932,10 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_linux_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -3945,16 +3945,16 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'adopt'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -3967,7 +3967,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
   #Linux-debian-x86
   nodejs_build_debian_x86_lib_Clang:
@@ -3977,7 +3977,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -4016,10 +4016,10 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native clang YES YES
+          ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_linux_x86_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4031,7 +4031,7 @@ jobs:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable UTF-8 locale
         run: |
@@ -4070,7 +4070,7 @@ jobs:
         run: |
           cd build/lib/linux
           chmod +x *.sh
-          ./build_all_and_pack.sh native gcc YES YES
+          ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
   #Mac
@@ -4079,10 +4079,10 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           check-latest: true
@@ -4095,10 +4095,10 @@ jobs:
         run: |
           cd build/lib/mac
           chmod +x *.sh
-          ./build_all_and_pack.sh YES YES
+          ./build_all_and_pack.sh YES YES NO dynamic_lib
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_macos_universal_binary_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4109,7 +4109,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -4136,7 +4136,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4164,7 +4164,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4173,7 +4173,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_freebsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4184,7 +4184,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSD
@@ -4211,7 +4211,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
             
 
       - name: "Retry: Run in FreeBSD"
@@ -4239,7 +4239,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
             
 
       - name: "Verify: Run in FreeBSD"
@@ -4252,7 +4252,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSDArmClang
@@ -4279,7 +4279,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4307,7 +4307,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4316,7 +4316,7 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_freebsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4326,7 +4326,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in FreeBSD
         id: RunInFreeBSDArmGcc
@@ -4353,7 +4353,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES            
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in FreeBSD"
@@ -4381,7 +4381,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=freebsd
-            ./build_all_and_pack.sh native gcc YES YES            
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in FreeBSD"
@@ -4394,7 +4394,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSDLibsClang
@@ -4421,7 +4421,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OpenBSD"
@@ -4449,7 +4449,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OpenBSD"
@@ -4458,7 +4458,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_openbsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4468,7 +4468,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in OpenBSD
         id: RunInOpenBSDArmLibsClang
@@ -4496,7 +4496,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OpenBSD"
@@ -4525,7 +4525,7 @@ jobs:
             chmod +x *.sh
             ls -l
             export BQ_UNIX_VERSION=openbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OpenBSD"
@@ -4534,7 +4534,7 @@ jobs:
           echo "::error::Run in OpenBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_openbsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4544,7 +4544,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in Solaris (GCC)
         id: RunInSolarisGccNode
@@ -4616,7 +4616,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in Solaris (GCC)"
@@ -4689,7 +4689,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=solaris
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in Solaris (GCC)"
@@ -4698,7 +4698,7 @@ jobs:
           echo "::error::Run in Solaris (GCC) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_solaris_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4708,7 +4708,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Resolve pkg.omnios.org on host
         run: |
@@ -4764,7 +4764,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in OmniOS (GCC only)"
@@ -4815,7 +4815,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=omnios
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in OmniOS (GCC only)"
@@ -4824,7 +4824,7 @@ jobs:
           echo "::error::Run in OmniOS (GCC only) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_omnios_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4834,7 +4834,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibsClang
@@ -4864,7 +4864,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -4895,7 +4895,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -4904,7 +4904,7 @@ jobs:
           echo "::error::Run in DragonFlyBSD failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_dragonflybsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -4914,7 +4914,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibsGcc
@@ -4944,7 +4944,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in DragonFlyBSD"
@@ -4975,7 +4975,7 @@ jobs:
             export LC_ALL=en_US.UTF-8
             export LC_CTYPE=en_US.UTF-8
             export MM_CHARSET=UTF-8
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in DragonFlyBSD"
@@ -4988,7 +4988,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_9
         continue-on-error: true
@@ -5056,7 +5056,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Retry: Run in NetBSD (Clang, x86_64)"
         id: vm_step_9_retry
@@ -5125,7 +5125,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Verify: Run in NetBSD (Clang, x86_64)"
         if: steps.vm_step_9.outcome == 'failure' && steps.vm_step_9_retry.outcome == 'failure'
@@ -5133,7 +5133,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, x86_64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_netbsd_x86_64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -5143,7 +5143,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_10
         continue-on-error: true
@@ -5208,7 +5208,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in NetBSD (GCC, x86_64)"
@@ -5275,7 +5275,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in NetBSD (GCC, x86_64)"
@@ -5288,7 +5288,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_11
         continue-on-error: true
@@ -5355,7 +5355,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Retry: Run in NetBSD (Clang, arm64)"
         id: vm_step_11_retry
@@ -5423,7 +5423,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native clang YES YES
+            ./build_all_and_pack.sh native clang YES YES NO dynamic_lib
 
       - name: "Verify: Run in NetBSD (Clang, arm64)"
         if: steps.vm_step_11.outcome == 'failure' && steps.vm_step_11_retry.outcome == 'failure'
@@ -5431,7 +5431,7 @@ jobs:
           echo "::error::Run in NetBSD (Clang, arm64) failed after retry"
           exit 1
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tmp_node_netbsd_arm64_libs_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -5441,7 +5441,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_12
         continue-on-error: true
@@ -5507,7 +5507,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Retry: Run in NetBSD (GCC, arm64)"
@@ -5575,7 +5575,7 @@ jobs:
             chmod +x *.sh 2>/dev/null || true
             ls -l
             export BQ_UNIX_VERSION=netbsd
-            ./build_all_and_pack.sh native gcc YES YES
+            ./build_all_and_pack.sh native gcc YES YES NO dynamic_lib
 
 
       - name: "Verify: Run in NetBSD (GCC, arm64)"
@@ -5604,10 +5604,10 @@ jobs:
       - nodejs_build_netbsd_arm64_libs_Clang
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all artifacts from native builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: tmp_node_*
           merge-multiple: false
@@ -5726,13 +5726,13 @@ jobs:
           ./build_all_and_pack.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: nodejs_npm_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
           
       - name: Delete intermediate artifacts
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: tmp_node_* 
           failOnError: false
@@ -5743,7 +5743,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: build plugin
         run: |
@@ -5752,7 +5752,7 @@ jobs:
           ./linux_build_all_and_pack.sh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: unreal_plugin_sources_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -5762,7 +5762,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: build plugin
         run: |
@@ -5774,7 +5774,7 @@ jobs:
     needs: extract_version
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: build plugin
         run: |
@@ -5795,10 +5795,10 @@ jobs:
       - build_linux_android
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download native artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: downloaded_artifacts
 
@@ -6051,7 +6051,7 @@ jobs:
           find "$DIST_DIR" -maxdepth 1 -type f -printf '%f\n' | sort
 
       - name: Upload prebuilt Unreal plugin
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: unreal_plugin_prebuilt_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
@@ -6077,10 +6077,10 @@ jobs:
       - build_harmony_os_on_mac
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all artifacts from native builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: downloaded_artifacts
 
@@ -6284,7 +6284,314 @@ jobs:
           npm pack --pack-destination ../../dist/plugins/${ENGINE}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.engine }}_package_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist
+
+  #########################################################Python Wrapper Build####################################################
+  build_python_wrapper:
+    name: python_build_(${{ matrix.name }})
+    runs-on: ${{ matrix.runner }}
+    needs: extract_version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos_universal
+            runner: macos-latest
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: linux_x86_64
+            runner: ubuntu-latest
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: linux_arm64
+            runner: ubuntu-24.04-arm
+            build_cmd: |
+              chmod +x build/wrapper/python/build_all_and_pack.sh
+              bash build/wrapper/python/build_all_and_pack.sh
+          - name: windows_x86_64
+            runner: windows-latest
+            build_cmd: build\wrapper\python\build_all_and_pack.bat
+          - name: windows_arm64
+            runner: windows-11-arm
+            build_cmd: build\wrapper\python\build_all_and_pack.bat
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Build Python Wrapper
+        env:
+          PY_PYTHON: '3.11'
+        run: ${{ matrix.build_cmd }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: python_wrapper_${{ matrix.name }}_${{ needs.extract_version.outputs.version }}
+          path: install/wrapper_python/
+
+  #FreeBSD Python Wrapper (requires VM, cannot use matrix)
+  build_python_wrapper_freebsd_x86_64:
+    name: python_build_(freebsd_x86_64)
+    runs-on: ubuntu-latest
+    needs: extract_version
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run in FreeBSD(Attempt 1)
+        continue-on-error: true
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          mem: 8192
+          prepare: |
+            for i in 1 2 3 4 5; do
+              pkg install -y llvm cmake bash python3 py311-pip py311-setuptools py311-wheel && exit 0
+              echo "Install failed, retrying in 60s... ($i/5)"
+              sleep 60
+            done
+            exit 1
+          run: |
+            touch BUILD_STARTED
+            set -e -x
+            chmod +x build/wrapper/python/build_all_and_pack_unix.sh
+            bash build/wrapper/python/build_all_and_pack_unix.sh
+            touch BUILD_SUCCESS
+
+      - name: Check Retry
+        id: CheckRetry
+        run: |
+          if [ ! -f "BUILD_STARTED" ]; then
+            echo "retry=true" >> $GITHUB_OUTPUT
+          elif [ ! -f "BUILD_SUCCESS" ]; then
+            echo "::error::Python build script execution failed! (Not retrying)"
+            exit 1
+          fi
+
+      - name: Cleanup Before Retry
+        if: steps.CheckRetry.outputs.retry == 'true'
+        run: |
+          set +e
+          DOMAINS="$(sudo virsh list --all --name 2>/dev/null | grep -v "^$" || true)"
+          if [ -z "$DOMAINS" ]; then
+            echo "No lingering domains found."
+          else
+            for DOMAIN in $DOMAINS; do
+              sudo virsh destroy "$DOMAIN" 2>/dev/null || true
+              sudo virsh undefine "$DOMAIN" --nvram 2>/dev/null \
+                || sudo virsh undefine "$DOMAIN" 2>/dev/null || true
+            done
+          fi
+          find . -name "*.qcow2" -delete 2>/dev/null || true
+          sudo find /home/runner/work/_actions/vmactions -name "*.qcow2" -delete 2>/dev/null || true
+          sudo rm -f /var/lib/libvirt/dnsmasq/*.leases 2>/dev/null || true
+          sleep 5
+          echo "Cleanup complete."
+
+      - name: Run in FreeBSD(Attempt 2)
+        if: steps.CheckRetry.outputs.retry == 'true'
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          mem: 8192
+          prepare: |
+            for i in 1 2 3 4 5; do
+              pkg install -y llvm cmake bash python3 py311-pip py311-setuptools py311-wheel && exit 0
+              echo "Install failed, retrying in 60s... ($i/5)"
+              sleep 60
+            done
+            exit 1
+          run: |
+            touch BUILD_STARTED
+            set -e -x
+            chmod +x build/wrapper/python/build_all_and_pack_unix.sh
+            bash build/wrapper/python/build_all_and_pack_unix.sh
+            touch BUILD_SUCCESS
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: python_wrapper_freebsd_x86_64_${{ needs.extract_version.outputs.version }}
+          path: install/wrapper_python/
+
+  ####################################################### Java Fat JAR (Maven Central) ########################################
+  java_maven_fat_jar_collect:
+    runs-on: ubuntu-latest
+    needs:
+      - extract_version
+      - build_windows_java11_wrapper
+      - build_windows_x86_64_lib_MSVC
+      - build_windows_arm64_lib_MSVC
+      - build_ubuntu_x86_64_lib_Clang
+      - build_ubuntu_arm64_lib_Clang
+      - build_debian_x86_lib_Clang
+      - build_mac_lib
+      - build_freebsd_x86_64_libs_Clang
+      - build_freebsd_arm64_libs_Clang
+      - build_openbsd_x86_64_libs_Clang
+      - build_openbsd_arm64_libs_Clang
+      - build_netbsd_x86_64_libs_Clang
+      - build_netbsd_arm64_libs_Clang
+      - build_dragonflybsd_x86_64_libs_Clang
+      - build_solaris_x86_64_libs_GCC
+      - build_omnios_x86_64_libs_gcc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v5
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Download all needed artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: downloaded_artifacts
+
+      - name: List downloaded artifacts
+        run: ls -l downloaded_artifacts
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y unzip zip
+
+      - name: Stage natives and inject into fat JAR
+        shell: bash
+        env:
+          VERSION: ${{ needs.extract_version.outputs.version }}
+        run: |
+          set -euo pipefail
+          : "${VERSION:?VERSION env not set}"
+          BASE="downloaded_artifacts"
+          NATIVES_STAGE="$(pwd)/fat_jar_natives"
+
+          # ── helpers ─────────────────────────────────────────────────────
+          find_lib() {
+            # find_lib <artifact_base_dir> <filename> [preferred_build_type]
+            local base="$1" name="$2" prefer="${3:-RelWithDebInfo}"
+            local result
+            result=$(find "$base" -type f -name "$name" 2>/dev/null | grep "$prefer" | head -n1 || true)
+            [[ -z "$result" ]] && result=$(find "$base" -type f -name "$name" 2>/dev/null | head -n1 || true)
+            echo "$result"
+          }
+
+          copy_native() {
+            local src="$1" dst_dir="$2"
+            if [[ -f "$src" ]]; then
+              mkdir -p "$dst_dir"
+              cp -Lf "$src" "$dst_dir/"
+              echo "  staged: $(basename "$src")  →  $dst_dir/"
+            else
+              echo "  WARN: not found: $src" >&2
+            fi
+          }
+
+          # ── locate JARs from java_wrapper artifact ───────────────────────
+          JAVA_BASE="$BASE/java_wrapper_${VERSION}"
+          BINARY_JAR=$(find "$JAVA_BASE" -type f -name "BqLogWrapper_Java-*.jar" \
+                         ! -name "*sources*" ! -name "*javadoc*" | head -n1 || true)
+          SOURCES_JAR=$(find "$JAVA_BASE" -type f -name "*-sources.jar" | head -n1 || true)
+          JAVADOC_JAR=$(find "$JAVA_BASE" -type f -name "*-javadoc.jar" | head -n1 || true)
+
+          for v in BINARY_JAR SOURCES_JAR JAVADOC_JAR; do
+            eval "p=\$$v"
+            if [[ -z "$p" ]]; then
+              echo "ERROR: $v not found under $JAVA_BASE" >&2; exit 1
+            fi
+            echo "Found $v: $p"
+          done
+
+          # ── locate native libraries ──────────────────────────────────────
+          WIN_X64_DLL=$(find_lib    "$BASE/windows_x86_64_libs_${VERSION}"         "BqLog.dll")
+          WIN_ARM64_DLL=$(find_lib  "$BASE/windows_arm64_libs_${VERSION}"           "BqLog.dll")
+          LINUX_X64_SO=$(find_lib   "$BASE/linux_x86_64_libs_${VERSION}"           "libBqLog.so")
+          LINUX_ARM64_SO=$(find_lib "$BASE/linux_arm64_libs_${VERSION}"             "libBqLog.so")
+          LINUX_X86_SO=$(find_lib   "$BASE/linux_x86_libs_${VERSION}"              "libBqLog.so")
+          MAC_DYLIB=$(find_lib      "$BASE/macos_universal_binary_libs_${VERSION}"  "libBqLog.dylib")
+          FREEBSD_X64=$(find_lib    "$BASE/freebsd_x86_64_libs_${VERSION}"         "libBqLog.so")
+          FREEBSD_ARM64=$(find_lib  "$BASE/freebsd_arm64_libs_${VERSION}"           "libBqLog.so")
+          OPENBSD_X64=$(find_lib    "$BASE/openbsd_x86_64_libs_${VERSION}"         "libBqLog.so")
+          OPENBSD_ARM64=$(find_lib  "$BASE/openbsd_arm64_libs_${VERSION}"           "libBqLog.so")
+          NETBSD_X64=$(find_lib     "$BASE/netbsd_x86_64_libs_${VERSION}"          "libBqLog.so")
+          NETBSD_ARM64=$(find_lib   "$BASE/netbsd_arm64_libs_${VERSION}"            "libBqLog.so")
+          DRAGONFLY_X64=$(find_lib  "$BASE/dragonflybsd_x86_64_libs_${VERSION}"    "libBqLog.so")
+          SOLARIS_X64=$(find_lib    "$BASE/solaris_x86_64_libs_${VERSION}"         "libBqLog.so")
+          OMNIOS_X64=$(find_lib     "$BASE/omnios_x86_64_libs_${VERSION}"          "libBqLog.so")
+
+          # Mandatory platforms — fail fast if missing
+          for v in WIN_X64_DLL WIN_ARM64_DLL LINUX_X64_SO LINUX_ARM64_SO MAC_DYLIB; do
+            eval "p=\$$v"
+            [[ -z "$p" ]] && { echo "ERROR: $v not found" >&2; exit 1; }
+          done
+
+          # ── copy into staging directory ──────────────────────────────────
+          mkdir -p "$NATIVES_STAGE"
+          copy_native "$WIN_X64_DLL"    "$NATIVES_STAGE/windows-x86_64"
+          copy_native "$WIN_ARM64_DLL"  "$NATIVES_STAGE/windows-arm64"
+          copy_native "$LINUX_X64_SO"   "$NATIVES_STAGE/linux-x86_64"
+          copy_native "$LINUX_ARM64_SO" "$NATIVES_STAGE/linux-arm64"
+          [[ -n "$LINUX_X86_SO"    ]] && copy_native "$LINUX_X86_SO"    "$NATIVES_STAGE/linux-x86"
+          # macOS universal binary covers both archs
+          copy_native "$MAC_DYLIB"      "$NATIVES_STAGE/macos-x86_64"
+          copy_native "$MAC_DYLIB"      "$NATIVES_STAGE/macos-arm64"
+          [[ -n "$FREEBSD_X64"    ]] && copy_native "$FREEBSD_X64"    "$NATIVES_STAGE/freebsd-x86_64"
+          [[ -n "$FREEBSD_ARM64"  ]] && copy_native "$FREEBSD_ARM64"  "$NATIVES_STAGE/freebsd-arm64"
+          [[ -n "$OPENBSD_X64"    ]] && copy_native "$OPENBSD_X64"    "$NATIVES_STAGE/openbsd-x86_64"
+          [[ -n "$OPENBSD_ARM64"  ]] && copy_native "$OPENBSD_ARM64"  "$NATIVES_STAGE/openbsd-arm64"
+          [[ -n "$NETBSD_X64"     ]] && copy_native "$NETBSD_X64"     "$NATIVES_STAGE/netbsd-x86_64"
+          [[ -n "$NETBSD_ARM64"   ]] && copy_native "$NETBSD_ARM64"   "$NATIVES_STAGE/netbsd-arm64"
+          [[ -n "$DRAGONFLY_X64"  ]] && copy_native "$DRAGONFLY_X64"  "$NATIVES_STAGE/dragonfly-x86_64"
+          # solaris and omnios both map to sunos-x86_64; omnios written last (either is fine)
+          [[ -n "$SOLARIS_X64"    ]] && copy_native "$SOLARIS_X64"    "$NATIVES_STAGE/sunos-x86_64"
+          [[ -n "$OMNIOS_X64"     ]] && copy_native "$OMNIOS_X64"     "$NATIVES_STAGE/sunos-x86_64"
+
+          echo "Staged native layout:"
+          find "$NATIVES_STAGE" -type f | sort
+
+          # ── build a temp inject tree: natives/<target>/<file> ────────────
+          TMP_INJECT="$(mktemp -d)"
+          while IFS= read -r f; do
+            rel="${f#$NATIVES_STAGE/}"           # e.g. linux-x86_64/libBqLog.so
+            dst="$TMP_INJECT/natives/$rel"
+            mkdir -p "$(dirname "$dst")"
+            cp -Lf "$f" "$dst"
+          done < <(find "$NATIVES_STAGE" -type f)
+
+          # ── copy binary JAR and inject natives/ ──────────────────────────
+          FAT_JAR="$(pwd)/BqLogWrapper_Java-${VERSION}.jar"
+          cp -f "$BINARY_JAR" "$FAT_JAR"
+          pushd "$TMP_INJECT" >/dev/null
+          jar uf "$FAT_JAR" natives
+          popd >/dev/null
+          rm -rf "$TMP_INJECT"
+
+          echo "Fat JAR natives/ layout:"
+          jar tf "$FAT_JAR" | grep "^natives/" | sort
+
+          # ── collect all three JARs into dist ─────────────────────────────
+          mkdir -p dist/maven/java
+          cp -f "$FAT_JAR"    "dist/maven/java/BqLogWrapper_Java-${VERSION}.jar"
+          cp -f "$SOURCES_JAR" "dist/maven/java/BqLogWrapper_Java-${VERSION}-sources.jar"
+          cp -f "$JAVADOC_JAR" "dist/maven/java/BqLogWrapper_Java-${VERSION}-javadoc.jar"
+
+          echo "dist/maven/java:"
+          ls -lh dist/maven/java/
+
+      - name: Upload fat JAR artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: java_maven_fat_jar_${{ needs.extract_version.outputs.version }}
+          path: ${{ github.workspace }}/dist/maven/java
