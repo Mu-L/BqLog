@@ -63,8 +63,8 @@ for build_target in "${BUILD_TARGET[@]}"; do
 done
 
 pushd "harmonyOS" >/dev/null
-/Users/yucao/Library/OpenHarmony/command-line-tools/bin/hvigorw clean --no-daemon
-/Users/yucao/Library/OpenHarmony/command-line-tools/bin/hvigorw assembleHar --mode module -p module=bqlog@default -p product=default --no-daemon -p buildMode=release --no-parallel
+hvigorw clean --no-daemon
+hvigorw assembleHar --mode module -p module=bqlog@default -p product=default --no-daemon -p buildMode=release --no-parallel
 mkdir -p ../../../../install/dynamic_lib
 cp -f bqlog/build/default/outputs/default/bqlog.har ../../../../install/dynamic_lib/bqlog.har
 
