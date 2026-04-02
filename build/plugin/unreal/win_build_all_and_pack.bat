@@ -63,6 +63,10 @@ for %%T in (ue4 ue5) do (
     if exist "%PUBLIC_DIR%\BqLog_h_%%T.txt" move /Y "%PUBLIC_DIR%\BqLog_h_%%T.txt" "%PUBLIC_DIR%\BqLog.h" >nul
     pushd "%PUBLIC_DIR%" && del /q /f *.txt >nul 2>&1 & popd
 
+    REM Replace version in .uplugin
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+      "$v='%VERSION%'; $parts=$v.Split('.'); $vint=[int]$parts[0]*10000+[int]$parts[1]*100+[int]$parts[2]; $f='%TARGET_DIR%\BqLog.uplugin'; $c=Get-Content $f -Raw; $c=$c -replace '\"Version\": 1', ('\"Version\": '+$vint); $c=$c -replace '\"VersionName\": \"1.0\"', ('\"VersionName\": \"'+$v+'\"'); Set-Content $f $c -NoNewline"
+
     if exist "%DIST_DIR%\bqlog-unreal-plugin-%VERSION%-%%T.zip" del /q "%DIST_DIR%\bqlog-unreal-plugin-%VERSION%-%%T.zip"
     powershell -NoProfile -ExecutionPolicy Bypass -Command ^
       "Compress-Archive -Path '%TARGET_DIR%' -DestinationPath '%DIST_DIR%\bqlog-unreal-plugin-%VERSION%-%%T.zip' -Force"

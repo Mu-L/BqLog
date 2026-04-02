@@ -54,6 +54,14 @@ for ue_version in "${UE_VERSIONS[@]}"; do
 
   rm -f "$PUBLIC_DIR"/*.txt 2>/dev/null || true
 
+  # Replace version in .uplugin
+  VERSION_MAJOR=$(echo "$VERSION" | cut -d. -f1)
+  VERSION_MINOR=$(echo "$VERSION" | cut -d. -f2)
+  VERSION_PATCH=$(echo "$VERSION" | cut -d. -f3)
+  VERSION_INT=$(( VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ))
+  sed -i "s/\"Version\": 1/\"Version\": $VERSION_INT/" "$TARGET_DIR/BqLog.uplugin"
+  sed -i "s/\"VersionName\": \"1.0\"/\"VersionName\": \"$VERSION\"/" "$TARGET_DIR/BqLog.uplugin"
+
   ZIP_NAME="bqlog-unreal-plugin-${VERSION}-${ue_version}.zip"
   rm -f "$DIST_DIR/$ZIP_NAME"
   (cd "$TMP_DIR" && zip -rq "$DIST_DIR/$ZIP_NAME" "BqLog")
