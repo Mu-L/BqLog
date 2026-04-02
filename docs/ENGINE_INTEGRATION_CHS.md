@@ -40,12 +40,12 @@ log.info("Hello from Unity! value:{}", 42);
 ### 集成方式
 
 - **预编译版（Prebuilt）**
-  - 从 [Releases 页面](https://github.com/Tencent/BqLog/releases)下载 `unreal_plugin_prebuilt_{version}`；
-  - 解压后根据自己的引擎版本，选择对应压缩包，解压到游戏项目的 `Plugins` 目录下。
+  - 从 [Releases 页面](https://github.com/Tencent/BqLog/releases)根据引擎版本下载 `unreal_plugin_prebuilt_ue4_{version}` 或 `unreal_plugin_prebuilt_ue5_{version}`；
+  - 解压到游戏项目的 `Plugins` 目录下。
 
 - **源码版（Source）**
-  - 从 [Releases 页面](https://github.com/Tencent/BqLog/releases)下载 `unreal_plugin_source_{version}`；
-  - 解压后根据自己的引擎版本，选择对应压缩包，解压到游戏项目的 `Plugins` 目录下，由引擎进行二次编译。
+  - 从 [Releases 页面](https://github.com/Tencent/BqLog/releases)根据引擎版本下载 `unreal_plugin_sources_ue4_{version}` 或 `unreal_plugin_sources_ue5_{version}`；
+  - 解压到游戏项目的 `Plugins` 目录下，由引擎进行二次编译。
 
 ### 1）对 `FName` / `FString` / `FText` 的支持
 

@@ -40,12 +40,12 @@ For more examples, refer to `/demo/csharp` directory in the repository.
 ### Integration
 
 - **Prebuilt**
-  - Download `unreal_plugin_prebuilt_{version}` from the [Releases page](https://github.com/Tencent/BqLog/releases);
-  - Unzip and according to your engine version, select the corresponding compressed package, unzip to the `Plugins` directory of your game project.
+  - Download `unreal_plugin_prebuilt_ue4_{version}` or `unreal_plugin_prebuilt_ue5_{version}` (depending on your engine version) from the [Releases page](https://github.com/Tencent/BqLog/releases);
+  - Unzip to the `Plugins` directory of your game project.
 
 - **Source**
-  - Download `unreal_plugin_source_{version}` from the [Releases page](https://github.com/Tencent/BqLog/releases);
-  - Unzip and according to your engine version, select the corresponding compressed package, unzip to the `Plugins` directory of your game project, to be recompiled by the engine.
+  - Download `unreal_plugin_sources_ue4_{version}` or `unreal_plugin_sources_ue5_{version}` (depending on your engine version) from the [Releases page](https://github.com/Tencent/BqLog/releases);
+  - Unzip to the `Plugins` directory of your game project, to be recompiled by the engine.
 
 ### 1) Support for `FName` / `FString` / `FText`
 
