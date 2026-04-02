@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Tencent. All Rights Reserved.
 using UnrealBuildTool;
 
 public class BqLogBPNodes : ModuleRules

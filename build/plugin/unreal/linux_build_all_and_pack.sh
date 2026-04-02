@@ -61,6 +61,15 @@ for ue_version in "${UE_VERSIONS[@]}"; do
   VERSION_INT=$(( VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ))
   sed -i "s/\"Version\": 1/\"Version\": $VERSION_INT/" "$TARGET_DIR/BqLog.uplugin"
   sed -i "s/\"VersionName\": \"1.0\"/\"VersionName\": \"$VERSION\"/" "$TARGET_DIR/BqLog.uplugin"
+  # Replace EngineVersion based on UE major version
+  if [[ "$ue_version" == "ue4" ]]; then
+    sed -i "s/\"EngineVersion\": \"0.0\"/\"EngineVersion\": \"4.27\"/" "$TARGET_DIR/BqLog.uplugin"
+  else
+    sed -i "s/\"EngineVersion\": \"0.0\"/\"EngineVersion\": \"5.7\"/" "$TARGET_DIR/BqLog.uplugin"
+  fi
+
+  # Remove .gitkeep files before zipping
+  find "$TARGET_DIR" -name ".gitkeep" -delete
 
   ZIP_NAME="bqlog-unreal-plugin-${VERSION}-${ue_version}.zip"
   rm -f "$DIST_DIR/$ZIP_NAME"

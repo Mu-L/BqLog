@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Tencent. All Rights Reserved.
 #include "Modules/ModuleManager.h"
 #include "Logging/LogMacros.h"
 #include "bq_log/bq_log.h"

@@ -6052,6 +6052,11 @@ jobs:
             VERSION_INT=$(( VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ))
             sed -i "s/\"Version\": 1/\"Version\": $VERSION_INT/" "$plugin_dir/BqLog.uplugin"
             sed -i "s/\"VersionName\": \"1.0\"/\"VersionName\": \"$VERSION\"/" "$plugin_dir/BqLog.uplugin"
+            if [[ "$ue" == "ue4" ]]; then
+              sed -i "s/\"EngineVersion\": \"0.0\"/\"EngineVersion\": \"4.27\"/" "$plugin_dir/BqLog.uplugin"
+            else
+              sed -i "s/\"EngineVersion\": \"0.0\"/\"EngineVersion\": \"5.7\"/" "$plugin_dir/BqLog.uplugin"
+            fi
 
             rm -rf "$plugin_dir/Binaries/Win64" "$plugin_dir/Binaries/Win64Arm64" "$plugin_dir/Binaries/Linux" "$plugin_dir/Binaries/LinuxAArch64" "$plugin_dir/Binaries/Mac" "$plugin_dir/Binaries/IOS"
             mkdir -p "$plugin_dir/Binaries/Win64" "$plugin_dir/Binaries/Win64Arm64" "$plugin_dir/Binaries/Linux" "$plugin_dir/Binaries/LinuxAArch64" "$plugin_dir/Binaries/Mac" "$plugin_dir/Binaries/IOS" "$plugin_dir/Binaries/Android"
@@ -6083,6 +6088,7 @@ jobs:
               copy_file_follow "${ANDROID_SO[$abi]}" "$thirdparty_root/Android/$abi/libBqLog.so"
             done
 
+            find "$plugin_dir" -name ".gitkeep" -delete
             zip_name="bqlog-unreal-plugin-prebuilt-${VERSION}-${ue}.zip"
             rm -f "$DIST_DIR/$zip_name" "$DIST_DIR/$zip_name.sha256"
             (cd "$stage_dir" && zip -qry "$DIST_DIR/$zip_name" "BqLog")

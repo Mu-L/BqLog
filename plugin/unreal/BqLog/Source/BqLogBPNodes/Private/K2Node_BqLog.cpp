@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Tencent. All Rights Reserved.
 #include "K2Node_BqLog.h"
 #include "BqLogFunctionLibrary.h"
 #include "BqLog.h"

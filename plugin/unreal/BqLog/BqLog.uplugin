@@ -1,5 +1,6 @@
 {
 	"FileVersion": 3,
+	"EngineVersion": "0.0",
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "BqLog",
@@ -16,7 +17,17 @@
 	"IsExperimentalVersion": false,
 	"Installed": false,
     "Modules": [
-        { "Name": "BqLog", "Type": "Runtime", "LoadingPhase": "PreDefault" },
-        { "Name": "BqLogBPNodes", "Type": "UncookedOnly", "LoadingPhase": "Default" }
+        {
+            "Name": "BqLog",
+            "Type": "Runtime",
+            "LoadingPhase": "PreDefault",
+            "PlatformAllowList": [ "Win64", "Linux", "LinuxArm64", "Mac", "IOS", "Android" ]
+        },
+        {
+            "Name": "BqLogBPNodes",
+            "Type": "UncookedOnly",
+            "LoadingPhase": "Default",
+            "PlatformAllowList": [ "Win64", "Linux", "LinuxArm64", "Mac" ]
+        }
     ]
 }

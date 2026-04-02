@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Tencent. All Rights Reserved.
 #pragma once
 
 #include "CoreMinimal.h"
