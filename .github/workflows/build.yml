@@ -5759,17 +5759,12 @@ jobs:
           set -euo pipefail
           DIST="${{ github.workspace }}/dist"
           for ue in ue4 ue5; do
-            # Move normal zips into per-UE subdir
+            # GitHub download: root is BqLog/
             mkdir -p "$DIST/$ue"
-            mv "$DIST/bqlog-unreal-plugin-${VERSION}-${ue}.zip"        "$DIST/$ue/"
-            mv "$DIST/bqlog-unreal-plugin-${VERSION}-${ue}.zip.sha256" "$DIST/$ue/"
-            # Create Fab zip (root is plugin contents directly, no BqLog/ wrapper)
+            (cd "$DIST/$ue" && unzip -q "$DIST/bqlog-unreal-plugin-${VERSION}-${ue}.zip")
+            # Fab download: root is plugin contents directly (no BqLog/ wrapper)
             mkdir -p "$DIST/fab_${ue}"
-            tmpfab="$DIST/_fab_tmp_${ue}"
-            mkdir -p "$tmpfab"
-            (cd "$tmpfab" && unzip -q "$DIST/$ue/bqlog-unreal-plugin-${VERSION}-${ue}.zip")
-            (cd "$tmpfab/BqLog" && zip -rq "$DIST/fab_${ue}/dont_download_this_only_for_fab_${ue}.zip" .)
-            rm -rf "$tmpfab"
+            cp -R "$DIST/$ue/BqLog/." "$DIST/fab_${ue}/"
           done
 
       - name: Upload UE4 Source Artifact
@@ -5787,13 +5782,13 @@ jobs:
       - name: Upload UE4 Fab Source Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: unreal_plugin_sources_fab_ue4_${{ needs.extract_version.outputs.version }}
+          name: dont_download_this_only_for_fab_ue4_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist/fab_ue4
 
       - name: Upload UE5 Fab Source Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: unreal_plugin_sources_fab_ue5_${{ needs.extract_version.outputs.version }}
+          name: dont_download_this_only_for_fab_ue5_${{ needs.extract_version.outputs.version }}
           path: ${{ github.workspace }}/dist/fab_ue5
 
   unreal_plugin_build_on_win64:
@@ -6106,8 +6101,7 @@ jobs:
           DIST="${{ github.workspace }}/dist"
           for ue in ue4 ue5; do
             mkdir -p "$DIST/$ue"
-            mv "$DIST/bqlog-unreal-plugin-prebuilt-${VERSION}-${ue}.zip"        "$DIST/$ue/"
-            mv "$DIST/bqlog-unreal-plugin-prebuilt-${VERSION}-${ue}.zip.sha256" "$DIST/$ue/"
+            (cd "$DIST/$ue" && unzip -q "$DIST/bqlog-unreal-plugin-prebuilt-${VERSION}-${ue}.zip")
           done
 
       - name: Upload UE4 Prebuilt Artifact
