@@ -73,36 +73,9 @@ log_my.error(fstring_1, name1);
 
 ### 2）将 BqLog 的输出转接到 Unreal 日志窗口
 
-已引入 Unreal 插件后，BqLog 日志会自动转接到 Unreal 的 Output Log 中。
-若未使用插件，而是直接在 C++ 级别集成 BqLog，可以自行使用 console 回调进行转发：
+Unreal 插件会自动将所有 BqLog 输出转接到 Unreal 的 Output Log，无需额外配置。
 
-```cpp
-static void on_bq_log(uint64_t log_id, int32_t category_idx,
-                      int32_t log_level, const char* content, int32_t length)
-{
-    switch (log_level)
-    {
-    case (int32_t)bq::log_level::verbose:
-        UE_LOG(LogTemp, VeryVerbose, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    case (int32_t)bq::log_level::debug:
-        UE_LOG(LogTemp, Verbose, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    case (int32_t)bq::log_level::info:
-        UE_LOG(LogTemp, Log, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    case (int32_t)bq::log_level::warning:
-        UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    case (int32_t)bq::log_level::error:
-        UE_LOG(LogTemp, Error, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    case (int32_t)bq::log_level::fatal:
-        UE_LOG(LogTemp, Fatal, TEXT("%s"), UTF8_TO_TCHAR(content)); break;
-    default: break;
-    }
-}
-
-void CallThisOnYourGameStart()
-{
-    bq::log::register_console_callback(&on_bq_log);
-}
-```
+> **注意：** 如果未使用插件而是直接在 C++ 级别集成 BqLog，可以通过 `bq::log::register_console_callback` 手动将日志转发到 `UE_LOG`。详见 [高级用法](./ADVANCED_USAGE_CHS.md)。
 
 ### 3）在蓝图中使用 BqLog
 

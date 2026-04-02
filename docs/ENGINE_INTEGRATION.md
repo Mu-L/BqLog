@@ -73,48 +73,9 @@ If you wish to customize adaptation behavior, you can also use "Method 2 (Global
 
 ### 2) Redirect BqLog output to Unreal Log Window
 
-If you have imported the Unreal plugin, BqLog logs will be automatically redirected to Unreal's Output Log.
-If the plugin is not used, but BqLog is integrated directly at C++ level, you can use the console callback to forward manually:
+The Unreal plugin automatically redirects all BqLog output to Unreal's Output Log — no extra setup is required.
 
-```cpp
-// You can get Log name and Category name based on different category_idx / log_id,
-// forward them to different UE_LOG Categories.
-static void on_bq_log(uint64_t log_id,
-                      int32_t category_idx,
-                      int32_t log_level,
-                      const char* content,
-                      int32_t length)
-{
-    switch (log_level)
-    {
-    case (int32_t)bq::log_level::verbose:
-        UE_LOG(LogTemp, VeryVerbose, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    case (int32_t)bq::log_level::debug:
-        UE_LOG(LogTemp, Verbose, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    case (int32_t)bq::log_level::info:
-        UE_LOG(LogTemp, Log, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    case (int32_t)bq::log_level::warning:
-        UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    case (int32_t)bq::log_level::error:
-        UE_LOG(LogTemp, Error, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    case (int32_t)bq::log_level::fatal:
-        UE_LOG(LogTemp, Fatal, TEXT("%s"), UTF8_TO_TCHAR(content));
-        break;
-    default:
-        break;
-    }
-}
-
-void CallThisOnYourGameStart()
-{
-    bq::log::register_console_callback(&on_bq_log);
-}
-```
+> **Note:** If you are integrating BqLog at the C++ level without the plugin, you can use `bq::log::register_console_callback` to forward logs to `UE_LOG` manually. See [Advanced Usage](./ADVANCED_USAGE.md) for details.
 
 ### 3) Using BqLog in Blueprint
 
