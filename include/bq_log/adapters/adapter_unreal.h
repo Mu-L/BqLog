@@ -21,10 +21,7 @@
 #include <stdint.h>
 #include "bq_common/bq_common_public_include.h"
 
-/**
- * You can define BQ_LOG_DISABLE_ADAPTER_FOR_UE macro to disable default Unreal adapter
- */
-#if defined(ENGINE_MAJOR_VERSION) && !defined(BQ_LOG_DISABLE_ADAPTER_FOR_UE)
+#if defined(BQ_LOG_UE_PLUGIN)
 #include "CoreMinimal.h"
 
 inline size_t bq_log_format_str_size(const FString& str)

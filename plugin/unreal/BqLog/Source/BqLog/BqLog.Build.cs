@@ -13,6 +13,8 @@ public class BqLog : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        PublicDefinitions.Add("BQ_LOG_UE_PLUGIN=1");
+
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core", "CoreUObject", "Engine"
