@@ -22,6 +22,7 @@
 
 #if defined(BQ_LOG_UE_PLUGIN)
 #include "CoreMinimal.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 inline size_t bq_log_format_str_size(const FString& str)
 {
@@ -59,7 +60,6 @@ inline const char16_t* bq_log_format_str_chars(const FName& str)
     auto display_entry = str.GetDisplayNameEntry();
     if (!display_entry) {
         return nullptr;
-        ;
     }
 #if ENGINE_MAJOR_VERSION == 4
     if (display_entry->IsWide()) {
