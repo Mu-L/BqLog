@@ -47,6 +47,34 @@ For more examples, refer to `/demo/csharp` directory in the repository.
   - Download `unreal_plugin_sources_ue4_{version}` or `unreal_plugin_sources_ue5_{version}` (depending on your engine version) from the [Releases page](https://github.com/Tencent/BqLog/releases);
   - Unzip to the `Plugins` directory of your game project, to be recompiled by the engine.
 
+### Enabling the Plugin
+
+Add the BqLog plugin to your `.uproject` file's `Plugins` section:
+
+```json
+"Plugins": [
+    {
+        "Name": "BqLog",
+        "Enabled": true
+    }
+]
+```
+
+> Plugins placed in the `Plugins` directory are enabled by default, but explicitly declaring them in `.uproject` is recommended for clarity and version control.
+
+### Adding BqLog Module Dependency
+
+In your game module's `.Build.cs` file, add `"BqLog"` to the dependency list so that Unreal's build system links and includes BqLog correctly:
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] {
+    "Core", "CoreUObject", "Engine",
+    "BqLog"   // ← Add this
+});
+```
+
+> The Blueprint node module `BqLogBPNodes` is an editor-only module bundled within the plugin. You do **not** need to add it to your module dependencies — it is automatically loaded by the editor when the plugin is enabled.
+
 ### 1) Support for `FName` / `FString` / `FText`
 
 In Unreal environment, BqLog has built-in adapters:

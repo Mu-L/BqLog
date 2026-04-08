@@ -47,6 +47,34 @@ log.info("Hello from Unity! value:{}", 42);
   - 从 [Releases 页面](https://github.com/Tencent/BqLog/releases)根据引擎版本下载 `unreal_plugin_sources_ue4_{version}` 或 `unreal_plugin_sources_ue5_{version}`；
   - 解压到游戏项目的 `Plugins` 目录下，由引擎进行二次编译。
 
+### 启用插件
+
+在你的 `.uproject` 文件的 `Plugins` 节点下添加 BqLog：
+
+```json
+"Plugins": [
+    {
+        "Name": "BqLog",
+        "Enabled": true
+    }
+]
+```
+
+> 放在 `Plugins` 目录下的插件默认会被启用，但在 `.uproject` 中显式声明是更规范的做法，便于版本管理和团队协作。
+
+### 添加 BqLog 模块依赖
+
+在你的游戏模块的 `.Build.cs` 文件中，将 `"BqLog"` 加入依赖列表，以便 Unreal 构建系统正确链接和包含 BqLog：
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] {
+    "Core", "CoreUObject", "Engine",
+    "BqLog"   // ← 添加这一行
+});
+```
+
+> 蓝图节点模块 `BqLogBPNodes` 是插件内置的编辑器专用模块，**不需要**手动添加到你的模块依赖中——启用插件后编辑器会自动加载它。
+
 ### 1）对 `FName` / `FString` / `FText` 的支持
 
 在 Unreal 环境中，BqLog 内置了适配器：

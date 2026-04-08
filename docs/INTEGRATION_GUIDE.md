@@ -145,9 +145,49 @@
 
 ## HarmonyOS (ArkTS / C++)
 
-- Download `harmony_os_libs_{version}`;
-- Import the `har` package, or directly import `.so` + `/wrapper/typescript/src` source code under the repository (optional);
-- Supports direct calling from ArkTS side, also supports calling from Native C++ side.
+### Integration
+
+- **ohpm (recommended)**
+
+  ```bash
+  ohpm install bqlog
+  ```
+
+  Or add to your module's `oh-package.json5`:
+
+  ```json5
+  "dependencies": {
+      "bqlog": "latest"
+  }
+  ```
+
+- **Manual har**
+
+  Download `harmony_os_libs_{version}` from the [Releases page](https://github.com/Tencent/BqLog/releases), copy the `.har` file into your project, then add to your module's `oh-package.json5`:
+
+  ```json5
+  "dependencies": {
+      "bqlog": "file:./path/to/bqlog.har"
+  }
+  ```
+
+Supports direct calling from ArkTS side, also supports calling from Native C++ side.
+
+### C++ (Native) usage
+
+After importing the `har` package (via ohpm or manual), add the following to your native module's `CMakeLists.txt`:
+
+```cmake
+find_package(BqLog)
+
+target_link_libraries(entry PUBLIC bqlog::BqLog)
+```
+
+Then include in C++:
+
+```cpp
+#include "bq_log/bq_log.h"
+```
 
 ---
 
