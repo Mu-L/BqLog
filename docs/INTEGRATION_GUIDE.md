@@ -39,6 +39,36 @@
 
 ---
 
+## iOS / Apple Platforms (C++ / Objective-C)
+
+Download `ios_libs_{version}` from the [Releases page](https://github.com/Tencent/BqLog/releases). The package contains `BqLog.xcframework` with support for multiple Apple platforms (iOS device, iOS Simulator, tvOS, watchOS, visionOS) and multiple build configurations (Debug, Release, RelWithDebInfo, MinSizeRel).
+
+### Integration via Xcode
+
+1. Drag `BqLog.xcframework` into your Xcode project;
+2. In your target's **General → Frameworks, Libraries, and Embedded Content**, ensure `BqLog.xcframework` is set to **Embed & Sign**;
+3. Include in your source files:
+
+```cpp
+#include "bq_log/bq_log.h"
+```
+
+### Integration via CMake (for CMake-based iOS projects)
+
+```cmake
+# Adjust the path to where you placed the xcframework
+set(BQLOG_XCFRAMEWORK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/path/to/BqLog.xcframework")
+find_library(BQLOG_LIB BqLog PATHS ${BQLOG_XCFRAMEWORK_PATH} REQUIRED)
+
+target_link_libraries(${CMAKE_PROJECT_NAME} ${BQLOG_LIB})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    "${BQLOG_XCFRAMEWORK_PATH}/Headers")
+```
+
+> **Note:** BqLog does not currently publish to CocoaPods or Swift Package Manager. Use the xcframework from the Releases page for integration.
+
+---
+
 ## Java / Kotlin (Android / Server)
 
 ### Android
@@ -73,7 +103,7 @@
   ```cmake
   find_package(BqLog REQUIRED CONFIG)
 
-  target_link_libraries(your_native_lib
+  target_link_libraries(${CMAKE_PROJECT_NAME}
       bqlog::BqLog
       android
       log)
@@ -82,7 +112,7 @@
   Then include in C++:
 
   ```cpp
-  #include <bq_log/bq_log.h>
+  #include "bq_log/bq_log.h"
   ```
 
 - **Manual AAR**
@@ -101,7 +131,7 @@
   }
   ```
 
-  Java/Kotlin and C++ usage are identical to the Maven approach above.
+  Java/Kotlin and C++ (NDK) usage are identical to the Maven approach above.
 
 ### Java (Server / Desktop)
 
@@ -180,7 +210,7 @@ After importing the `har` package (via ohpm or manual), add the following to you
 ```cmake
 find_package(BqLog)
 
-target_link_libraries(entry PUBLIC bqlog::BqLog)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC bqlog::BqLog)
 ```
 
 Then include in C++:

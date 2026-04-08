@@ -39,6 +39,36 @@
 
 ---
 
+## iOS / Apple 平台（C++ / Objective-C）
+
+从 [Releases 页面](https://github.com/Tencent/BqLog/releases) 下载 `ios_libs_{version}`。包内包含 `BqLog.xcframework`，支持多个 Apple 平台（iOS 真机、iOS 模拟器、tvOS、watchOS、visionOS）及多种构建配置（Debug、Release、RelWithDebInfo、MinSizeRel）。
+
+### 通过 Xcode 集成
+
+1. 将 `BqLog.xcframework` 拖入 Xcode 工程；
+2. 在 target 的 **General → Frameworks, Libraries, and Embedded Content** 中，确保 `BqLog.xcframework` 设置为 **Embed & Sign**；
+3. 在源码中包含头文件：
+
+```cpp
+#include "bq_log/bq_log.h"
+```
+
+### 通过 CMake 集成（适用于基于 CMake 的 iOS 工程）
+
+```cmake
+# 将路径替换为你放置 xcframework 的实际位置
+set(BQLOG_XCFRAMEWORK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/path/to/BqLog.xcframework")
+find_library(BQLOG_LIB BqLog PATHS ${BQLOG_XCFRAMEWORK_PATH} REQUIRED)
+
+target_link_libraries(${CMAKE_PROJECT_NAME} ${BQLOG_LIB})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    "${BQLOG_XCFRAMEWORK_PATH}/Headers")
+```
+
+> **注意：** BqLog 目前未发布到 CocoaPods 或 Swift Package Manager，请从 Releases 页面下载 xcframework 进行集成。
+
+---
+
 ## Java / Kotlin（Android / Server）
 
 ### Android
@@ -74,7 +104,7 @@
   ```cmake
   find_package(BqLog REQUIRED CONFIG)
 
-  target_link_libraries(your_native_lib
+  target_link_libraries(${CMAKE_PROJECT_NAME}
       bqlog::BqLog
       android
       log)
@@ -83,7 +113,7 @@
   C++ 代码中直接包含：
 
   ```cpp
-  #include <bq_log/bq_log.h>
+  #include "bq_log/bq_log.h"
   ```
 
 - **手动引入 AAR**
@@ -102,7 +132,7 @@
   }
   ```
 
-  Java / Kotlin 与 C++ 的使用方式与 Maven 方式完全相同。
+  Java / Kotlin 与 C++（NDK）的使用方式与 Maven 方式完全相同。
 
 ### Java（Server / Desktop）
 
@@ -181,7 +211,7 @@
 ```cmake
 find_package(BqLog)
 
-target_link_libraries(entry PUBLIC bqlog::BqLog)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC bqlog::BqLog)
 ```
 
 然后在 C++ 代码中直接包含：
