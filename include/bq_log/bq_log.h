@@ -19,12 +19,12 @@
  */
 
 // suppress some third party library warnings on Unreal Engine(Such as IWYU)
-#if defined(THIRD_PARTY_INCLUDES_START) && defined(THIRD_PARTY_INCLUDES_END)
+#if !defined(BQ_LOG_UE_PLUGIN) && defined(THIRD_PARTY_INCLUDES_START) && defined(THIRD_PARTY_INCLUDES_END)
 THIRD_PARTY_INCLUDES_START
 #endif
 
 #include "bq_log/bq_log_entry.h"
 
-#if defined(THIRD_PARTY_INCLUDES_START) && defined(THIRD_PARTY_INCLUDES_END)
+#if !defined(BQ_LOG_UE_PLUGIN) && defined(THIRD_PARTY_INCLUDES_START) && defined(THIRD_PARTY_INCLUDES_END)
 THIRD_PARTY_INCLUDES_END
 #endif
