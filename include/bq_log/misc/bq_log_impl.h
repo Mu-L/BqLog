@@ -240,7 +240,7 @@ namespace bq {
         }
         if (!format_data_ptr) {
             // Ugly hack
-            bq::tools::_type_copy<false>(log_format_content, handle.format_data_addr - sizeof(uint32_t), total_format_data_size + sizeof(uint32_t));
+            bq::tools::_type_copy<false>(log_format_content, handle.format_data_addr - sizeof(uint32_t), format_size + sizeof(uint32_t));
             memcpy(handle.format_data_addr + format_size, bq::get<0>(stack_info), bq::get<1>(stack_info));
             *reinterpret_cast<uint32_t*>(handle.format_data_addr - sizeof(uint32_t)) = static_cast<uint32_t>(total_format_data_size);
         }
@@ -274,7 +274,7 @@ namespace bq {
         }
         if (!format_data_ptr) {
             // Ugly hack
-            bq::tools::_type_copy<false>(log_format_content, handle.format_data_addr - sizeof(uint32_t), total_format_data_size + sizeof(uint32_t));
+            bq::tools::_type_copy<false>(log_format_content, handle.format_data_addr - sizeof(uint32_t), format_size + sizeof(uint32_t));
             memcpy(handle.format_data_addr + format_size, bq::get<0>(stack_info), bq::get<1>(stack_info));
             *reinterpret_cast<uint32_t*>(handle.format_data_addr - sizeof(uint32_t)) = static_cast<uint32_t>(total_format_data_size);
         }
