@@ -36,16 +36,21 @@ for ue_version in "${UE_VERSIONS[@]}"; do
   rm -rf "$TARGET_DIR/Binaries"
   mkdir -p "$PUBLIC_DIR" "$PRIVATE_DIR"
 
-  cp -R "$ROOT_DIR/include/." "$PUBLIC_DIR/"
-  cp -R "$ROOT_DIR/src/bq_log" "$PRIVATE_DIR/"
-  cp -R "$ROOT_DIR/src/bq_common" "$PRIVATE_DIR/"
+  # BqLog core library → ThirdParty directory (third-party declaration for Fab)
+  THIRDPARTY_DIR="$TARGET_DIR/Source/BqLog/ThirdParty/BqLog"
+  mkdir -p "$THIRDPARTY_DIR/include"
+  mkdir -p "$THIRDPARTY_DIR/src"
+  cp -R "$ROOT_DIR/include/." "$THIRDPARTY_DIR/include/"
+  cp -R "$ROOT_DIR/src/bq_log" "$THIRDPARTY_DIR/src/"
+  cp -R "$ROOT_DIR/src/bq_common" "$THIRDPARTY_DIR/src/"
+  cp "$ROOT_DIR/LICENSE"* "$THIRDPARTY_DIR/"
 
-  mkdir -p "$PRIVATE_DIR/IOS" "$PRIVATE_DIR/Mac"
-  if [[ -f "$PRIVATE_DIR/bq_common/platform/ios_misc.mm" ]]; then
-    mv -f "$PRIVATE_DIR/bq_common/platform/ios_misc.mm" "$PRIVATE_DIR/IOS/"
+  mkdir -p "$THIRDPARTY_DIR/src/IOS" "$THIRDPARTY_DIR/src/Mac"
+  if [[ -f "$THIRDPARTY_DIR/src/bq_common/platform/ios_misc.mm" ]]; then
+    mv -f "$THIRDPARTY_DIR/src/bq_common/platform/ios_misc.mm" "$THIRDPARTY_DIR/src/IOS/"
   fi
-  if [[ -f "$PRIVATE_DIR/bq_common/platform/mac_misc.mm" ]]; then
-    mv -f "$PRIVATE_DIR/bq_common/platform/mac_misc.mm" "$PRIVATE_DIR/Mac/"
+  if [[ -f "$THIRDPARTY_DIR/src/bq_common/platform/mac_misc.mm" ]]; then
+    mv -f "$THIRDPARTY_DIR/src/bq_common/platform/mac_misc.mm" "$THIRDPARTY_DIR/src/Mac/"
   fi
 
   if [[ -f "$PUBLIC_DIR/BqLog_h_${ue_version}.txt" ]]; then

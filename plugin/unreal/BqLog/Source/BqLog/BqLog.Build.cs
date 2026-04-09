@@ -29,10 +29,31 @@ public class BqLog : ModuleRules
             "Core", "CoreUObject", "Engine"
         });
 
+        ConfigureSourceBuild();
         ConfigurePrebuilt(Target);
         //OptimizeCode = CodeOptimization.Never;
         //bUseUnity = false;
         //MinFilesUsingPrecompiledHeaderOverride = 1;
+    }
+
+    /// <summary>
+    /// Source build: BqLog core headers and sources live under ThirdParty/BqLog/{include,src}.
+    /// This path is only present in the source-compile variant (no prebuilt binaries).
+    /// </summary>
+    private void ConfigureSourceBuild()
+    {
+        string thirdParty = Path.Combine(ModuleDirectory, "ThirdParty", "BqLog");
+        string includeDir = Path.Combine(thirdParty, "include");
+        string srcDir = Path.Combine(thirdParty, "src");
+
+        if (Directory.Exists(includeDir))
+        {
+            PublicIncludePaths.Add(includeDir);
+        }
+        if (Directory.Exists(srcDir))
+        {
+            PrivateIncludePaths.Add(srcDir);
+        }
     }
 
     private void ConfigurePrebuilt(ReadOnlyTargetRules Target)
@@ -40,7 +61,9 @@ public class BqLog : ModuleRules
         string moduleDir = ModuleDirectory;
         string pluginRoot = Path.GetFullPath(Path.Combine(moduleDir, "..", ".."));
         string thirdPartyRoot = Path.Combine(moduleDir, "ThirdParty", "BqLog");
-        if (!Directory.Exists(thirdPartyRoot))
+        // Only proceed if this is the prebuilt variant (has Shared/ with platform binaries).
+        // The source-compile variant also has ThirdParty/BqLog/ but with include/ and src/ instead.
+        if (!Directory.Exists(Path.Combine(thirdPartyRoot, "Shared")))
         {
             return;
         }

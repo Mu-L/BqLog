@@ -9,6 +9,7 @@ set "TARGET_DIR=%TMP_DIR%\BqLog"
 set "PUBLIC_DIR=%TARGET_DIR%\Source\BqLog\Public"
 set "PRIVATE_DIR=%TARGET_DIR%\Source\BqLog\Private"
 set "DIST_DIR=%ROOT_DIR%\dist"
+set "THIRDPARTY_DIR=%TARGET_DIR%\Source\BqLog\ThirdParty\BqLog"
 
 if not exist "%DIST_DIR%" mkdir "%DIST_DIR%" >nul
 if not exist "%TMP_DIR%" mkdir "%TMP_DIR%" >nul
@@ -45,20 +46,26 @@ for %%T in (ue4 ue5) do (
     rmdir /S /Q "%TARGET_DIR%\Binaries"
     if errorlevel 8 exit /b 8
 
-    robocopy "%ROOT_DIR%\include" "%PUBLIC_DIR%" /E >nul
+    REM BqLog core library -> ThirdParty directory (third-party declaration for Fab)
+    mkdir "%THIRDPARTY_DIR%\include" >nul 2>&1
+    mkdir "%THIRDPARTY_DIR%\src" >nul 2>&1
+
+    robocopy "%ROOT_DIR%\include" "%THIRDPARTY_DIR%\include" /E >nul
     if errorlevel 8 exit /b 8
 
-    robocopy "%ROOT_DIR%\src\bq_log" "%PRIVATE_DIR%\bq_log" /E >nul
+    robocopy "%ROOT_DIR%\src\bq_log" "%THIRDPARTY_DIR%\src\bq_log" /E >nul
     if errorlevel 8 exit /b 8
 
-    robocopy "%ROOT_DIR%\src\bq_common" "%PRIVATE_DIR%\bq_common" /E >nul
+    robocopy "%ROOT_DIR%\src\bq_common" "%THIRDPARTY_DIR%\src\bq_common" /E >nul
     if errorlevel 8 exit /b 8
 
-    if not exist "%PRIVATE_DIR%\IOS" mkdir "%PRIVATE_DIR%\IOS" >nul
-    if not exist "%PRIVATE_DIR%\Mac" mkdir "%PRIVATE_DIR%\Mac" >nul
+    copy /Y "%ROOT_DIR%\LICENSE*" "%THIRDPARTY_DIR%\" >nul 2>&1
 
-    if exist "%PRIVATE_DIR%\bq_common\platform\ios_misc.mm" move /Y "%PRIVATE_DIR%\bq_common\platform\ios_misc.mm" "%PRIVATE_DIR%\IOS\" >nul
-    if exist "%PRIVATE_DIR%\bq_common\platform\mac_misc.mm" move /Y "%PRIVATE_DIR%\bq_common\platform\mac_misc.mm" "%PRIVATE_DIR%\Mac\" >nul
+    if not exist "%THIRDPARTY_DIR%\src\IOS" mkdir "%THIRDPARTY_DIR%\src\IOS" >nul
+    if not exist "%THIRDPARTY_DIR%\src\Mac" mkdir "%THIRDPARTY_DIR%\src\Mac" >nul
+
+    if exist "%THIRDPARTY_DIR%\src\bq_common\platform\ios_misc.mm" move /Y "%THIRDPARTY_DIR%\src\bq_common\platform\ios_misc.mm" "%THIRDPARTY_DIR%\src\IOS\" >nul
+    if exist "%THIRDPARTY_DIR%\src\bq_common\platform\mac_misc.mm" move /Y "%THIRDPARTY_DIR%\src\bq_common\platform\mac_misc.mm" "%THIRDPARTY_DIR%\src\Mac\" >nul
 
     if exist "%PUBLIC_DIR%\BqLog_h_%%T.txt" move /Y "%PUBLIC_DIR%\BqLog_h_%%T.txt" "%PUBLIC_DIR%\BqLog.h" >nul
     pushd "%PUBLIC_DIR%" && del /q /f *.txt >nul 2>&1 & popd
