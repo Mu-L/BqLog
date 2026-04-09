@@ -9,7 +9,7 @@ set "TARGET_DIR=%TMP_DIR%\BqLog"
 set "PUBLIC_DIR=%TARGET_DIR%\Source\BqLog\Public"
 set "PRIVATE_DIR=%TARGET_DIR%\Source\BqLog\Private"
 set "DIST_DIR=%ROOT_DIR%\dist"
-set "THIRDPARTY_DIR=%TARGET_DIR%\Source\BqLog\ThirdParty\BqLog"
+set "THIRDPARTY_DIR=%TARGET_DIR%\Source\ThirdParty\BqLog"
 
 if not exist "%DIST_DIR%" mkdir "%DIST_DIR%" >nul
 if not exist "%TMP_DIR%" mkdir "%TMP_DIR%" >nul

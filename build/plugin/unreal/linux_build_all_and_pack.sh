@@ -37,7 +37,7 @@ for ue_version in "${UE_VERSIONS[@]}"; do
   mkdir -p "$PUBLIC_DIR" "$PRIVATE_DIR"
 
   # BqLog core library → ThirdParty directory (third-party declaration for Fab)
-  THIRDPARTY_DIR="$TARGET_DIR/Source/BqLog/ThirdParty/BqLog"
+  THIRDPARTY_DIR="$TARGET_DIR/Source/ThirdParty/BqLog"
   mkdir -p "$THIRDPARTY_DIR/include"
   mkdir -p "$THIRDPARTY_DIR/src"
   cp -R "$ROOT_DIR/include/." "$THIRDPARTY_DIR/include/"

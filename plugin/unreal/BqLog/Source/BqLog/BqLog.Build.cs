@@ -9,6 +9,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 using UnrealBuildTool;
+#if UE_5_0_OR_LATER
+using EpicGames.Core;
+#else
+using Tools.DotNETCommon;
+#endif
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +47,7 @@ public class BqLog : ModuleRules
     /// </summary>
     private void ConfigureSourceBuild()
     {
-        string thirdParty = Path.Combine(ModuleDirectory, "ThirdParty", "BqLog");
+        string thirdParty = Path.Combine(ModuleDirectory, "..", "ThirdParty", "BqLog");
         string includeDir = Path.Combine(thirdParty, "include");
         string srcDir = Path.Combine(thirdParty, "src");
 
@@ -53,6 +58,7 @@ public class BqLog : ModuleRules
         if (Directory.Exists(srcDir))
         {
             PrivateIncludePaths.Add(srcDir);
+            ConditionalAddModuleDirectory(new DirectoryReference(srcDir));
         }
     }
 
@@ -60,7 +66,7 @@ public class BqLog : ModuleRules
     {
         string moduleDir = ModuleDirectory;
         string pluginRoot = Path.GetFullPath(Path.Combine(moduleDir, "..", ".."));
-        string thirdPartyRoot = Path.Combine(moduleDir, "ThirdParty", "BqLog");
+        string thirdPartyRoot = Path.Combine(moduleDir, "..", "ThirdParty", "BqLog");
         // Only proceed if this is the prebuilt variant (has Shared/ with platform binaries).
         // The source-compile variant also has ThirdParty/BqLog/ but with include/ and src/ instead.
         if (!Directory.Exists(Path.Combine(thirdPartyRoot, "Shared")))
