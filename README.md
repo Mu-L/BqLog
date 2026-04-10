@@ -2,13 +2,13 @@
   <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
-# BqLog (BianQue Log) V 2.2.7
+# BqLog (BianQue Log) V 2.2.8
 
 **English** | [简体中文](./README_CHS.md)
 
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.2.7-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.2.7-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.2.8-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.2.8-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -20,15 +20,12 @@
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_Download-Release_2.2.7-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.7)
+[![Download](https://img.shields.io/badge/⬇_Download-Release_2.2.8-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.8)
 
-## 📋 What's New in v2.2.7
+## 📋 What's New in v2.2.8
 
-- **Python 3.7+ support** — Added Python wrapper via CPython C Extension (Stable ABI).
-- **Package registry publishing** — Now available on [npm](https://www.npmjs.com/package/@pippocao/bqlog) (`npm install @pippocao/bqlog`), [PyPI](https://pypi.org/project/bqlog/) (`pip install bqlog`), [Maven Central](https://central.sonatype.com/namespace/com.tencent.bqlog) (Gradle/Maven), and [OHPM](https://ohpm.openharmony.cn/#/en/detail/bqlog) (`ohpm install bqlog`).
-- **Python category log generator** — `BqLog_CategoryLogGenerator` now generates Python category log wrappers (`.py`).
-- **TypeScript dual-target generation** — Separate outputs for Node.js (`_nodejs.ts`) and HarmonyOS (`_ohos.ts`).
-- **Category log test coverage** — Added test suites for Python, Java, C#, and TypeScript.
+- **Code quality** — Refactored all SFINAE usages: moved `enable_if` from return types to template parameters for improved readability and consistency.
+- **Bug fix** — Fixed crash when stack trace is enabled in C++. ([#62](https://github.com/Tencent/BqLog/issues/62))
 
 > Full changelog → [CHANGELOG.md](CHANGELOG.md)
 

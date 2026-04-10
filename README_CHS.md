@@ -2,13 +2,13 @@
   <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
-# BqLog (扁鹊日志) V 2.2.7
+# BqLog (扁鹊日志) V 2.2.8
 
 [English](./README.md) | **简体中文**
 
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.2.7-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.2.7-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.2.8-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.2.8-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -20,15 +20,12 @@
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_下载-Release_2.2.7-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.7)
+[![Download](https://img.shields.io/badge/⬇_下载-Release_2.2.8-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.2.8)
 
-## 📋 v2.2.7 更新亮点
+## 📋 v2.2.8 更新亮点
 
-- **Python 3.7+ 支持** — 通过 CPython C Extension（Stable ABI）新增 Python 包装层。
-- **包仓库发布** — 已发布至 [npm](https://www.npmjs.com/package/@pippocao/bqlog)（`npm install @pippocao/bqlog`）、[PyPI](https://pypi.org/project/bqlog/)（`pip install bqlog`）、[Maven Central](https://central.sonatype.com/namespace/com.tencent.bqlog)（Gradle/Maven）、[OHPM](https://ohpm.openharmony.cn/#/cn/detail/bqlog)（`ohpm install bqlog`）。
-- **Python Category Log 生成器** — `BqLog_CategoryLogGenerator` 工具现可生成 Python 分类日志包装（`.py`）。
-- **TypeScript 双目标生成** — 分别为 Node.js（`_nodejs.ts`）和 HarmonyOS（`_ohos.ts`）生成独立输出。
-- **分类日志测试覆盖** — 新增 Python、Java、C#、TypeScript 的分类日志测试用例。
+- **代码质量优化** — 重构所有 SFINAE 写法：将 `enable_if` 从返回值类型移至模板参数，提升可读性与一致性。
+- **Bug 修复** — 修复 C++ 开启堆栈追踪时的崩溃问题。（[#62](https://github.com/Tencent/BqLog/issues/62)）
 
 > 完整更新日志 → [CHANGELOG.md](CHANGELOG.md)
 

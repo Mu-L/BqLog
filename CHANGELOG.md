@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.2.8] - 2026-04-10
+- **Code quality**: Refactored all SFINAE usages — moved `enable_if` from return types to template parameters for improved readability and consistency.
+- **Bug fix**: [Crash when enable stack trace in C++ #62](https://github.com/Tencent/BqLog/issues/62)
+
 ## [v2.2.7] - 2026-04-01
 - **Python 3.7+ support**: Added Python 3.7+ support via CPython C Extension wrapper (Stable ABI).
 - **npm publishing**: Node.js wrapper is now published to npm as [`@pippocao/bqlog`](https://www.npmjs.com/package/@pippocao/bqlog), installable via `npm install @pippocao/bqlog`.
