@@ -279,6 +279,7 @@ namespace bq {
             (void)value;
             clear_data();
             type_ = enum_property_value_type::null_type;
+            return *this;
         }
 
         template <typename T, bq::enable_if_t<(property_value_trait<T>::value < enum_property_value_type::invalid_type), bool> = true>
