@@ -353,29 +353,29 @@ namespace bq {
         {
         }
 
-        template <size_t _Index, class... _Types>
-        friend constexpr tuple_element_t<_Index, tuple<_Types...>>& get(tuple<_Types...>& _Tuple) noexcept;
+        template <size_t Index, class... Types>
+        friend constexpr tuple_element_t<Index, tuple<Types...>>& get(tuple<Types...>& _Tuple) noexcept;
 
-        template <size_t _Index, class... _Types>
-        friend constexpr const tuple_element_t<_Index, tuple<_Types...>>& get(const tuple<_Types...>& _Tuple) noexcept;
+        template <size_t Index, class... Types>
+        friend constexpr const tuple_element_t<Index, tuple<Types...>>& get(const tuple<Types...>& _Tuple) noexcept;
 
-        template <size_t _Index, class... _Types>
-        friend constexpr tuple_element_t<_Index, tuple<_Types...>>&& get(tuple<_Types...>&& _Tuple) noexcept;
+        template <size_t Index, class... Types>
+        friend constexpr tuple_element_t<Index, tuple<Types...>>&& get(tuple<Types...>&& _Tuple) noexcept;
 
-        template <size_t _Index, class... _Types>
-        friend constexpr const tuple_element_t<_Index, tuple<_Types...>>&& get(const tuple<_Types...>&& _Tuple) noexcept;
+        template <size_t Index, class... Types>
+        friend constexpr const tuple_element_t<Index, tuple<Types...>>&& get(const tuple<Types...>&& _Tuple) noexcept;
 
-        template <class _Ty, class... _Types>
-        friend constexpr _Ty& get(tuple<_Types...>& _Tuple) noexcept;
+        template <class _Ty, class... Types>
+        friend constexpr _Ty& get(tuple<Types...>& _Tuple) noexcept;
 
-        template <class _Ty, class... _Types>
-        friend constexpr const _Ty& get(const tuple<_Types...>& _Tuple) noexcept;
+        template <class _Ty, class... Types>
+        friend constexpr const _Ty& get(const tuple<Types...>& _Tuple) noexcept;
 
-        template <class _Ty, class... _Types>
-        friend constexpr _Ty&& get(tuple<_Types...>&& _Tuple) noexcept;
+        template <class _Ty, class... Types>
+        friend constexpr _Ty&& get(tuple<Types...>&& _Tuple) noexcept;
 
-        template <class _Ty, class... _Types>
-        friend constexpr const _Ty&& get(const tuple<_Types...>&& _Tuple) noexcept;
+        template <class _Ty, class... Types>
+        friend constexpr const _Ty&& get(const tuple<Types...>&& _Tuple) noexcept;
     };
 
     template <size_t Index, typename... Types>
