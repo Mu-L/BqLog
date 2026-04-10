@@ -39,14 +39,14 @@ namespace bq {
         struct is_data_compatible : bq::bool_type<bq::string::template is_std_string_view_compatible<T>::value || bq::u16string::template is_std_string_view_compatible<T>::value || bq::u32string::template is_std_string_view_compatible<T>::value> {
         };
 
-        template <typename T>
-        inline auto __bq_string_compatible_class_get_data(const T& str) -> bq::enable_if_t<is_c_str_compatible<T>::value, const typename T::value_type*>
+        template <typename T, bq::enable_if_t<is_c_str_compatible<T>::value, bool> = true>
+        inline auto __bq_string_compatible_class_get_data(const T& str) -> const typename T::value_type*
         {
             return str.c_str();
         }
 
-        template <typename T>
-        inline auto __bq_string_compatible_class_get_data(const T& str) -> bq::enable_if_t<is_data_compatible<T>::value, const typename T::value_type*>
+        template <typename T, bq::enable_if_t<is_data_compatible<T>::value, bool> = true>
+        inline auto __bq_string_compatible_class_get_data(const T& str) -> const typename T::value_type*
         {
             return str.data();
         }
@@ -249,14 +249,14 @@ namespace bq {
                 return N;
             }
         }
-        template <typename STR_TYPE>
-        bq_forceinline bq::enable_if_t<bq::is_pointer<STR_TYPE>::value, size_t> string_len(const STR_TYPE& str)
+        template <typename STR_TYPE, bq::enable_if_t<bq::is_pointer<STR_TYPE>::value, bool> = true>
+        bq_forceinline size_t string_len(const STR_TYPE& str)
         {
             return string_len_ptr(str);
         }
 
-        template <typename STR_TYPE>
-        bq_forceinline bq::enable_if_t<bq::is_array<STR_TYPE>::value, size_t> string_len(const STR_TYPE& str)
+        template <typename STR_TYPE, bq::enable_if_t<bq::is_array<STR_TYPE>::value, bool> = true>
+        bq_forceinline size_t string_len(const STR_TYPE& str)
         {
             return string_len_array(str);
         }

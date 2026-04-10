@@ -171,14 +171,14 @@ namespace bq {
         return bq::api::__api_fetch_and_remove_console_buffer(fetch_and_remove_console_buffer_callback_wrapper, (const void*)on_console_callback);
     }
 
-    template <typename STR>
-    inline bq::enable_if_t<bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, char*>::value || bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, const char*>::value> log::console(bq::log_level level, const STR& str)
+    template <typename STR, bq::enable_if_t<bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, char*>::value || bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, const char*>::value, bool>>
+    inline void log::console(bq::log_level level, const STR& str)
     {
         bq::api::__api_log_device_console(level, str);
     }
 
-    template <typename STR>
-    inline bq::enable_if_t<!(bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, char*>::value || bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, const char*>::value)> log::console(bq::log_level level, const STR& str)
+    template <typename STR, bq::enable_if_t<!(bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, char*>::value || bq::is_same<bq::decay_t<bq::remove_cv_t<STR>>, const char*>::value), bool>>
+    inline void log::console(bq::log_level level, const STR& str)
     {
         bq::api::__api_log_device_console(level, str.c_str());
     }
@@ -216,8 +216,8 @@ namespace bq {
         }
     }
 
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::do_log(uint32_t category_index, bq::log_level level, const STR& log_format_content) const
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::do_log(uint32_t category_index, bq::log_level level, const STR& log_format_content) const
     {
         if (!is_enable_for(category_index, level)) {
             return false;
@@ -248,8 +248,8 @@ namespace bq {
         return true;
     }
 
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::do_log(uint32_t category_index, bq::log_level level, const STR& log_format_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::do_log(uint32_t category_index, bq::log_level level, const STR& log_format_content, const Args&... args) const
     {
         if (!is_enable_for(category_index, level)) {
             return false;
@@ -284,64 +284,64 @@ namespace bq {
         return true;
     }
 
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::verbose(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::verbose(const STR& log_content) const
     {
         return do_log(0, log_level::verbose, log_content);
     }
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::debug(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::debug(const STR& log_content) const
     {
         return do_log(0, log_level::debug, log_content);
     }
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::info(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::info(const STR& log_content) const
     {
         return do_log(0, log_level::info, log_content);
     }
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::warning(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::warning(const STR& log_content) const
     {
         return do_log(0, log_level::warning, log_content);
     }
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::error(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::error(const STR& log_content) const
     {
         return do_log(0, log_level::error, log_content);
     }
-    template <typename STR>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::fatal(const STR& log_content) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    inline bool log::fatal(const STR& log_content) const
     {
         return do_log(0, log_level::fatal, log_content);
     }
 
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::verbose(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::verbose(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::verbose, log_content, args...);
     }
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::debug(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::debug(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::debug, log_content, args...);
     }
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::info(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::info(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::info, log_content, args...);
     }
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::warning(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::warning(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::warning, log_content, args...);
     }
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::error(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::error(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::error, log_content, args...);
     }
-    template <typename STR, typename... Args>
-    inline bq::enable_if_t<log::is_bq_log_format<STR>::value, bool> log::fatal(const STR& log_content, const Args&... args) const
+    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    inline bool log::fatal(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::fatal, log_content, args...);
     }

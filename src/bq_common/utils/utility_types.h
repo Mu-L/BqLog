@@ -292,7 +292,8 @@ namespace bq {
         {
             return ptr_;
         }
-        bq::enable_if_t<!bq::is_const<T>::value, const T*> get() const
+        template <typename _ = T, bq::enable_if_t<!bq::is_const<_>::value, bool> = true>
+        const T* get() const
         {
             return ptr_;
         }

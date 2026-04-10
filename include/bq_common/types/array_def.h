@@ -152,8 +152,8 @@ namespace bq {
         template <typename... V>
         size_type emplace_back(V&&... args);
 
-        template <typename U = T>
-        typename bq::enable_if<bq::is_pod<U>::value>::type fill_uninitialized(size_type count);
+        template <typename U = T, bq::enable_if_t<bq::is_pod<U>::value, bool> = true>
+        void fill_uninitialized(size_type count);
 
         void pop_back();
 
@@ -176,11 +176,11 @@ namespace bq {
 
         void clear();
 
-        template <typename U = T>
-        typename bq::enable_if<bq::is_pod<U>::value>::type reset();
+        template <typename U = T, bq::enable_if_t<bq::is_pod<U>::value, bool> = true>
+        void reset();
 
-        template <typename U = T>
-        typename bq::enable_if<!bq::is_pod<U>::value>::type reset();
+        template <typename U = T, bq::enable_if_t<!bq::is_pod<U>::value, bool> = true>
+        void reset();
 
         bool set_capacity(size_type new_capacity, bool force_reset = false);
 

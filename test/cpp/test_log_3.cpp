@@ -507,13 +507,13 @@ namespace bq {
                 result.insert_batch(result.end(), value, N);
                 return result;
             }
-            template <typename T>
-            static typename bq::enable_if<(bq::tools::_is_utf8_c_style_string<T>::value && bq::is_array<T>::value), bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<(bq::tools::_is_utf8_c_style_string<T>::value && bq::is_array<T>::value), bool> = true>
+            static bq::string trans(const T& value)
             {
                 return trans_utf8_char_array_impl(value);
             }
-            template <typename T>
-            static typename bq::enable_if<(bq::tools::_is_utf8_c_style_string<T>::value && bq::is_pointer<T>::value), bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<(bq::tools::_is_utf8_c_style_string<T>::value && bq::is_pointer<T>::value), bool> = true>
+            static bq::string trans(const T& value)
             {
                 if (!value) {
                     return "null";
@@ -528,13 +528,13 @@ namespace bq {
                 result.insert_batch(result.end(), (const char16_t*)value, N);
                 return get_utf8_from_utf16(result.c_str());
             }
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_utf16_c_style_string<T>::value && bq::is_array<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_utf16_c_style_string<T>::value && bq::is_array<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 return trans_utf16_char_array_impl(value);
             }
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_utf16_c_style_string<T>::value && bq::is_pointer<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_utf16_c_style_string<T>::value && bq::is_pointer<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 if (!value) {
                     return "null";
@@ -549,13 +549,13 @@ namespace bq {
                 result.insert_batch(result.end(), (const char32_t*)value, N);
                 return get_utf8_from_utf16(result.c_str());
             }
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_utf32_c_style_string<T>::value && bq::is_array<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_utf32_c_style_string<T>::value && bq::is_array<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 return trans_utf32_char_array_impl(value);
             }
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_utf32_c_style_string<T>::value && bq::is_pointer<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_utf32_c_style_string<T>::value && bq::is_pointer<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 if (!value) {
                     return "null";
@@ -563,14 +563,14 @@ namespace bq {
                 return get_utf8_from_utf32(value);
             }
 
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_std_string_view_like<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_std_string_view_like<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 return trans(value.data());
             }
 
-            template <typename T>
-            static typename bq::enable_if<bq::tools::_is_bq_string_like<T>::value, bq::string>::type trans(const T& value)
+            template <typename T, bq::enable_if_t<bq::tools::_is_bq_string_like<T>::value, bool> = true>
+            static bq::string trans(const T& value)
             {
                 return trans(value.c_str());
             }

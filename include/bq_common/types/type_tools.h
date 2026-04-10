@@ -130,15 +130,15 @@ namespace bq {
         }
     };
 
-    template <typename T, typename hash_value_type>
-    inline typename bq::enable_if<(bq::is_same<T, float>::value || bq::is_same<T, double>::value), hash_value_type>::type
+    template <typename T, typename hash_value_type, bq::enable_if_t<(bq::is_same<T, float>::value || bq::is_same<T, double>::value), bool> = true>
+    inline hash_value_type
     __inner_hash_calculate(const T& value)
     {
         return decimal_type_hash_calculator<T>::hash_code(value);
     }
 
-    template <typename T, typename hash_value_type>
-    inline typename bq::enable_if<!(bq::is_same<T, float>::value || bq::is_same<T, double>::value), hash_value_type>::type
+    template <typename T, typename hash_value_type, bq::enable_if_t<!(bq::is_same<T, float>::value || bq::is_same<T, double>::value), bool> = true>
+    inline hash_value_type
     __inner_hash_calculate(const T& value)
     {
         return integer_type_hash_calculator<T>::hash_code(value);
