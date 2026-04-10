@@ -265,6 +265,7 @@ namespace bq {
         {
             (void)thread_handle;
             (void)thread_name;
+            return false;
         }
 
         struct thread_platform_def {
