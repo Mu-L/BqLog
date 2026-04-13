@@ -503,32 +503,38 @@ namespace bq {
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 1, bool> = true>
             static bq_forceinline size_t get_null_str_size()
             {
-                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size({ 'n', 'u', 'l', 'l' });
+                char null_str[4] = { 'n', 'u', 'l', 'l' };
+                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size(null_str);
             }
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 2, bool> = true>
             static bq_forceinline size_t get_null_str_size()
             {
-                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size({ u'n', u'u', u'l', u'l' });
+                char16_t null_str[4] = { u'n', u'u', u'l', u'l' };
+                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size(null_str);
             }
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 4, bool> = true>
             static bq_forceinline size_t get_null_str_size()
             {
-                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size({ U'n', U'u', U'l', U'l' });
+                char32_t null_str[4] = { U'n', U'u', U'l', U'l' };
+                return _serialize_str_helper_by_type_impl<_string_type::array_type>::get_storage_data_size(null_str);
             }
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 1, bool> = true>
             static bq_forceinline void null_str_copy(uint8_t* data_addr, size_t data_size)
             {
-                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy({ 'n', 'u', 'l', 'l' }, data_addr, data_size);
+                char null_str[4] = { 'n', 'u', 'l', 'l' };
+                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy(null_str, data_addr, data_size);
             }
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 2, bool> = true>
             static bq_forceinline void null_str_copy(uint8_t* data_addr, size_t data_size)
             {
-                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy({ u'n', u'u', u'l', u'l' }, data_addr, data_size);
+                char16_t null_str[4] = { u'n', u'u', u'l', u'l' };
+                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy(null_str, data_addr, data_size);
             }
             template <typename CHAR_TYPE, bq::enable_if_t<sizeof(CHAR_TYPE) == 4, bool> = true>
             static bq_forceinline void null_str_copy(uint8_t* data_addr, size_t data_size)
             {
-                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy({ U'n', U'u', U'l', U'l' }, data_addr, data_size);
+                char32_t null_str[4] = { U'n', U'u', U'l', U'l' };
+                _serialize_str_helper_by_type_impl<_string_type::array_type>::type_copy(null_str, data_addr, data_size);
             }
 
             template <typename CHAR_TYPE>

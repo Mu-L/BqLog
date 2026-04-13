@@ -284,63 +284,63 @@ namespace bq {
         return true;
     }
 
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::verbose(const STR& log_content) const
     {
         return do_log(0, log_level::verbose, log_content);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::debug(const STR& log_content) const
     {
         return do_log(0, log_level::debug, log_content);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::info(const STR& log_content) const
     {
         return do_log(0, log_level::info, log_content);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::warning(const STR& log_content) const
     {
         return do_log(0, log_level::warning, log_content);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::error(const STR& log_content) const
     {
         return do_log(0, log_level::error, log_content);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>>
     inline bool log::fatal(const STR& log_content) const
     {
         return do_log(0, log_level::fatal, log_content);
     }
 
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::verbose(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::verbose, log_content, args...);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::debug(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::debug, log_content, args...);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::info(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::info, log_content, args...);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::warning(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::warning, log_content, args...);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::error(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::error, log_content, args...);
     }
-    template <typename STR, bq::enable_if_t<log::is_bq_log_format<STR>::value, bool>, typename... Args>
+    template <typename STR, bq::enable_if_t<bq::log::is_bq_log_format<STR>::value, bool>, typename... Args>
     inline bool log::fatal(const STR& log_content, const Args&... args) const
     {
         return do_log(0, log_level::fatal, log_content, args...);
