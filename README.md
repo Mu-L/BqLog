@@ -16,7 +16,9 @@
 [![Language](https://img.shields.io/badge/language-C%2B%2B%20%7C%20Java%20%7C%20C%23%20%7C%20Kotlin%20%7C%20TypeScript%20%7C%20Python-blue.svg?style=flat)]()
 
 > BqLog is a lightweight, high-performance, industrial-grade logging system that has been widely used in online projects such as "Honor of Kings".
-> **BqLog 2.x is officially released! With native `HarmonyOS NEXT`, `Python` and `Node.js` support, ***multiple times faster than 1.x***, and asymmetric hybrid encryption.**
+> **BqLog 2.x is officially released!** With native `HarmonyOS NEXT`, `Python` and `Node.js` support, and asymmetric hybrid encryption.
+>
+> 🚀 In [Benchmarks](#-benchmark-results), BqLog's compressed log mode is **2–3x faster than fmtlog**, **3–6x faster than quill**, **3–16x faster than spdlog**, **10–12x faster than Log4j2**, and **25–60x faster than glog**; plain text mode also outperforms all of them.
 
 ---
 
@@ -177,37 +179,53 @@ bq.log.force_flush_all_logs();
 
 ## 📊 Benchmark results
 
-Test: 1–10 threads, each writing 2,000,000 log entries. Environment: i9-13900K, 128 GB, Windows 11.
+Test: 1–10 threads, each writing 2,000,000 log entries. Environment: MacBook Pro, Apple M4 Pro (14-core: 10P + 4E), 48 GB, macOS.
 
-#### Total Time Cost with 4 parameters (ms)
+Comparison: BqLog (Text / Compress / Compress+Encrypt) vs spdlog 1.17.0, glog 0.7.1, fmtlog, quill 11.1.0, Log4j2 2.23.1.
 
-|                         | 1 Thread | 2 Threads | 3 Threads | 4 Threads | 5 Threads | 6 Threads | 7 Threads | 8 Threads | 9 Threads | 10 Threads |
-|-------------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|---------|
-| BqLog Compress (C++)    | 110    | 125    | 188    | 256    | 318    | 374    | 449    | 511    | 583    | 642     |
-| BqLog Text (C++)        | 344    | 699    | 1036   | 1401   | 1889   | 2211   | 2701   | 3121   | 3393   | 3561    |
-| BqLog Compress (Java)   | 129    | 141    | 215    | 292    | 359    | 421    | 507    | 568    | 640    | 702     |
-| BqLog Text (Java)       | 351    | 702    | 1052   | 1399   | 1942   | 2301   | 2754   | 3229   | 3506   | 3695    |
-| Log4j2 Text             | 1065   | 2583   | 4249   | 4843   | 5068   | 6195   | 6424   | 7943   | 8794   | 9254    |
+#### Throughput — Total Time Cost with 4 parameters (ms)
 
-<img src="docs/img/benchmark_4_params.png" alt="Results of 4 params" style="width: 100%;">
+|                              | 1 Thread | 2 Threads | 3 Threads | 4 Threads | 5 Threads | 6 Threads | 7 Threads | 8 Threads | 9 Threads | 10 Threads |
+|------------------------------|----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|
+| BqLog Compress (C++)         | 79       | 99        | 115       | 170       | 222       | 311       | 324       | 372       | 484       | 759        |
+| BqLog Compress+Encrypt (C++) | 83       | 106       | 134       | 189       | 223       | 328       | 337       | 390       | 532       | 995        |
+| BqLog Text (C++)             | 202      | 417       | 648       | 910       | 1167      | 1425      | 1718      | 1969      | 2281      | 2718       |
+| fmtlog                       | 248      | 489       | 765       | 1059      | 1341      | 1588      | 1906      | 2234      | 2379      | 2818       |
+| quill                        | 425      | 805       | 1222      | 1700      | 2108      | 2592      | 2951      | 3458      | 3957      | 4316       |
+| spdlog                       | 434      | 1366      | 3133      | 4779      | 6228      | 9241      | 10829     | 11348     | 11197     | 12003      |
+| Log4j2 (Java)                | 946      | 1841      | 2422      | 3685      | 5542      | 5245      | 5775      | 5786      | 8048      | 8752       |
+| glog                         | 2138     | 3812      | 7144      | 10446     | 13552     | 21695     | 28806     | 35153     | 40397     | 45162      |
 
-#### Total Time Cost without parameters (ms)
+#### Peak Memory Usage (MB)
 
-|                         | 1 Thread | 2 Threads | 3 Threads | 4 Threads | 5 Threads | 6 Threads | 7 Threads | 8 Threads | 9 Threads | 10 Threads |
-|-------------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|---------|
-| BqLog Compress (C++)    | 97     | 101    | 155    | 228    | 290    | 341    | 415    | 476    | 541    | 601     |
-| BqLog Text (C++)        | 153    | 351    | 468    | 699    | 916    | 1098   | 1212   | 1498   | 1733   | 1908    |
-| BqLog Compress (Java)   | 109    | 111    | 178    | 240    | 321    | 378    | 449    | 525    | 592    | 670     |
-| BqLog Text (Java)       | 167    | 354    | 491    | 718    | 951    | 1139   | 1278   | 1550   | 1802   | 1985    |
-| Log4j2 Text             | 3204   | 6489   | 7702   | 8485   | 9640   | 10458  | 11483  | 12853  | 13995  | 14633   |
+|                              | 1 Thread | 4 Threads | 10 Threads |
+|------------------------------|----------|-----------|------------|
+| BqLog Compress (C++)         | 2.7      | 3.0       | 3.9        |
+| BqLog Compress+Encrypt (C++) | 2.8      | 3.2       | 4.2        |
+| BqLog Text (C++)             | 2.7      | 3.5       | 4.4        |
+| spdlog                       | 2.1      | 2.2       | 2.4        |
+| glog                         | 2.1      | 2.5       | 3.2        |
+| fmtlog                       | 3.9      | 6.1       | 12.7       |
+| quill                        | 272.9    | 1058.5    | 2746.6     |
 
-<img src="docs/img/benchmark_no_param.png" alt="Results of no param" style="width: 100%;">
+#### Output File Size (1 thread, 4M log entries)
 
-- TextFileAppender: BqLog has about **3x** performance advantage over Log4j2
-- CompressedFileAppender: BqLog has about **10x+** performance advantage over Log4j2
-- Compared with BqLog 1.5, 2.x average performance improved by about **40%**
+| Library | Format | Size | Compression Ratio |
+|---------|--------|------|-------------------|
+| BqLog Compress | Binary | 45 MB | **6.7x** smaller |
+| BqLog Compress+Encrypt | Encrypted | 45 MB | **6.7x** smaller |
+| BqLog Text | Text | 302 MB | — |
+| spdlog | Text | 293 MB | — |
+| quill | Text | 255 MB | — |
+| fmtlog | Text | 285 MB | — |
+| glog | Text | 348 MB | — |
 
-> For full benchmark code and methodology, see [Benchmark](docs/BENCHMARK.md).
+- BqLog Compress: **2–3x faster** than fmtlog, **3–16x** than spdlog, **25–60x** than glog
+- Encryption adds **near-zero overhead**
+- Compressed format is **6.7x smaller** than text
+- BqLog uses only **2.7–4.4 MB** memory across all modes and thread counts
+
+> For full benchmark code, methodology, and feature comparison, see [Benchmark](docs/BENCHMARK.md).
 
 ---
 

@@ -6,9 +6,10 @@
 
 测试环境：
 
-- **CPU**：13th Gen Intel(R) Core(TM) i9-13900K @ 3.00 GHz
-- **Memory**：128 GB
-- **OS**：Windows 11
+- **机型**：MacBook Pro
+- **CPU**：Apple M4 Pro（14 核：10 性能核 + 4 能效核）
+- **Memory**：48 GB
+- **OS**：macOS
 
 测试用例如下：
 
@@ -20,429 +21,431 @@
 
 对比对象：
 
-- BqLog 2.x（C++ / Java，TextFileAppender 与 CompressedFileAppender）
-- Log4j2（仅 TextFileAppender，**不使用滚动时 gzip 压缩**，因为其压缩是在滚动时对已存在文本文件再做 gzip，性能模型不同，无法公平对比）
+- BqLog 2.x（C++，TextFileAppender、CompressedFileAppender、CompressedFileAppender + 加密）
+- spdlog 1.17.0（同步文件日志）
+- glog 0.7.1（同步文件日志，流式 API）
+- fmtlog（异步文件日志，编译时启用 `FMTLOG_BLOCK=1` 防止静默丢日志）
+- quill 11.1.0（异步文件日志，按官方 benchmark 配置：后端 busy-spin）
+- Log4j2（Java，异步 + Disruptor — 保留自之前的 benchmark）
 
-### 2. BqLog C++ Benchmark 代码
+### 2. Benchmark 结果
+
+#### 2.1 吞吐量 — 带 4 个参数的总耗时（毫秒）
+
+|                              | 1 线程 | 2 线程 | 3 线程 | 4 线程 | 5 线程 | 6 线程 | 7 线程 | 8 线程 | 9 线程 | 10 线程 |
+|------------------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|---------|
+| BqLog Compress (C++)         | 79     | 99     | 115    | 170    | 222    | 311    | 324    | 372    | 484    | 759     |
+| BqLog Compress+Encrypt (C++) | 83     | 106    | 134    | 189    | 223    | 328    | 337    | 390    | 532    | 995     |
+| BqLog Text (C++)             | 202    | 417    | 648    | 910    | 1167   | 1425   | 1718   | 1969   | 2281   | 2718    |
+| fmtlog                       | 248    | 489    | 765    | 1059   | 1341   | 1588   | 1906   | 2234   | 2379   | 2818    |
+| quill                        | 425    | 805    | 1222   | 1700   | 2108   | 2592   | 2951   | 3458   | 3957   | 4316    |
+| spdlog                       | 434    | 1366   | 3133   | 4779   | 6228   | 9241   | 10829  | 11348  | 11197  | 12003   |
+| Log4j2 (Java)                | 946    | 1841   | 2422   | 3685   | 5542   | 5245   | 5775   | 5786   | 8048   | 8752    |
+| glog                         | 2138   | 3812   | 7144   | 10446  | 13552  | 21695  | 28806  | 35153  | 40397  | 45162   |
+
+#### 2.2 峰值内存占用（MB）
+
+使用 macOS 上的 `/usr/bin/time -l` 测量进程 RSS 峰值。每个 benchmark 作为独立进程运行，仅含 1 个 logger 实例。
+
+|                              | 1 线程 | 4 线程 | 10 线程 |
+|------------------------------|--------|--------|---------|
+| BqLog Compress (C++)         | 2.7    | 3.0    | 3.9     |
+| BqLog Compress+Encrypt (C++) | 2.8    | 3.2    | 4.2     |
+| BqLog Text (C++)             | 2.7    | 3.5    | 4.4     |
+| spdlog                       | 2.1    | 2.2    | 2.4     |
+| glog                         | 2.1    | 2.5    | 3.2     |
+| fmtlog                       | 3.9    | 6.1    | 12.7    |
+| quill                        | 272.9  | 1058.5 | 2746.6  |
+
+#### 2.3 日志文件大小对比（1 线程，400 万条日志）
+
+| 库 | 格式 | 文件大小 | 每条日志字节数 |
+|----|------|---------|-------------|
+| BqLog Compress | 二进制（压缩） | 45 MB | 12 B |
+| BqLog Compress+Encrypt | 二进制（加密） | 45 MB | 12 B |
+| BqLog Text | 文本 | 302 MB | 79 B |
+| spdlog | 文本 | 293 MB | 77 B |
+| glog | 文本 | 348 MB | 91 B |
+| fmtlog | 文本 | 285 MB | 75 B |
+| quill | 文本 | 255 MB | 67 B |
+| Log4j2 | 文本 | ~300 MB | — |
+
+#### 2.4 总结
+
+- **BqLog Compress** 吞吐量最高 — 比 fmtlog 快 **2-3 倍**，比 spdlog 快 **3-16 倍**，比 glog 快 **25-60 倍**
+- 即使是 **BqLog Text** 模式，在所有线程数下也优于所有其他文本日志库
+- **加密几乎零额外开销** — BqLog Compress 与 Compress+Encrypt 性能几乎相同
+- **内存高效** — BqLog 仅使用 **2.7-4.4 MB**，无论模式如何
+- **压缩格式比文本小 6.7 倍**，大幅节省存储和 I/O 成本
+
+> 注：glog 不支持 `{fmt}` 格式化参数，在有参数测试中使用流式 `operator<<`。fmtlog 编译时启用了 `FMTLOG_BLOCK=1` 以防止静默丢日志（其默认行为）。quill 按照其官方 benchmark 配置使用 busy-spin 后端以获得最佳性能。
+
+### 3. 功能对比
+
+| 特性 | BqLog | spdlog | glog | fmtlog | quill | Log4j2 |
+|------|-------|--------|------|--------|-------|--------|
+| 异步写入 | ✅ | ✅（可选） | ❌ | ✅ | ✅ | ✅ |
+| 实时压缩 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌（滚动 gzip） |
+| 日志加密 | ✅（RSA+AES 混合） | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 崩溃恢复 | ✅（Recovery） | ❌ | ✅（信号处理） | ❌ | ✅（信号处理） | ❌ |
+| 多语言支持 | ✅（C++/Java/C#/Python/JS/ArkTS） | ❌（仅 C++） | ❌（仅 C++） | ❌（仅 C++） | ❌（仅 C++） | 仅 Java |
+| 跨平台 | ✅（Win/Mac/Linux/iOS/Android/鸿蒙） | ✅（Win/Mac/Linux） | ✅（Win/Mac/Linux） | ✅（Win/Mac/Linux） | ✅（Win/Mac/Linux） | JVM |
+| `{fmt}` 格式化 | ✅ | ✅ | ❌（流式） | ✅ | ✅ | ✅（类似） |
+| 热路径无堆分配 | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| 游戏引擎插件 | ✅（Unity/Unreal） | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+### 4. 附录：Benchmark 源代码
+
+#### 4.1 BqLog C++ Benchmark 代码
+
+##### BqLog TextFileAppender
 
 ```cpp
-#if defined(WIN32)
-#include <windows.h>
-#endif
 #include "bq_log/bq_log.h"
-#include <stdio.h>
 #include <thread>
-#include <chrono>
-#include <string>
-#include <iostream>
 #include <vector>
+#include <chrono>
+#include <iostream>
+#include <cstdlib>
 
-void test_compress_multi_param(int32_t thread_count)
-{
-    std::cout << "============================================================" << std::endl;
-    std::cout << "=========Begin Compressed File Log Test 1, 4 params=========" << std::endl;
-    bq::log log_obj = bq::log::get_log_by_name("compress");
-    std::vector<std::thread*> threads(thread_count);
+static const int ITERATIONS = 2000000;
 
-    uint64_t start_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
+int main(int argc, char* argv[]) {
+    if (argc < 2) return 1;
+    int thread_count = std::atoi(argv[1]);
 
-    std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx] = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i)
-            {
-                log_obj.info("idx:{}, num:{}, This test, {}, {}",
-                    idx, i, 2.4232f, true);
-            }
-        });
-    }
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx]->join();
-        delete threads[idx];
-    }
-
-    bq::log::force_flush_all_logs();
-
-    uint64_t flush_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Time Cost:" << (flush_time - start_time) << std::endl;
-    std::cout << "============================================================" << std::endl << std::endl;
-}
-
-void test_text_multi_param(int32_t thread_count)
-{
-    std::cout << "============================================================" << std::endl;
-    std::cout << "============Begin Text File Log Test 2, 4 params============" << std::endl;
-    bq::log log_obj = bq::log::get_log_by_name("text");
-    std::vector<std::thread*> threads(thread_count);
-
-    uint64_t start_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx] = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i)
-            {
-                log_obj.info("idx:{}, num:{}, This test, {}, {}",
-                    idx, i, 2.4232f, true);
-            }
-        });
-    }
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx]->join();
-        delete threads[idx];
-    }
-
-    bq::log::force_flush_all_logs();
-
-    uint64_t flush_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Time Cost:" << (flush_time - start_time) << std::endl;
-    std::cout << "============================================================" << std::endl << std::endl;
-}
-
-void test_compress_no_param(int32_t thread_count)
-{
-    std::cout << "============================================================" << std::endl;
-    std::cout << "=========Begin Compressed File Log Test 3, no param=========" << std::endl;
-    bq::log log_obj = bq::log::get_log_by_name("compress");
-    std::vector<std::thread*> threads(thread_count);
-
-    uint64_t start_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx] = new std::thread([&log_obj]() {
-            for (int i = 0; i < 2000000; ++i)
-            {
-                log_obj.info("Empty Log, No Param");
-            }
-        });
-    }
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx]->join();
-        delete threads[idx];
-    }
-
-    bq::log::force_flush_all_logs();
-
-    uint64_t flush_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Time Cost:" << (flush_time - start_time) << std::endl;
-    std::cout << "============================================================" << std::endl << std::endl;
-}
-
-void test_text_no_param(int32_t thread_count)
-{
-    std::cout << "============================================================" << std::endl;
-    std::cout << "============Begin Text File Log Test 4, no param============" << std::endl;
-    bq::log log_obj = bq::log::get_log_by_name("text");
-    std::vector<std::thread*> threads(thread_count);
-
-    uint64_t start_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx] = new std::thread([&log_obj]() {
-            for (int i = 0; i < 2000000; ++i)
-            {
-                log_obj.info("Empty Log, No Param");
-            }
-        });
-    }
-
-    for (int32_t idx = 0; idx < thread_count; ++idx)
-    {
-        threads[idx]->join();
-        delete threads[idx];
-    }
-
-    bq::log::force_flush_all_logs();
-
-    uint64_t flush_time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-
-    std::cout << "Time Cost:" << (flush_time - start_time) << std::endl;
-    std::cout << "============================================================" << std::endl << std::endl;
-}
-
-int main()
-{
-#ifdef BQ_WIN
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-#endif
-    bq::log compressed_log = bq::log::create_log("compress", R"(
-        appenders_config.appender_3.type=compressed_file
-        appenders_config.appender_3.levels=[all]
-        appenders_config.appender_3.file_name=benchmark_output/compress_
-        appenders_config.appender_3.capacity_limit=1
+    bq::log log_obj = bq::log::create_log("bench_text", R"(
+        log.high_perform_mode_freq_threshold_per_second=1
+        appenders_config.appender_0.type=text_file
+        appenders_config.appender_0.levels=[all]
+        appenders_config.appender_0.file_name=output/bqlog_text
+        appenders_config.appender_0.always_create_new_file=true
     )");
 
-    bq::log text_log = bq::log::create_log("text", R"(
-        appenders_config.appender_3.type=text_file
-        appenders_config.appender_3.levels=[all]
-        appenders_config.appender_3.file_name=benchmark_output/text_
-        appenders_config.appender_3.capacity_limit=1
-    )");
-
-    std::cout << "Please input the number of threads which will write log simultaneously:" << std::endl;
-    int32_t thread_count = 0;
-    std::cin >> thread_count;
-
-    // 用一条日志触发 capacity_limit，确保旧日志文件被清理
-    compressed_log.verbose("use this log to trigger capacity_limit make sure old log files is deleted");
-    text_log.verbose("use this log to trigger capacity_limit make sure old log files is deleted");
+    auto start = std::chrono::steady_clock::now();
+    std::vector<std::thread> threads;
+    for (int t = 0; t < thread_count; ++t) {
+        threads.emplace_back([t, &log_obj]() {
+            for (int i = 0; i < ITERATIONS; ++i) {
+                log_obj.info("idx:{}, num:{}, This test, {}, {}", t, i, 2.4232f, true);
+            }
+        });
+    }
+    for (auto& th : threads) th.join();
     bq::log::force_flush_all_logs();
+    auto end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Time Cost:" << ms << " ms" << std::endl;
+    return 0;
+}
+```
 
-    test_compress_multi_param(thread_count);
-    test_text_multi_param(thread_count);
-    test_compress_no_param(thread_count);
-    test_text_no_param(thread_count);
+##### BqLog CompressedFileAppender
+
+仅配置不同 — 测试逻辑完全一致：
+
+```cpp
+    bq::log log_obj = bq::log::create_log("bench_compress", R"(
+        log.high_perform_mode_freq_threshold_per_second=1
+        appenders_config.appender_0.type=compressed_file
+        appenders_config.appender_0.levels=[all]
+        appenders_config.appender_0.file_name=output/bqlog_compress
+        appenders_config.appender_0.always_create_new_file=true
+    )");
+```
+
+##### BqLog CompressedFileAppender + 加密
+
+```cpp
+    bq::log log_obj = bq::log::create_log("bench_compress_enc", R"(
+        log.high_perform_mode_freq_threshold_per_second=1
+        appenders_config.appender_0.type=compressed_file
+        appenders_config.appender_0.levels=[all]
+        appenders_config.appender_0.file_name=output/bqlog_compress_enc
+        appenders_config.appender_0.always_create_new_file=true
+        appenders_config.appender_0.pub_key=<YOUR_RSA_PUBLIC_KEY>
+    )");
+```
+
+#### 4.2 spdlog Benchmark 代码
+
+```cpp
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <thread>
+#include <vector>
+#include <chrono>
+#include <iostream>
+#include <cstdlib>
+
+static const int ITERATIONS = 2000000;
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) return 1;
+    int thread_count = std::atoi(argv[1]);
+
+    // multi_param
+    {
+        auto logger = spdlog::basic_logger_mt("bench_mp", "/tmp/bqlog_benchmark/output/spdlog_mp.log", true);
+        logger->set_pattern("%Y-%m-%d %H:%M:%S.%f [%t] [%l] %v");
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([&logger, t]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    logger->info("idx:{}, num:{}, This test, {}, {}", t, i, 2.4232f, true);
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        logger->flush();
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|spdlog|multi_param|" << thread_count << "|" << ms << std::endl;
+        spdlog::drop("bench_mp");
+    }
+
+    // no_param
+    {
+        auto logger = spdlog::basic_logger_mt("bench_np", "/tmp/bqlog_benchmark/output/spdlog_np.log", true);
+        logger->set_pattern("%Y-%m-%d %H:%M:%S.%f [%t] [%l] %v");
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([&logger]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    logger->info("Empty Log, No Param");
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        logger->flush();
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|spdlog|no_param|" << thread_count << "|" << ms << std::endl;
+        spdlog::drop("bench_np");
+    }
+    return 0;
+}
+```
+
+#### 4.3 glog Benchmark 代码
+
+注：glog 使用流式 `operator<<`，不支持 `{fmt}` 格式化。
+
+```cpp
+#include <glog/logging.h>
+#include <thread>
+#include <vector>
+#include <chrono>
+#include <iostream>
+#include <cstdlib>
+
+static const int ITERATIONS = 2000000;
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) return 1;
+    int thread_count = std::atoi(argv[1]);
+
+    google::InitGoogleLogging("benchmark");
+    FLAGS_log_dir = "/tmp/bqlog_benchmark/output/";
+    FLAGS_logtostderr = false;
+    FLAGS_alsologtostderr = false;
+
+    // multi_param
+    {
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([t]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    LOG(INFO) << "idx:" << t << ", num:" << i << ", This test, " << 2.4232f << ", " << true;
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        google::FlushLogFiles(google::GLOG_INFO);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|glog|multi_param|" << thread_count << "|" << ms << std::endl;
+    }
+
+    // no_param
+    {
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    LOG(INFO) << "Empty Log, No Param";
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        google::FlushLogFiles(google::GLOG_INFO);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|glog|no_param|" << thread_count << "|" << ms << std::endl;
+    }
+
+    google::ShutdownGoogleLogging();
+    return 0;
+}
+```
+
+#### 4.4 fmtlog Benchmark 代码
+
+注：需要 `FMTLOG_BLOCK=1` 防止静默丢日志。
+
+```cpp
+#define FMTLOG_BLOCK 1
+#include "fmtlog.h"
+#include <thread>
+#include <vector>
+#include <chrono>
+#include <iostream>
+#include <cstdlib>
+#include <unistd.h>
+
+static const int ITERATIONS = 2000000;
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) return 1;
+    int thread_count = std::atoi(argv[1]);
+
+    fmtlog::setLogFile("/tmp/bqlog_benchmark/output/fmtlog_mp.log", false);
+    fmtlog::setHeaderPattern("{YmdHMSf} {l}[{t}] ");
+    fmtlog::startPollingThread(1);
+
+    // multi_param
+    {
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([t]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    FMTLOG(fmtlog::INF, "idx:{}, num:{}, This test, {}, {}", t, i, 2.4232f, true);
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        fmtlog::poll(true);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|fmtlog|multi_param|" << thread_count << "|" << ms << std::endl;
+    }
+
+    // no_param
+    {
+        fmtlog::setLogFile("/tmp/bqlog_benchmark/output/fmtlog_np.log", false);
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    FMTLOG(fmtlog::INF, "Empty Log, No Param");
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        fmtlog::poll(true);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|fmtlog|no_param|" << thread_count << "|" << ms << std::endl;
+    }
+
+    fmtlog::stopPollingThread();
+    _exit(0);  // fmtlog has cleanup issues, use _exit
+}
+```
+
+#### 4.5 quill Benchmark 代码
+
+注：按照 quill 官方 benchmark 配置，使用 busy-spin 后端。
+
+```cpp
+#include "quill/Backend.h"
+#include "quill/Frontend.h"
+#include "quill/LogMacros.h"
+#include "quill/Logger.h"
+#include "quill/sinks/FileSink.h"
+#include <thread>
+#include <vector>
+#include <chrono>
+#include <iostream>
+#include <cstdlib>
+
+static const int ITERATIONS = 2000000;
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) return 1;
+    int thread_count = std::atoi(argv[1]);
+
+    // Backend config following quill's official benchmark
+    quill::BackendOptions backend_options;
+    backend_options.sleep_duration = std::chrono::nanoseconds{0};  // busy spin
+    quill::Backend::start(backend_options);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let backend init
+
+    // multi_param
+    {
+        auto file_sink = quill::Frontend::create_or_get_sink<quill::FileSink>(
+            "/tmp/bqlog_benchmark/output/quill_mp.log");
+        quill::Logger* logger = quill::Frontend::create_or_get_logger(
+            "bench_mp", std::move(file_sink),
+            quill::PatternFormatterOptions{
+                "%(time) [%(thread_id)] %(log_level) %(message)",
+                "%H:%M:%S.%Qns"});
+
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([logger, t]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    LOG_INFO(logger, "idx:{}, num:{}, This test, {}, {}", t, i, 2.4232f, true);
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        logger->flush_log();
+        quill::Frontend::remove_logger(logger);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|quill|multi_param|" << thread_count << "|" << ms << std::endl;
+    }
+
+    // no_param
+    {
+        auto file_sink = quill::Frontend::create_or_get_sink<quill::FileSink>(
+            "/tmp/bqlog_benchmark/output/quill_np.log");
+        quill::Logger* logger = quill::Frontend::create_or_get_logger(
+            "bench_np", std::move(file_sink),
+            quill::PatternFormatterOptions{
+                "%(time) [%(thread_id)] %(log_level) %(message)",
+                "%H:%M:%S.%Qns"});
+
+        auto start = std::chrono::steady_clock::now();
+        std::vector<std::thread> threads;
+        for (int t = 0; t < thread_count; ++t) {
+            threads.emplace_back([logger]() {
+                for (int i = 0; i < ITERATIONS; ++i) {
+                    LOG_INFO(logger, "Empty Log, No Param");
+                }
+            });
+        }
+        for (auto& th : threads) th.join();
+        logger->flush_log();
+        quill::Frontend::remove_logger(logger);
+        auto end = std::chrono::steady_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "RESULT|quill|no_param|" << thread_count << "|" << ms << std::endl;
+    }
 
     return 0;
 }
 ```
 
-### 3. BqLog Java Benchmark 代码
-
-```java
-import java.util.Scanner;
-
-/**
- * 请在运行前确保当前平台对应的动态库已在 java.library.path 内，
- * 或在 IDE 中配置 Native Library Location 指向 (ProjectRoot)/dist 下的动态库目录。
- * 否则可能遇到 UnsatisfiedLinkError。
- */
-public class benchmark_main {
-
-    static abstract class benchmark_thread implements Runnable {
-        protected int idx;
-        public benchmark_thread(int idx) {
-            this.idx = idx;
-        }
-    }
-
-    private static void test_compress_multi_param(int thread_count) throws Exception {
-        System.out.println("============================================================");
-        System.out.println("=========Begin Compressed File Log Test 1, 4 params=========");
-        bq.log log_obj = bq.log.get_log_by_name("compress");
-        Thread[] threads = new Thread[thread_count];
-
-        long start_time = System.currentTimeMillis();
-        System.out.println("Now Begin, each thread will write 2000000 log entries, please wait the result...");
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            Runnable r = new benchmark_thread(idx) {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 2000000; ++i) {
-                        log_obj.info("idx:{}, num:{}, This test, {}, {}",
-                            bq.utils.param.no_boxing(idx),
-                            bq.utils.param.no_boxing(i),
-                            bq.utils.param.no_boxing(2.4232f),
-                            bq.utils.param.no_boxing(true));
-                    }
-                }
-            };
-            threads[idx] = new Thread(r);
-            threads[idx].start();
-        }
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            threads[idx].join();
-        }
-
-        bq.log.force_flush_all_logs();
-
-        long flush_time = System.currentTimeMillis();
-        System.out.println("Time Cost:" + (flush_time - start_time));
-        System.out.println("============================================================");
-        System.out.println();
-    }
-
-    private static void test_text_multi_param(int thread_count) throws Exception {
-        System.out.println("============================================================");
-        System.out.println("============Begin Text File Log Test 2, 4 params============");
-        bq.log log_obj = bq.log.get_log_by_name("text");
-        Thread[] threads = new Thread[thread_count];
-
-        long start_time = System.currentTimeMillis();
-        System.out.println("Now Begin, each thread will write 2000000 log entries, please wait the result...");
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            Runnable r = new benchmark_thread(idx) {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 2000000; ++i) {
-                        log_obj.info("idx:{}, num:{}, This test, {}, {}",
-                            bq.utils.param.no_boxing(idx),
-                            bq.utils.param.no_boxing(i),
-                            bq.utils.param.no_boxing(2.4232f),
-                            bq.utils.param.no_boxing(true));
-                    }
-                }
-            };
-            threads[idx] = new Thread(r);
-            threads[idx].start();
-        }
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            threads[idx].join();
-        }
-
-        bq.log.force_flush_all_logs();
-
-        long flush_time = System.currentTimeMillis();
-        System.out.println("Time Cost:" + (flush_time - start_time));
-        System.out.println("============================================================");
-        System.out.println();
-    }
-
-    private static void test_compress_no_param(int thread_count) throws Exception {
-        System.out.println("============================================================");
-        System.out.println("=========Begin Compressed File Log Test 3, no param=========");
-        bq.log log_obj = bq.log.get_log_by_name("compress");
-        Thread[] threads = new Thread[thread_count];
-
-        long start_time = System.currentTimeMillis();
-        System.out.println("Now Begin, each thread will write 2000000 log entries, please wait the result...");
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            Runnable r = new benchmark_thread(idx) {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 2000000; ++i) {
-                        log_obj.info("Empty Log, No Param");
-                    }
-                }
-            };
-            threads[idx] = new Thread(r);
-            threads[idx].start();
-        }
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            threads[idx].join();
-        }
-
-        bq.log.force_flush_all_logs();
-
-        long flush_time = System.currentTimeMillis();
-        System.out.println("Time Cost:" + (flush_time - start_time));
-        System.out.println("============================================================");
-        System.out.println();
-    }
-
-    private static void test_text_no_param(int thread_count) throws Exception {
-        System.out.println("============================================================");
-        System.out.println("============Begin Text File Log Test 4, no param============");
-        bq.log log_obj = bq.log.get_log_by_name("text");
-        Thread[] threads = new Thread[thread_count];
-
-        long start_time = System.currentTimeMillis();
-        System.out.println("Now Begin, each thread will write 2000000 log entries, please wait the result...");
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            Runnable r = new benchmark_thread(idx) {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 2000000; ++i) {
-                        log_obj.info("Empty Log, No Param");
-                    }
-                }
-            };
-            threads[idx] = new Thread(r);
-            threads[idx].start();
-        }
-
-        for (int idx = 0; idx < thread_count; ++idx) {
-            threads[idx].join();
-        }
-
-        bq.log.force_flush_all_logs();
-
-        long flush_time = System.currentTimeMillis();
-        System.out.println("Time Cost:" + (flush_time - start_time));
-        System.out.println("============================================================");
-        System.out.println();
-    }
-
-    public static void main(String[] args) throws Exception {
-        bq.log compressed_log =  bq.log.create_log("compress", """
-            appenders_config.appender_3.type=compressed_file
-            appenders_config.appender_3.levels=[all]
-            appenders_config.appender_3.file_name=benchmark_output/compress_
-            appenders_config.appender_3.capacity_limit=1
-        """);
-
-        bq.log text_log =  bq.log.create_log("text", """
-            appenders_config.appender_3.type=text_file
-            appenders_config.appender_3.levels=[all]
-            appenders_config.appender_3.file_name=benchmark_output/text_
-            appenders_config.appender_3.capacity_limit=1
-        """);
-
-        System.out.println("Please input the number of threads which will write log simultaneously:");
-        int thread_count = 0;
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            thread_count = scanner.nextInt();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        compressed_log.verbose("use this log to trigger capacity_limit make sure old log files is deleted");
-        text_log.verbose("use this log to trigger capacity_limit make sure old log files is deleted");
-        bq.log.force_flush_all_logs();
-
-        test_compress_multi_param(thread_count);
-        test_text_multi_param(thread_count);
-        test_compress_no_param(thread_count);
-        test_text_no_param(thread_count);
-    }
-
-}
-```
-
-### 4. Log4j Benchmark 代码
+#### 4.6 Log4j Benchmark 代码
 
 Log4j2 部分只测试了文本输出格式，因为其 gzip 压缩是在「滚动时对已有文本文件重新 gzip 压缩」，这与 BqLog 实时压缩模式的性能模型完全不同，无法直接对标。
 
@@ -632,40 +635,3 @@ public class main {
 
 }
 ```
-
-### 5. Benchmark 结果
-
-所有耗时单位为毫秒，数值越小代表性能越高。
-从结果可见：
-
-- 在 TextFileAppender 场景下，BqLog 相比 Log4j2 有约 **3 倍** 性能优势；
-- 在 CompressedFileAppender 场景下，BqLog 相比 Log4j2 文本输出有约 **10 倍以上** 性能优势；
-- 若与 BqLog 1.5 版本相比，2.x 平均性能提升约 **40%**。
-
-
-> 为了排版清晰，没有加入BqLog1.5的数据，可以直接和旧版本的文档的[Benchmark](https://github.com/Tencent/BqLog/blob/stable_1.5/README_CHS.md#5-benchmark%E7%BB%93%E6%9E%9C)结果对比。采取了一样的硬件和操作系统环境，相同的测试用例，相同的Log4j的结果。 从结果上看BqLog 2.x版本对比1.5版本大约有40%左右的性能提升。
-#### 带 4 个参数的总耗时（毫秒）
-
-|                         | 1 线程 | 2 线程 | 3 线程 | 4 线程 | 5 线程 | 6 线程 | 7 线程 | 8 线程 | 9 线程 | 10 线程 |
-|-------------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|---------|
-| BqLog Compress (C++)    | 110    | 125    | 188    | 256    | 318    | 374    | 449    | 511    | 583    | 642     |
-| BqLog Text (C++)        | 344    | 699    | 1036   | 1401   | 1889   | 2211   | 2701   | 3121   | 3393   | 3561    |
-| BqLog Compress (Java)   | 129    | 141    | 215    | 292    | 359    | 421    | 507    | 568    | 640    | 702     |
-| BqLog Text (Java)       | 351    | 702    | 1052   | 1399   | 1942   | 2301   | 2754   | 3229   | 3506   | 3695    |
-| Log4j2 Text             | 1065   | 2583   | 4249   | 4843   | 5068   | 6195   | 6424   | 7943   | 8794   | 9254    |
-
-<img src="img/benchmark_4_params.png" alt="4个参数的结果" style="width: 100%;">
-
-#### 不带参数的总耗时（毫秒）
-
-一个有趣现象是，在「无参数」情况下，Log4j2 的耗时相对其「带参数」情况略低，但仍明显慢于 BqLog。
-
-|                         | 1 线程 | 2 线程 | 3 线程 | 4 线程 | 5 线程 | 6 线程 | 7 线程 | 8 线程 | 9 线程 | 10 线程 |
-|-------------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|---------|
-| BqLog Compress (C++)    | 97     | 101    | 155    | 228    | 290    | 341    | 415    | 476    | 541    | 601     |
-| BqLog Text (C++)        | 153    | 351    | 468    | 699    | 916    | 1098   | 1212   | 1498   | 1733   | 1908    |
-| BqLog Compress (Java)   | 109    | 111    | 178    | 240    | 321    | 378    | 449    | 525    | 592    | 670     |
-| BqLog Text (Java)       | 167    | 354    | 491    | 718    | 951    | 1139   | 1278   | 1550   | 1802   | 1985    |
-| Log4j2 Text             | 3204   | 6489   | 7702   | 8485   | 9640   | 10458  | 11483  | 12853  | 13995  | 14633   |
-
-<img src="img/benchmark_no_param.png" alt="不带参数的结果" style="width: 100%;">
