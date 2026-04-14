@@ -2412,28 +2412,45 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
                 exit 1
                 ;;
             esac
-          
+
             fetched=0
             for u in $URLS; do
               echo "Fetching $u"
@@ -2444,11 +2461,11 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
-          
+
             pkgin -y install openjdk17 || true
           run: |
             set -e -x
@@ -2480,28 +2497,45 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
                 exit 1
                 ;;
             esac
-          
+
             fetched=0
             for u in $URLS; do
               echo "Fetching $u"
@@ -2512,11 +2546,11 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
-          
+
             pkgin -y install openjdk17 || true
           run: |
             set -e -x
@@ -2565,21 +2599,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2597,7 +2648,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -2630,21 +2681,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2662,7 +2730,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -2706,21 +2774,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2738,7 +2823,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -2773,21 +2858,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2805,7 +2907,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -2857,21 +2959,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2889,7 +3008,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -2924,21 +3043,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -2956,7 +3092,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3004,21 +3140,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3036,7 +3189,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3070,21 +3223,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3102,7 +3272,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3153,21 +3323,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3185,7 +3372,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3219,21 +3406,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3251,7 +3455,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3296,21 +3500,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3328,7 +3549,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3364,21 +3585,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3396,7 +3634,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3449,21 +3687,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3481,7 +3736,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -3517,21 +3772,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                # aarch64
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -3549,7 +3821,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5001,20 +5273,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5032,7 +5322,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5070,20 +5360,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5101,7 +5409,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5156,20 +5464,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5187,7 +5513,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5223,20 +5549,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5254,7 +5598,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5302,20 +5646,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5333,7 +5695,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5370,20 +5732,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5401,7 +5781,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5455,20 +5835,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5486,7 +5884,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
@@ -5523,20 +5921,38 @@ jobs:
             set -e
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
 
-            /usr/sbin/pkg_add -v pkgin || true
-            pkgin -y update || true
-            pkgin -y install cmake gmake bash gdb || true
-            pkgin -y install clang || true
-            pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-
             ARCH="$(uname -m)"
+            PKG_MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
+            pkg_installed=0
+            for mirror in $PKG_MIRRORS; do
+              echo "=== Trying package mirror: $mirror ==="
+              export PKG_PATH="$mirror"
+              if /usr/sbin/pkg_add -v pkgin; then
+                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                pkgin -y update || true
+                pkgin -y install cmake gmake bash gdb || true
+                pkgin -y install clang || true
+                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
+                pkg_installed=1
+                break
+              fi
+              echo "Mirror $mirror failed, trying next..."
+            done
+            if [ "$pkg_installed" -ne 1 ]; then
+              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
+            fi
+
             URLS=""
             case "$ARCH" in
               amd64|x86_64)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/amd64/binary/sets/xbase.tar.xz"
                 ;;
               aarch64|arm64|evbarm)
-                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
+                URLS="https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://ftp.jaist.ac.jp/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz https://mirrors.tuna.tsinghua.edu.cn/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/xbase.tar.xz"
                 ;;
               *)
                 echo "Unknown arch $ARCH; please set xbase URL manually" >&2
@@ -5554,7 +5970,7 @@ jobs:
               fi
             done
             if [ "$fetched" -ne 1 ]; then
-              echo "Failed to fetch/extract xbase.tar.xz (tried: $URLS)" >&2
+              echo "Failed to fetch/extract xbase.tar.xz" >&2
               exit 1
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }

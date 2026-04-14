@@ -1422,24 +1422,35 @@ jobs:
           release: "10.1"
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
+            ARCH=$(uname -m)
+            MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
             for i in 1 2 3 4 5; do
-              (
-                set -e
-                /usr/sbin/pkg_add -v pkgin || true
-                pkgin -y update
-                pkgin -y install cmake gmake bash gdb
-                pkgin -y install clang
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
-              ) && exit 0
-            
-              echo "Install failed, retrying in 60s... ($i/5)"
+              for mirror in $MIRRORS; do
+                echo "=== Attempt $i, trying mirror: $mirror ==="
+                (
+                  set -e
+                  export PKG_PATH="$mirror"
+                  /usr/sbin/pkg_add -v pkgin || true
+                  echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                  pkgin -y update
+                  pkgin -y install cmake gmake bash gdb
+                  pkgin -y install clang
+                  pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
+                ) && exit 0
+                echo "Mirror $mirror failed, trying next..."
+              done
+              echo "All mirrors failed, retrying in 60s... ($i/5)"
               sleep 60
             done
             exit 1
           run: |
             touch UNIT_TEST_STARTED
             set -e -x
-            cd build/test/unix_like  
+            cd build/test/unix_like
             chmod +x *.sh
             ls -l
             ulimit -n
@@ -1460,7 +1471,7 @@ jobs:
       - name: Cleanup Before Retry
         if: steps.CheckRetry.outputs.retry == 'true'
         run: |
-          set +e 
+          set +e
           DOMAINS="$(sudo virsh list --all --name 2>/dev/null | grep -v "^$" || true)"
           if [ -z "$DOMAINS" ]; then
             echo "No lingering domains found (virsh may be unavailable or no domains exist)."
@@ -1491,17 +1502,28 @@ jobs:
           release: "10.1"
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
+            ARCH=$(uname -m)
+            MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
             for i in 1 2 3 4 5; do
-              (
-                set -e
-                /usr/sbin/pkg_add -v pkgin || true
-                pkgin -y update
-                pkgin -y install cmake gmake bash gdb
-                pkgin -y install clang
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
-              ) && exit 0
-            
-              echo "Install failed, retrying in 60s... ($i/5)"
+              for mirror in $MIRRORS; do
+                echo "=== Attempt $i, trying mirror: $mirror ==="
+                (
+                  set -e
+                  export PKG_PATH="$mirror"
+                  /usr/sbin/pkg_add -v pkgin || true
+                  echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                  pkgin -y update
+                  pkgin -y install cmake gmake bash gdb
+                  pkgin -y install clang
+                  pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
+                ) && exit 0
+                echo "Mirror $mirror failed, trying next..."
+              done
+              echo "All mirrors failed, retrying in 60s... ($i/5)"
               sleep 60
             done
             exit 1
@@ -1549,24 +1571,35 @@ jobs:
           release: "10.1"
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
+            ARCH=$(uname -m)
+            MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
             for i in 1 2 3 4 5; do
-              (
-                set -e
-                /usr/sbin/pkg_add -v pkgin || true
-                pkgin -y update
-                pkgin -y install cmake gmake bash gdb
-                pkgin -y install clang
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
-              ) && exit 0
-
-              echo "Install failed, retrying in 60s... ($i/5)"
+              for mirror in $MIRRORS; do
+                echo "=== Attempt $i, trying mirror: $mirror ==="
+                (
+                  set -e
+                  export PKG_PATH="$mirror"
+                  /usr/sbin/pkg_add -v pkgin || true
+                  echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                  pkgin -y update
+                  pkgin -y install cmake gmake bash gdb
+                  pkgin -y install clang
+                  pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
+                ) && exit 0
+                echo "Mirror $mirror failed, trying next..."
+              done
+              echo "All mirrors failed, retrying in 60s... ($i/5)"
               sleep 60
             done
             exit 1
           run: |
             touch UNIT_TEST_STARTED
             set -e -x
-            cd build/test/unix_like  
+            cd build/test/unix_like
             chmod +x *.sh
             ls -l
             ulimit -n
@@ -1588,7 +1621,7 @@ jobs:
       - name: Cleanup Before Retry
         if: steps.CheckRetry.outputs.retry == 'true'
         run: |
-          set +e 
+          set +e
           DOMAINS="$(sudo virsh list --all --name 2>/dev/null | grep -v "^$" || true)"
           if [ -z "$DOMAINS" ]; then
             echo "No lingering domains found (virsh may be unavailable or no domains exist)."
@@ -1620,17 +1653,28 @@ jobs:
           release: "10.1"
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
+            ARCH=$(uname -m)
+            MIRRORS="
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+            "
             for i in 1 2 3 4 5; do
-              (
-                set -e
-                /usr/sbin/pkg_add -v pkgin || true
-                pkgin -y update
-                pkgin -y install cmake gmake bash gdb
-                pkgin -y install clang
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
-              ) && exit 0
-
-              echo "Install failed, retrying in 60s... ($i/5)"
+              for mirror in $MIRRORS; do
+                echo "=== Attempt $i, trying mirror: $mirror ==="
+                (
+                  set -e
+                  export PKG_PATH="$mirror"
+                  /usr/sbin/pkg_add -v pkgin || true
+                  echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
+                  pkgin -y update
+                  pkgin -y install cmake gmake bash gdb
+                  pkgin -y install clang
+                  pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10
+                ) && exit 0
+                echo "Mirror $mirror failed, trying next..."
+              done
+              echo "All mirrors failed, retrying in 60s... ($i/5)"
               sleep 60
             done
             exit 1
