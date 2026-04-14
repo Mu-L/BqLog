@@ -26,7 +26,9 @@ jobs:
             runs_on: windows-11-arm
         exclude:
           - cc: mingw_gcc
-            runner: 11-arm
+            runner:
+              label: "arm64"
+              runs_on: windows-11-arm
 
     steps:
       - name: Checkout repository
