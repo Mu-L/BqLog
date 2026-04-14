@@ -1423,10 +1423,14 @@ jobs:
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             ARCH=$(uname -m)
+            case "$ARCH" in
+              evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
+              *) PKG_ARCH="$ARCH" ;;
+            esac
             MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
             "
             for i in 1 2 3 4 5; do
               for mirror in $MIRRORS; do
@@ -1503,10 +1507,14 @@ jobs:
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             ARCH=$(uname -m)
+            case "$ARCH" in
+              evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
+              *) PKG_ARCH="$ARCH" ;;
+            esac
             MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
             "
             for i in 1 2 3 4 5; do
               for mirror in $MIRRORS; do
@@ -1572,10 +1580,14 @@ jobs:
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             ARCH=$(uname -m)
+            case "$ARCH" in
+              evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
+              *) PKG_ARCH="$ARCH" ;;
+            esac
             MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
             "
             for i in 1 2 3 4 5; do
               for mirror in $MIRRORS; do
@@ -1654,10 +1666,14 @@ jobs:
           prepare: |
             export PATH="/usr/sbin:/usr/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             ARCH=$(uname -m)
+            case "$ARCH" in
+              evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
+              *) PKG_ARCH="$ARCH" ;;
+            esac
             MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${ARCH}/10.1/All
+              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
+              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
             "
             for i in 1 2 3 4 5; do
               for mirror in $MIRRORS; do
