@@ -47,7 +47,7 @@
 ## ✨ Highlights
 
 - Significant performance advantage over common open-source logging libraries (see [Benchmark](#-benchmark-results)); suitable for server, client, and mobile.
-- Low memory usage: in the Benchmark case (10 threads, 20,000,000 log entries), BqLog itself uses about 1 MB of memory.
+- Low memory usage: in the Benchmark case (10 threads, 20,000,000 log entries), BqLog itself uses about 2-3 MB of memory. And in mobile platform scenarios, it's generally around 1 MB.
 - Provides a high-performance, high-compression real-time compressed log format.
 - Supports strong hybrid encryption (asymmetric + symmetric) for log content protection with nearly zero performance overhead (optional).
 - Works well inside game engines (`Unity`, `Unreal`, etc.), with UE Blueprint and builtin data type support.
