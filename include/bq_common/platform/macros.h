@@ -9,7 +9,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 #pragma once
-#include "bq_common/platform/build_type.h"
 #include <stddef.h>
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define BQ_WIN 1
@@ -114,6 +113,8 @@
 #else
 #define bq_forceinline inline
 #endif
+
+#include "bq_common/platform/build_type.h"
 
 #if defined(_MSC_VER)
 #define BQ_API_EXPORT extern "C" __declspec(dllexport)
@@ -296,4 +297,10 @@ namespace bq {
 #define BQ_NO_ASAN __declspec(no_sanitize_address)
 #else
 #define BQ_NO_ASAN
+#endif
+
+#if defined(BQ_LATE_BINDING)
+#include "bq_common/platform/api_dynamic_binding.h"
+#else
+#define BQ_API_DEF(return_type, name, parameters, arguments) BQ_API return_type name parameters
 #endif
