@@ -171,11 +171,11 @@ namespace bq {
                     buffer_config.need_recovery = (bool)log_config["recovery"] && bq::memory_map::is_platform_support();
                 }
                 if (log_config["buffer_policy_when_full"].is_string()) {
-                    if (((bq::string)log_config["buffer_policy"]).equals_ignore_case("discard")) {
+                    if (((bq::string)log_config["buffer_policy_when_full"]).equals_ignore_case("discard")) {
                         buffer_config.policy = log_memory_policy::discard_when_full;
-                    } else if (((bq::string)log_config["buffer_policy"]).equals_ignore_case("block")) {
+                    } else if (((bq::string)log_config["buffer_policy_when_full"]).equals_ignore_case("block")) {
                         buffer_config.policy = log_memory_policy::block_when_full;
-                    } else if (((bq::string)log_config["buffer_policy"]).equals_ignore_case("expand")) {
+                    } else if (((bq::string)log_config["buffer_policy_when_full"]).equals_ignore_case("expand")) {
                         buffer_config.policy = log_memory_policy::auto_expand_when_full;
                     }
                 }
