@@ -181,6 +181,8 @@ namespace bq {
 
         struct library_handle_tag {};
 
+        struct library_unavailable_tag {};
+
         bq_forceinline void* get_library_handle()
         {
             void*& storage = pointer_slot<library_handle_tag, void*>::storage();
@@ -197,6 +199,35 @@ namespace bq {
                 }
             }
             return handle;
+        }
+
+        bq_forceinline bool is_library_ready()
+        {
+            void*& handle_storage = pointer_slot<library_handle_tag, void*>::storage();
+            void* handle = atomic_load_acquire(&handle_storage);
+            if (handle != nullptr) {
+                return true;
+            }
+
+            void*& unavailable_storage = pointer_slot<library_unavailable_tag, void*>::storage();
+            if (atomic_load_acquire(&unavailable_storage) != nullptr) {
+                return false;
+            }
+
+            handle = get_library_handle();
+            if (handle != nullptr) {
+                return true;
+            }
+
+            handle = atomic_load_acquire(&handle_storage);
+            if (handle != nullptr) {
+                return true;
+            }
+
+            void* expected = nullptr;
+            void* unavailable_marker = &unavailable_storage;
+            atomic_compare_exchange(&unavailable_storage, &expected, unavailable_marker);
+            return false;
         }
 
         template <typename tag_type, typename function_type>
@@ -223,6 +254,18 @@ namespace bq {
             }
             return function;
         }
+    }
+}
+
+namespace bq {
+    /// <summary>
+    /// Returns true when the late-bound dynamic library can be loaded.
+    /// If it has not been loaded yet, this call attempts to load and cache it.
+    /// Unlike invoking an API symbol, this function never fail-fasts on load failure.
+    /// </summary>
+    bq_forceinline bool is_library_ready()
+    {
+        return ::bq::api_dynamic_binding::is_library_ready();
     }
 }
 
