@@ -2,6 +2,7 @@
 #include <windows.h>
 #endif
 #include "bq_log/bq_log.h"
+#include "multi_format_templates.h"
 #include <stdio.h>
 #include <thread>
 #include <chrono>
@@ -50,6 +51,12 @@ static bq::log compressed_log_mixed_utf16 = bq::log::create_log("test_mixed_u16"
 		appenders_config.appender_3.type=compressed_file
 		appenders_config.appender_3.levels=[all]
 		appenders_config.appender_3.file_name= benchmark_output/test_mixed_u16
+		appenders_config.appender_3.capacity_limit=1
+	)");
+static bq::log compressed_log_multi_format = bq::log::create_log("test_multi_format", R"(
+		appenders_config.appender_3.type=compressed_file
+		appenders_config.appender_3.levels=[all]
+		appenders_config.appender_3.file_name= benchmark_output/test_multi_format
 		appenders_config.appender_3.capacity_limit=1
 	)");
 
@@ -392,6 +399,110 @@ void test_text_no_param(int32_t thread_count)
               << std::endl;
 }
 
+void test_compress_multi_format_single(int32_t thread_count)
+{
+    std::cout << "============================================================" << std::endl;
+    std::cout << "======Begin Compressed Multi-Format Test: SINGLE template======" << std::endl;
+    bq::log log_obj = bq::log::get_log_by_name("test_multi_format");
+    std::vector<std::thread*> threads;
+    threads.resize(thread_count);
+    uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Now Begin, each thread will write 2000000 log entries (1 template), please wait the result..." << std::endl;
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (int i = 0; i < 2000000; ++i) {
+                bench_log_multi_format(log_obj, 0, i); // always the same template
+            }
+        });
+        threads[idx] = st;
+    }
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        threads[idx]->join();
+        delete threads[idx];
+    }
+    bq::log::force_flush_all_logs();
+    uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Time Cost:" << (uint64_t)(flush_time - start_time) << std::endl;
+    std::cout << "============================================================" << std::endl
+              << std::endl;
+}
+
+void test_compress_multi_format_roundrobin(int32_t thread_count)
+{
+    std::cout << "============================================================" << std::endl;
+    std::cout << "===Begin Compressed Multi-Format Test: ROUND-ROBIN (no locality)===" << std::endl;
+    bq::log log_obj = bq::log::get_log_by_name("test_multi_format");
+    // warm up: make sure all templates are already registered so we measure steady state
+    for (int k = 0; k < BENCH_MULTI_FORMAT_COUNT; ++k) {
+        bench_log_multi_format(log_obj, k, 0);
+    }
+    bq::log::force_flush_all_logs();
+    std::vector<std::thread*> threads;
+    threads.resize(thread_count);
+    uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Now Begin, each thread will write 2000000 log entries (" << BENCH_MULTI_FORMAT_COUNT << " templates, round-robin), please wait the result..." << std::endl;
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (int i = 0; i < 2000000; ++i) {
+                bench_log_multi_format(log_obj, i % BENCH_MULTI_FORMAT_COUNT, i);
+            }
+        });
+        threads[idx] = st;
+    }
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        threads[idx]->join();
+        delete threads[idx];
+    }
+    bq::log::force_flush_all_logs();
+    uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Time Cost:" << (uint64_t)(flush_time - start_time) << std::endl;
+    std::cout << "============================================================" << std::endl
+              << std::endl;
+}
+
+void test_compress_multi_format_hotwindow(int32_t thread_count)
+{
+    std::cout << "============================================================" << std::endl;
+    std::cout << "===Begin Compressed Multi-Format Test: HOT-WINDOW (locality)===" << std::endl;
+    bq::log log_obj = bq::log::get_log_by_name("test_multi_format");
+    // warm up: register all templates so the lookup structure is fully populated
+    for (int k = 0; k < BENCH_MULTI_FORMAT_COUNT; ++k) {
+        bench_log_multi_format(log_obj, k, 0);
+    }
+    bq::log::force_flush_all_logs();
+    constexpr int W = 8; // hot window size; a code path logs its handful of messages in a burst
+    constexpr int BURST = 64; // iterations before the window slides elsewhere
+    std::vector<std::thread*> threads;
+    threads.resize(thread_count);
+    uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Now Begin, each thread will write 2000000 log entries (" << BENCH_MULTI_FORMAT_COUNT << " templates, hot-window W=" << W << "), please wait the result..." << std::endl;
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        std::thread* st = new std::thread([&log_obj]() {
+            int base = 0;
+            int i = 0;
+            while (i < 2000000) {
+                for (int b = 0; b < BURST && i < 2000000; ++b, ++i) {
+                    bench_log_multi_format(log_obj, base + (i % W), i);
+                }
+                base += W;
+                if (base > BENCH_MULTI_FORMAT_COUNT - W) {
+                    base = 0;
+                }
+            }
+        });
+        threads[idx] = st;
+    }
+    for (int32_t idx = 0; idx < thread_count; ++idx) {
+        threads[idx]->join();
+        delete threads[idx];
+    }
+    bq::log::force_flush_all_logs();
+    uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    std::cout << "Time Cost:" << (uint64_t)(flush_time - start_time) << std::endl;
+    std::cout << "============================================================" << std::endl
+              << std::endl;
+}
+
 int main()
 {
 #if defined(WIN32)
@@ -415,5 +526,14 @@ int main()
     test_compress_no_param(thread_count);
     test_compress_enc_no_param(thread_count);
     test_text_no_param(thread_count);
+
+    // Multi-format tests: same total log volume as the single-format tests above,
+    // but spread across BENCH_MULTI_FORMAT_COUNT distinct format templates so the
+    // compressed appender's format-template lookup is exercised with a large
+    // template set. Single-format (test_compress_multi_param above) vs these gives
+    // the comparison.
+    test_compress_multi_format_single(thread_count);
+    test_compress_multi_format_roundrobin(thread_count);
+    test_compress_multi_format_hotwindow(thread_count);
     return 0;
 }

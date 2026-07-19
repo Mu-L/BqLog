@@ -102,5 +102,18 @@ namespace bq {
         bq::hash_map_inline<uint64_t, uint32_t> thread_info_hash_cache_;
         uint32_t current_thread_info_max_index_;
         uint64_t last_log_entry_epoch_;
+
+        // Direct-mapped MRU cache in front of format_templates_hash_cache_ to skip
+        // the hash_map_inline::find on the hot path. Read-through only; no log
+        // file / protocol impact.
+        // Sized as an empirical L1 hot-set estimate for a typical ~30 high-frequency
+        // templates (direct-mapped needs headroom above the working set).
+        static constexpr uint32_t FMT_TEMPLATE_MRU_SIZE = 256; // must be a power of two
+        static constexpr uint32_t FMT_TEMPLATE_MRU_EMPTY = static_cast<uint32_t>(-1);
+        struct format_template_mru_slot {
+            uint64_t key;
+            uint32_t idx;
+        };
+        format_template_mru_slot format_template_mru_[FMT_TEMPLATE_MRU_SIZE];
     };
 }
