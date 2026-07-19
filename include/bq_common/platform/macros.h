@@ -170,7 +170,15 @@ namespace bq {
             return *____BQ_TLS_##Name##_ptr;                                     \
         }                                                                        \
     };                                                                           \
-    thread_local BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__) Name;
+    thread_local BQ_TLS_CONCAT(_bq_non_pod_holder_##Name##_, __LINE__) Name;     \
+    bq_forceinline Type& BQ_TLS_CONCAT(Name, _get_direct)()                      \
+    {                                                                            \
+        Type* ____p = ____BQ_TLS_##Name##_ptr;                                   \
+        if (____p) {                                                             \
+            return *____p;                                                        \
+        }                                                                        \
+        return Name.get();                                                       \
+    }
 #define BQ_TLS_NON_POD(Type, Name) BQ_TLS_DEFINE(Type, Name)
 
 #if defined(_MSC_VER) && !defined(__clang__)

@@ -161,7 +161,7 @@ namespace bq {
 
     log_buffer_write_handle log_buffer::alloc_write_chunk(uint32_t size, uint64_t current_epoch_ms)
     {
-        auto& tls_buffer = log_tls_info_.get().get_buffer_info(this);
+        auto& tls_buffer = log_tls_info__get_direct().get_buffer_info(this);
 
         block_node_head*& block_cache = tls_buffer.cur_block_;
         uint64_t& thread_last_update_epoch_ms = tls_buffer.last_update_epoch_ms_;
@@ -258,7 +258,7 @@ namespace bq {
 
     void log_buffer::commit_write_chunk(const log_buffer_write_handle& handle)
     {
-        auto& tls_buffer_info = log_tls_info_.get().get_buffer_info_directly(this);
+        auto& tls_buffer_info = log_tls_info__get_direct().get_buffer_info_directly(this);
         block_node_head*& block_cache = tls_buffer_info.cur_block_;
         bool is_high_frequency = (block_cache != nullptr);
         if (is_high_frequency) {
@@ -456,7 +456,7 @@ namespace bq {
 #if defined(BQ_LOG_BUFFER_DEBUG)
         assert((this->id_ == log_tls_info_.get().cur_log_buffer_id_) && "tls cur_log_buffer_ check failed");
 #endif
-        auto& current_buffer_info = log_tls_info_.get().get_buffer_info_directly(this);
+        auto& current_buffer_info = log_tls_info__get_direct().get_buffer_info_directly(this);
         java_buffer_info result;
         result.buffer_array_obj_ = nullptr;
         result.offset_store_ = &current_buffer_info.java_.buffer_offset_;
@@ -515,7 +515,7 @@ namespace bq {
 
     bq::block_node_head* log_buffer::alloc_new_hp_block()
     {
-        log_tls_buffer_info& tls_buffer_info = log_tls_info_.get().get_buffer_info_directly(this);
+        log_tls_buffer_info& tls_buffer_info = log_tls_info__get_direct().get_buffer_info_directly(this);
         block_misc_data misc_data;
         memset(&misc_data, 0, sizeof(misc_data));
         misc_data.context_.set_tls_info(&tls_buffer_info);
@@ -841,7 +841,7 @@ namespace bq {
 
     log_buffer_write_handle log_buffer::wt_alloc_oversize_write_chunk(uint32_t size, uint64_t current_epoch_ms)
     {
-        auto& tls_buffer = log_tls_info_.get().get_buffer_info(this);
+        auto& tls_buffer = log_tls_info__get_direct().get_buffer_info(this);
         auto& block_cache = tls_buffer.cur_block_;
         if (block_cache) {
             mark_block_removed(block_cache, true); // mark removed;
@@ -982,7 +982,7 @@ namespace bq {
 
     void log_buffer::wt_commit_oversize_write_chunk(const log_buffer_write_handle& oversize_handle)
     {
-        auto& tls_buffer_info = log_tls_info_.get().get_buffer_info_directly(this);
+        auto& tls_buffer_info = log_tls_info__get_direct().get_buffer_info_directly(this);
         tls_buffer_info.oversize_target_buffer_->buffer_.commit_write_chunk(oversize_handle);
         tls_buffer_info.oversize_target_buffer_->buffer_lock_.read_unlock();
         tls_buffer_info.oversize_target_buffer_ = nullptr;
@@ -1129,7 +1129,7 @@ namespace bq {
 #if defined(BQ_UNIT_TEST)
     const log_buffer::log_tls_buffer_info& log_buffer::get_buffer_info_for_this_thread() const
     {
-        return log_tls_info_.get().get_buffer_info(this);
+        return log_tls_info__get_direct().get_buffer_info(this);
     }
 #endif
 
