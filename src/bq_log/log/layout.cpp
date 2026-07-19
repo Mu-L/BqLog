@@ -1227,6 +1227,27 @@ namespace bq {
 
         auto begin_cursor = format_content_cursor;
         uint32_t e_count = 0;
+        // fast path for base-10: 3 digits per iteration via digit3 table
+        if (base == 10 && format_info_.type != 'e') {
+            const char* const digit3 = log_global_vars::get().digit3_array;
+            char tmp[20]; // uint64_t max is 20 digits
+            char* p = tmp + sizeof(tmp);
+            while (value >= 1000) {
+                uint32_t r = static_cast<uint32_t>(value % 1000);
+                value /= 1000;
+                p -= 3;
+                memcpy(p, &digit3[r * 3], 3);
+            }
+            const char* d = &digit3[static_cast<uint32_t>(value) * 3];
+            int32_t start = (value >= 100) ? 0 : ((value >= 10) ? 1 : 2);
+            for (int32_t k = 2; k >= start; --k) {
+                *--p = d[k];
+            }
+            uint32_t digit_count = static_cast<uint32_t>(tmp + sizeof(tmp) - p);
+            memcpy(&format_content[format_content_cursor], p, digit_count);
+            format_content_cursor += digit_count;
+            return format_content_cursor - width;
+        }
         do {
             int32_t digit = static_cast<int32_t>(value % base);
             if (digit < 0xA) {
@@ -1309,6 +1330,29 @@ namespace bq {
         auto begin_cursor = format_content_cursor;
         // Scientific Counting Check
         uint32_t e_count = 0;
+        // fast path for base-10: 3 digits per iteration via digit3 table
+        if (base == 10 && format_info_.type != 'e') {
+            // unsigned arithmetic handles INT64_MIN
+            uint64_t mag = (value < 0) ? (0ULL - static_cast<uint64_t>(value)) : static_cast<uint64_t>(value);
+            const char* const digit3 = log_global_vars::get().digit3_array;
+            char tmp[20]; // uint64_t max is 20 digits
+            char* p = tmp + sizeof(tmp);
+            while (mag >= 1000) {
+                uint32_t r = static_cast<uint32_t>(mag % 1000);
+                mag /= 1000;
+                p -= 3;
+                memcpy(p, &digit3[r * 3], 3);
+            }
+            const char* d = &digit3[static_cast<uint32_t>(mag) * 3];
+            int32_t start = (mag >= 100) ? 0 : ((mag >= 10) ? 1 : 2);
+            for (int32_t k = 2; k >= start; --k) {
+                *--p = d[k];
+            }
+            uint32_t digit_count = static_cast<uint32_t>(tmp + sizeof(tmp) - p);
+            memcpy(&format_content[format_content_cursor], p, digit_count);
+            format_content_cursor += digit_count;
+            return format_content_cursor - width;
+        }
         do {
             char digit = static_cast<char>(abs(static_cast<int32_t>(value % static_cast<int32_t>(base))));
             if (digit < 0xA) {
