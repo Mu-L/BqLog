@@ -1227,8 +1227,7 @@ namespace bq {
 
         auto begin_cursor = format_content_cursor;
         uint32_t e_count = 0;
-        // fast path for base-10: 3 digits per iteration via digit3 table
-        if (base == 10 && format_info_.type != 'e') {
+        if (base == 10 && format_info_.type != 'e' && value >= 1000000000ULL) {
             const char* const digit3 = log_global_vars::get().digit3_array;
             char tmp[20]; // uint64_t max is 20 digits
             char* p = tmp + sizeof(tmp);
@@ -1330,8 +1329,8 @@ namespace bq {
         auto begin_cursor = format_content_cursor;
         // Scientific Counting Check
         uint32_t e_count = 0;
-        // fast path for base-10: 3 digits per iteration via digit3 table
-        if (base == 10 && format_info_.type != 'e') {
+        if (base == 10 && format_info_.type != 'e'
+            && (value >= 1000000000LL || value <= -1000000000LL)) {
             // unsigned arithmetic handles INT64_MIN
             uint64_t mag = (value < 0) ? (0ULL - static_cast<uint64_t>(value)) : static_cast<uint64_t>(value);
             const char* const digit3 = log_global_vars::get().digit3_array;
