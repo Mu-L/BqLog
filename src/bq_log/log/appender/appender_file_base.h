@@ -172,6 +172,7 @@ namespace bq {
         bool enable_rolling_log_file_;
         uint64_t expire_time_ms_;
         uint64_t capacity_limit_;
+        size_t write_cache_target_size_;
         uint64_t current_file_expire_time_epoch_ms_;
         bool flush_when_destruct_ = true;
         bool disk_full_drop_ = false;

@@ -101,6 +101,12 @@ namespace bq {
         uint32_t current_format_template_max_index_;
         bq::hash_map_inline<uint64_t, uint32_t> thread_info_hash_cache_;
         uint32_t current_thread_info_max_index_;
+        // For small thread sets the hash map lookup is already cheap. Enable the
+        // last-thread fast path only after enough distinct producers have been
+        // observed to offset the extra branch and cache state.
+        static constexpr uint32_t THREAD_INFO_LAST_CACHE_MIN_TEMPLATES = 8;
+        uint64_t last_thread_info_id_;
+        uint32_t last_thread_info_idx_;
         uint64_t last_log_entry_epoch_;
 
         // Direct-mapped MRU cache in front of format_templates_hash_cache_ to skip

@@ -80,6 +80,7 @@ snapshot.categories_mask=[ModuleA.SystemA.ClassA,ModuleB]
 | `expire_time_seconds`       | ✘       | 正整数或 `0`                            | `0`（不清理）          | ✘               | ✔                | ✔                      |
 | `expire_time_days`          | ✘       | 正整数或 `0`                            | `0`（不清理）          | ✘               | ✔                | ✔                      |
 | `capacity_limit`            | ✘       | 正整数或 `0`                            | `0`（不限制）          | ✘               | ✔                | ✔                      |
+| `write_cache_size`          | ✘       | 正整数（`65536` 到 `4194304`）          | `65536`              | ✘               | ✔                | ✔                      |
 | `categories_mask`           | ✘       | 字符串数组（`[]`）                       | 空（不过滤）            | ✔               | ✔                | ✔                      |
 | `always_create_new_file`    | ✘       | `true` / `false`                        | `false`           | ✘               | ✔                | ✔                      |
 | `enable_rolling_log_file`    | ✘       | `true` / `false`                        | `true`            | ✘               | ✔                | ✔                      |
@@ -150,6 +151,7 @@ appenders_config.appender_3.file_name=~/bqLog/compress_log
 - `expire_time_seconds`：按秒数清理超时文件；`0` 关闭该功能。
 - `expire_time_days`：按天清理超时文件；`0` 关闭该功能。
 - `capacity_limit`：限制该 Appender 输出的文件的总大小，超过时按时间从旧文件开始删除。
+- `write_cache_size`：文件写入内存缓存大小（字节）。配置值会限制在 64 KiB～4 MiB，并向上取整为 2 的幂。增大该值可以减少写系统调用次数，但会增加每个文件 Appender 的内存占用。
 - `categories_mask`：仅当日志 Category 匹配该数组中的前缀时，才会输出日志（参见 [高级用法 — Category](./ADVANCED_USAGE_CHS.md#2-支持分类category的-log-对象)）。
 - `always_create_new_file`：`true` 时，即使同一天内，每次进程重启也新开一个文件；默认 `false` 为追加写。
 - `enable_rolling_log_file`：是否启用按日期滚动文件，默认 `true`。

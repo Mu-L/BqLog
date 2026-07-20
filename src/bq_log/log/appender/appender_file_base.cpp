@@ -19,6 +19,8 @@
 namespace bq {
     static constexpr size_t CACHE_READ_DEFAULT_SIZE = 32 * 1024;
     static constexpr size_t CACHE_WRITE_DEFAULT_SIZE = 64 * 1024;
+    static constexpr size_t CACHE_WRITE_MIN_SIZE = 64 * 1024;
+    static constexpr size_t CACHE_WRITE_MAX_SIZE = 4 * 1024 * 1024;
 
     appender_file_base::~appender_file_base()
     {
@@ -49,8 +51,9 @@ namespace bq {
         cache_write_head_->cache_write_finished_cursor_ -= real_write_size;
         cache_write_cursor_ -= real_write_size;
         current_file_size_ += real_write_size;
-        if (cache_write_entity_->size() > CACHE_WRITE_DEFAULT_SIZE && get_total_used_write_cache_size() <= (CACHE_READ_DEFAULT_SIZE >> 1)) {
-            resize_cache_write_entity(CACHE_WRITE_DEFAULT_SIZE);
+        if (cache_write_entity_->size() > write_cache_target_size_
+            && get_total_used_write_cache_size() <= (CACHE_READ_DEFAULT_SIZE >> 1)) {
+            resize_cache_write_entity(write_cache_target_size_);
         }
         const bool is_disk_full_error = (error_code ==
 #if defined(BQ_WIN)
@@ -112,8 +115,8 @@ namespace bq {
             try_recover();
             clean_cache_write();
         }
-        assert(get_total_used_write_cache_size() <= CACHE_WRITE_DEFAULT_SIZE);
-        resize_cache_write_entity(CACHE_WRITE_DEFAULT_SIZE);
+        assert(get_total_used_write_cache_size() <= write_cache_target_size_);
+        resize_cache_write_entity(write_cache_target_size_);
         return !config_file_name_.is_empty();
     }
 
@@ -455,6 +458,19 @@ namespace bq {
             capacity_limit_ = (uint64_t)config_obj["capacity_limit"];
         } else {
             capacity_limit_ = 0;
+        }
+
+        write_cache_target_size_ = CACHE_WRITE_DEFAULT_SIZE;
+        if (config_obj["write_cache_size"].is_integral()) {
+            int64_t configured_size =
+                static_cast<int64_t>(config_obj["write_cache_size"]);
+            if (configured_size > 0) {
+                size_t clamped_size = static_cast<size_t>(configured_size);
+                clamped_size = bq::max_value(CACHE_WRITE_MIN_SIZE, clamped_size);
+                clamped_size = bq::min_value(CACHE_WRITE_MAX_SIZE, clamped_size);
+                write_cache_target_size_ =
+                    static_cast<size_t>(bq::roundup_pow_of_two(clamped_size));
+            }
         }
 
         if (config_obj["enable_rolling_log_file"].is_bool()) {
