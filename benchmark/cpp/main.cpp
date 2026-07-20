@@ -1,8 +1,9 @@
-﻿#if defined(WIN32)
+#if defined(WIN32)
 #include <windows.h>
 #endif
 #include "bq_log/bq_log.h"
 #include "multi_format_templates.h"
+#include <cstdint>
 #include <stdio.h>
 #include <thread>
 #include <chrono>
@@ -100,20 +101,20 @@ static void prepare_datas()
     ascii_charset_u16.fill_uninitialized(character_pool_size);
     chinese_charset_u16.fill_uninitialized(character_pool_size);
     mixed_charset_u16.fill_uninitialized(character_pool_size);
-    for (size_t i = 0; i < character_pool_size; ++i) {
-        ascii_charset[i] = (char)((i % 95) + 32);
-        ascii_charset_u16[i] = (char16_t)((i % 95) + 32);
-        chinese_charset_u16[i] = (char16_t)(0x4E00 + (i % 20902));
-        if ((i % 200) < 100) {
-            mixed_charset_u16[i] = (char16_t)((i % 95) + 32);
+    for (size_t character_index = 0; character_index < character_pool_size; ++character_index) {
+        ascii_charset[character_index] = (char)((character_index % 95) + 32);
+        ascii_charset_u16[character_index] = (char16_t)((character_index % 95) + 32);
+        chinese_charset_u16[character_index] = (char16_t)(0x4E00 + (character_index % 20902));
+        if ((character_index % 200) < 100) {
+            mixed_charset_u16[character_index] = (char16_t)((character_index % 95) + 32);
         } else {
-            mixed_charset_u16[i] = (char16_t)(0x4E00 + (i % 20902));
+            mixed_charset_u16[character_index] = (char16_t)(0x4E00 + (character_index % 20902));
         }
     }
-    for (size_t i = 0; i < logs_count; ++i) {
-        size_t start = (i * 9973) % (character_pool_size - 1);
+    for (size_t log_index = 0; log_index < logs_count; ++log_index) {
+        size_t start = (log_index * 9973) % (character_pool_size - 1);
         size_t max_size = (character_pool_size - 1 - start);
-        size_t data_size = i % 1024;
+        size_t data_size = log_index % 1024;
         data_size = bq::min_value(data_size, max_size);
         positions.push_back(bq::make_tuple(start, data_size));
     }
@@ -128,17 +129,17 @@ void test_compress_ascii_utf8(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (size_t i = 0; i < logs_count; ++i) {
-                log_obj.info(benchmark_string_view<char>(ascii_charset.begin() + bq::get<0>(positions[i]), bq::get<1>(positions[i])));
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (size_t log_index = 0; log_index < logs_count; ++log_index) {
+                log_obj.info(benchmark_string_view<char>(ascii_charset.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -156,17 +157,17 @@ void test_compress_ascii_utf16(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (size_t i = 0; i < logs_count; ++i) {
-                log_obj.info(benchmark_string_view<char16_t>(ascii_charset_u16.begin() + bq::get<0>(positions[i]), bq::get<1>(positions[i])));
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (size_t log_index = 0; log_index < logs_count; ++log_index) {
+                log_obj.info(benchmark_string_view<char16_t>(ascii_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -184,17 +185,17 @@ void test_compress_chinese_utf16(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (size_t i = 0; i < logs_count; ++i) {
-                log_obj.info(benchmark_string_view<char16_t>(chinese_charset_u16.begin() + bq::get<0>(positions[i]), bq::get<1>(positions[i])));
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (size_t log_index = 0; log_index < logs_count; ++log_index) {
+                log_obj.info(benchmark_string_view<char16_t>(chinese_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -212,17 +213,17 @@ void test_compress_mixed_utf16(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (size_t i = 0; i < logs_count; ++i) {
-                log_obj.info(benchmark_string_view<char16_t>(mixed_charset_u16.begin() + bq::get<0>(positions[i]), bq::get<1>(positions[i])));
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([&log_obj]() {
+            for (size_t log_index = 0; log_index < logs_count; ++log_index) {
+                log_obj.info(benchmark_string_view<char16_t>(mixed_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -240,17 +241,17 @@ void test_compress_multi_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
-                log_obj.info("idx:{}, num:{}, This test, {}, {}", idx, i, 2.4232f, true);
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
+                log_obj.info("idx:{}, num:{}, This test, {}, {}", thread_index, log_index, 2.4232f, true);
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -268,17 +269,17 @@ void test_compress_enc_multi_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
-                log_obj.info("idx:{}, num:{}, This test, {}, {}", idx, i, 2.4232f, true);
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
+                log_obj.info("idx:{}, num:{}, This test, {}, {}", thread_index, log_index, 2.4232f, true);
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -296,17 +297,17 @@ void test_text_multi_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
-                log_obj.info("idx:{}, num:{}, This test, {}, {}", idx, i, 2.4232f, true);
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
+                log_obj.info("idx:{}, num:{}, This test, {}, {}", thread_index, log_index, 2.4232f, true);
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -324,17 +325,17 @@ void test_compress_no_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
                 log_obj.info("Empty Log, No Param");
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -352,17 +353,17 @@ void test_compress_enc_no_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
                 log_obj.info("Empty Log, No Param");
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -380,17 +381,17 @@ void test_text_no_param(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([idx, &log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([thread_index, &log_obj]() {
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
                 log_obj.info("Empty Log, No Param");
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -408,17 +409,17 @@ void test_compress_multi_format_single(int32_t thread_count)
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries (1 template), please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
         std::thread* st = new std::thread([&log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
-                bench_log_multi_format(log_obj, 0, i); // always the same template
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
+                bench_log_multi_format(log_obj, 0, log_index); // always the same template
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -433,25 +434,25 @@ void test_compress_multi_format_roundrobin(int32_t thread_count)
     std::cout << "===Begin Compressed Multi-Format Test: ROUND-ROBIN (no locality)===" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_multi_format");
     // warm up: make sure all templates are already registered so we measure steady state
-    for (int k = 0; k < BENCH_MULTI_FORMAT_COUNT; ++k) {
-        bench_log_multi_format(log_obj, k, 0);
+    for (int32_t format_index = 0; format_index < BENCH_MULTI_FORMAT_COUNT; ++format_index) {
+        bench_log_multi_format(log_obj, format_index, 0);
     }
     bq::log::force_flush_all_logs();
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries (" << BENCH_MULTI_FORMAT_COUNT << " templates, round-robin), please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
         std::thread* st = new std::thread([&log_obj]() {
-            for (int i = 0; i < 2000000; ++i) {
-                bench_log_multi_format(log_obj, i % BENCH_MULTI_FORMAT_COUNT, i);
+            for (int32_t log_index = 0; log_index < 2000000; ++log_index) {
+                bench_log_multi_format(log_obj, log_index % BENCH_MULTI_FORMAT_COUNT, log_index);
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
@@ -466,35 +467,35 @@ void test_compress_multi_format_hotwindow(int32_t thread_count)
     std::cout << "===Begin Compressed Multi-Format Test: HOT-WINDOW (locality)===" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_multi_format");
     // warm up: register all templates so the lookup structure is fully populated
-    for (int k = 0; k < BENCH_MULTI_FORMAT_COUNT; ++k) {
-        bench_log_multi_format(log_obj, k, 0);
+    for (int32_t format_index = 0; format_index < BENCH_MULTI_FORMAT_COUNT; ++format_index) {
+        bench_log_multi_format(log_obj, format_index, 0);
     }
     bq::log::force_flush_all_logs();
-    constexpr int W = 8; // hot window size; a code path logs its handful of messages in a burst
-    constexpr int BURST = 64; // iterations before the window slides elsewhere
+    constexpr int32_t hot_window_size = 8;
+    constexpr int32_t burst_size = 64;
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
-    std::cout << "Now Begin, each thread will write 2000000 log entries (" << BENCH_MULTI_FORMAT_COUNT << " templates, hot-window W=" << W << "), please wait the result..." << std::endl;
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        std::thread* st = new std::thread([&log_obj]() {
-            int base = 0;
-            int i = 0;
-            while (i < 2000000) {
-                for (int b = 0; b < BURST && i < 2000000; ++b, ++i) {
-                    bench_log_multi_format(log_obj, base + (i % W), i);
+    std::cout << "Now Begin, each thread will write 2000000 log entries (" << BENCH_MULTI_FORMAT_COUNT << " templates, hot-window W=" << hot_window_size << "), please wait the result..." << std::endl;
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        std::thread* st = new std::thread([&log_obj, hot_window_size, burst_size]() {
+            int32_t window_base_index = 0;
+            int32_t log_index = 0;
+            while (log_index < 2000000) {
+                for (int32_t burst_index = 0; burst_index < burst_size && log_index < 2000000; ++burst_index, ++log_index) {
+                    bench_log_multi_format(log_obj, window_base_index + (log_index % hot_window_size), log_index);
                 }
-                base += W;
-                if (base > BENCH_MULTI_FORMAT_COUNT - W) {
-                    base = 0;
+                window_base_index += hot_window_size;
+                if (window_base_index > BENCH_MULTI_FORMAT_COUNT - hot_window_size) {
+                    window_base_index = 0;
                 }
             }
         });
-        threads[idx] = st;
+        threads[thread_index] = st;
     }
-    for (int32_t idx = 0; idx < thread_count; ++idx) {
-        threads[idx]->join();
-        delete threads[idx];
+    for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
+        threads[thread_index]->join();
+        delete threads[thread_index];
     }
     bq::log::force_flush_all_logs();
     uint64_t flush_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
