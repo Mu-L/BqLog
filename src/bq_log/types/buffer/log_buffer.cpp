@@ -283,9 +283,9 @@ namespace bq {
         }
     }
 
-    log_buffer_read_handle log_buffer::read_chunk()
-    {
 #if defined(BQ_LOG_BUFFER_DEBUG)
+    void log_buffer::debug_check_read_thread()
+    {
         if (log_global_vars::get().is_thread_check_enabled()) {
             if (empty_thread_id_ == read_thread_id_) {
                 read_thread_id_ = bq::platform::thread::get_current_thread_id();
@@ -293,15 +293,12 @@ namespace bq {
             bq::platform::thread::thread_id current_thread_id = bq::platform::thread::get_current_thread_id();
             assert(current_thread_id == read_thread_id_ && "only single thread reading is supported for log_buffer!");
         }
+    }
 #endif
+
+    log_buffer_read_handle log_buffer::read_chunk_full_impl()
+    {
         auto& rt_reading = rt_cache_.current_reading_;
-        if (rt_reading.hp_handle_cache_.result == enum_buffer_result_code::success) {
-            if (rt_reading.hp_handle_cache_.has_next()) {
-                return rt_reading.hp_handle_cache_.next();
-            } else {
-                rt_reading.hp_handle_cache_.result = enum_buffer_result_code::err_empty_log_buffer;
-            }
-        }
         log_buffer_read_handle read_handle;
         context_verify_result verify_result = context_verify_result::version_invalid;
         refresh_traverse_end_mark();
@@ -398,39 +395,10 @@ namespace bq {
         return read_handle;
     }
 
-    void log_buffer::return_read_chunk(const log_buffer_read_handle& handle)
+    void log_buffer::return_read_chunk_full_impl(const log_buffer_read_handle& handle)
     {
-#if defined(BQ_LOG_BUFFER_DEBUG)
-        if (log_global_vars::get().is_thread_check_enabled()) {
-            bq::platform::thread::thread_id current_thread_id = bq::platform::thread::get_current_thread_id();
-            assert(current_thread_id == read_thread_id_ && "only single thread reading is supported for log_buffer!");
-        }
-#endif
-        if (rt_cache_.current_reading_.hp_handle_cache_.result == enum_buffer_result_code::success) {
-#if defined(BQ_LOG_BUFFER_DEBUG)
-            assert(rt_cache_.current_reading_.hp_handle_cache_.verify_chunk(handle) && "log_buffer::return_read_chunk hp chunk return verify failed");
-#endif
-            if (!rt_cache_.current_reading_.hp_handle_cache_.has_next()) {
-#if defined(BQ_LOG_BUFFER_DEBUG)
-                assert(rt_cache_.current_reading_.cur_block_);
-#endif
-                rt_cache_.current_reading_.cur_block_->get_buffer().return_batch_read_chunks(rt_cache_.current_reading_.hp_handle_cache_);
-            }
-            return;
-        }
         if (rt_cache_.current_reading_.cur_block_) {
-            if (rt_cache_.current_reading_.hp_handle_cache_.result == enum_buffer_result_code::success) {
-#if defined(BQ_LOG_BUFFER_DEBUG)
-                assert(rt_cache_.current_reading_.hp_handle_cache_.verify_chunk(handle) && "log_buffer::return_read_chunk hp chunk return verify failed");
-#endif
-                if (!rt_cache_.current_reading_.hp_handle_cache_.has_next()) {
-                    rt_cache_.current_reading_.cur_block_->get_buffer().return_batch_read_chunks(rt_cache_.current_reading_.hp_handle_cache_);
-                }
-                return;
-            } else {
-                rt_cache_.current_reading_.cur_block_->get_buffer().return_batch_read_chunks(rt_cache_.current_reading_.hp_handle_cache_);
-            }
-
+            rt_cache_.current_reading_.cur_block_->get_buffer().return_batch_read_chunks(rt_cache_.current_reading_.hp_handle_cache_);
         } else if (enum_buffer_result_code::success == handle.result) {
             log_buffer_read_handle handle_cpy = handle;
             handle_cpy.data_addr -= sizeof(context_head);
