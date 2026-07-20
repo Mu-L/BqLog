@@ -344,9 +344,7 @@ namespace bq {
 
         uint32_t thread_info_idx = (uint32_t)-1;
         const uint64_t current_thread_id = handle.get_log_head().log_thread_id;
-        const bool use_thread_info_cache =
-            current_thread_info_max_index_ >= THREAD_INFO_LAST_CACHE_MIN_TEMPLATES;
-        if (use_thread_info_cache && current_thread_id == last_thread_info_id_) {
+        if (current_thread_id == last_thread_info_id_) {
             thread_info_idx = last_thread_info_idx_;
         } else {
             auto thread_info__iter = thread_info_hash_cache_.find(current_thread_id);
@@ -382,11 +380,8 @@ namespace bq {
             } else {
                 thread_info_idx = thread_info__iter->value();
             }
-            if (current_thread_info_max_index_
-                >= THREAD_INFO_LAST_CACHE_MIN_TEMPLATES) {
-                last_thread_info_id_ = current_thread_id;
-                last_thread_info_idx_ = thread_info_idx;
-            }
+            last_thread_info_id_ = current_thread_id;
+            last_thread_info_idx_ = thread_info_idx;
         }
 
         // write log entry
