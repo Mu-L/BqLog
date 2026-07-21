@@ -1,5 +1,11 @@
 # Changelog
 
+## [v2.4.0] - 2026-07-21
+- **Performance — Raising the bar once again**: Added `thread_info` caching, accelerated TLS access, inlined critical hot paths, optimized integer formatting, and improved L1 cache utilization for compressed logging.
+- **Performance gain**: Typical workloads improve by approximately **10%–20%**; actual gains vary with thread count, log format, argument types, and output mode.
+- **Bug fix**: Fixed parsing of `log.buffer_policy_when_full`; the configured `discard`, `block`, or `expand` policy is now applied correctly instead of silently falling back to the default `block` policy.
+- **Configuration**: Added `write_cache_size` for file Appenders, allowing the per-Appender write cache to be tuned from 64 KiB to 4 MiB.
+
 ## [v2.3.2] - 2026-07-12
 - **Bug fix**: [Embedded null bytes were dropped in decoder output #69](https://github.com/Tencent/BqLog/issues/69) — the log decoder now preserves embedded null bytes intact.
 - **Bug fix**: Fixed decoding and recovery in the extreme case where different encryption modes are switched repeatedly within the same log file (mixed-encryption multi-segment), so such files now decode and recover correctly.

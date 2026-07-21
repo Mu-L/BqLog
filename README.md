@@ -2,13 +2,13 @@
   <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
-# BqLog (BianQue Log) V 2.3.2
+# BqLog (BianQue Log) V 2.4.0
 
 **English** | [简体中文](./README_CHS.md)
 
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.3.2-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.3.2-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.4.0-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.4.0-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -22,13 +22,14 @@
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_Download-Release_2.3.2-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.3.2)
+[![Download](https://img.shields.io/badge/⬇_Download-Release_2.4.0-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.4.0)
 
-## 📋 What's New in v2.3.2
+## 📋 What's New in v2.4.0
 
-- **Bug fix** — [Embedded null bytes were dropped in decoder output (#69)](https://github.com/Tencent/BqLog/issues/69); the log decoder now preserves embedded null bytes intact.
-- **Bug fix** — Fixed decoding and recovery for the extreme case where different encryption modes are switched repeatedly within the same log file (mixed-encryption multi-segment).
-- **Robustness** — Hardened parsing of corrupted log files, plus better truncate validation and mmap allocation so disk-space errors surface before mapping access.
+- **Performance — Raising the bar once again** — Added `thread_info` caching, accelerated TLS access, inlined critical hot paths, optimized integer formatting, and improved L1 cache utilization for compressed logging.
+- Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
+- **Bug fix** — Fixed `log.buffer_policy_when_full` parsing so `discard`, `block`, and `expand` are applied correctly.
+- **Configuration** — Added the `write_cache_size` option for tuning each file Appender's write cache from 64 KiB to 4 MiB.
 
 > Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
