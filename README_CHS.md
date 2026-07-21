@@ -2,13 +2,13 @@
   <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
-# BqLog (扁鹊日志) V 2.3.2
+# BqLog (扁鹊日志) V 2.4.0
 
 [English](./README.md) | **简体中文**
 
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.3.2-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.3.2-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.4.0-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_更新日志-v2.4.0-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -22,13 +22,14 @@
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_下载-Release_2.3.2-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.3.2)
+[![Download](https://img.shields.io/badge/⬇_下载-Release_2.4.0-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.4.0)
 
-## 📋 v2.3.2 更新亮点
+## 📋 v2.4.0 更新亮点
 
-- **Bug 修复** — [解码输出中嵌入的空字节 (null byte) 被丢弃 (#69)](https://github.com/Tencent/BqLog/issues/69)；日志解码器现已完整保留嵌入的空字节。
-- **Bug 修复** — 修复了在同一个日志文件上反复切换不同加密模式（混合加密多分段）这一极端场景下的解码与复盘（recovery）问题。
-- **健壮性** — 强化了损坏日志文件的解析，并改进 truncate 校验与 mmap 分配，使磁盘空间不足的错误在映射访问前暴露出来。
+- **性能优化——“百尺竿头，更进一步”**：主要收益来自 `thread_info` 缓存、TLS 访问加速、关键路径内联、整数格式化优化，以及压缩日志的 L1 缓存优化。
+- 常规使用场景下，性能通常提升约 **10%～20%**；实际收益会随线程数、日志格式、参数类型及输出模式而有所不同。
+- **Bug 修复**：修复 `log.buffer_policy_when_full` 的解析错误，`discard`、`block` 和 `expand` 策略现在均可正确生效。
+- **配置扩展**：文件 Appender 新增 `write_cache_size` 配置，可在 64 KiB～4 MiB 范围内调整每个 Appender 的写缓存。
 
 > 完整更新日志 → [CHANGELOG.md](CHANGELOG.md)
 
