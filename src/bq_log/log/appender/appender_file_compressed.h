@@ -67,9 +67,13 @@ namespace bq {
 
     public:
         static constexpr uint32_t format_version = 10;
+        static constexpr uint32_t DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES = 100000;
+        static constexpr uint32_t DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES = 2048;
 
     protected:
         virtual bool init_impl(const bq::property_value& config_obj) override;
+
+        virtual bool reset_impl(const bq::property_value& config_obj) override;
 
         virtual bool log_impl(const log_entry_handle& handle) override;
 
@@ -101,9 +105,10 @@ namespace bq {
         static constexpr uint32_t CACHE_EMPTY = static_cast<uint32_t>(-1);
         static constexpr uint32_t FORMAT_L1_SIZE = 256;
         static constexpr uint32_t THREAD_L1_SIZE = 64;
-        static constexpr uint32_t FORMAT_L2_MAX_SIZE = 100000;
+        static constexpr uint32_t CACHE_MIN_ENTRIES = 8;
+        static constexpr uint32_t FORMAT_L2_MAX_CONFIG_ENTRIES = 16 * 1024 * 1024;
         static constexpr uint32_t FORMAT_L2_HOT_CAPACITY = 4096;
-        static constexpr uint32_t THREAD_L2_MAX_SIZE = 2048;
+        static constexpr uint32_t THREAD_L2_MAX_CONFIG_ENTRIES = 1024 * 1024;
         static constexpr uint32_t THREAD_L2_HOT_CAPACITY = 256;
 
         struct direct_cache_slot {
@@ -113,12 +118,27 @@ namespace bq {
 
         direct_cache_slot format_l1_[FORMAT_L1_SIZE];
         direct_cache_slot thread_l1_[THREAD_L1_SIZE];
-        bounded_hash_cache<FORMAT_L2_MAX_SIZE, FORMAT_L2_HOT_CAPACITY> format_l2_;
-        bounded_hash_cache<THREAD_L2_MAX_SIZE, THREAD_L2_HOT_CAPACITY> thread_l2_;
+        bounded_hash_cache<FORMAT_L2_MAX_CONFIG_ENTRIES, FORMAT_L2_HOT_CAPACITY> format_l2_ { DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES };
+        bounded_hash_cache<THREAD_L2_MAX_CONFIG_ENTRIES, THREAD_L2_HOT_CAPACITY> thread_l2_ { DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES };
+        uint32_t format_template_cache_max_entries_ = DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES;
+        uint32_t thread_info_cache_max_entries_ = DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES;
         uint64_t last_thread_id_;
         uint32_t last_thread_info_idx_;
         uint32_t current_format_template_max_index_;
         uint32_t current_thread_info_max_index_;
         uint64_t last_log_entry_epoch_;
+
+#if defined(BQ_UNIT_TEST)
+    public:
+        uint32_t get_format_template_cache_max_entries_for_test() const
+        {
+            return format_template_cache_max_entries_;
+        }
+
+        uint32_t get_thread_info_cache_max_entries_for_test() const
+        {
+            return thread_info_cache_max_entries_;
+        }
+#endif
     };
 }

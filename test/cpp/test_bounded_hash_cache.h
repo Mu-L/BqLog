@@ -19,19 +19,19 @@ namespace bq {
             static bool find_value(CACHE& cache, uint64_t key, uint32_t expected)
             {
                 uint32_t value = 0;
-                uint32_t insert_token = 0;
-                return cache.find(key, value, insert_token) && value == expected;
+                typename CACHE::insert_token token;
+                return cache.find(key, value, token) && value == expected;
             }
 
             static void test_basic(test_result& result)
             {
                 bq::bounded_hash_cache<32, 8> cache;
                 uint32_t value = 0;
-                uint32_t insert_token = UINT32_MAX;
-                result.add_result(!cache.find(7, value, insert_token), "bounded cache empty find");
-                result.add_result(insert_token == 0, "bounded cache insert token");
+                bq::bounded_hash_cache<32, 8>::insert_token token;
+                result.add_result(!cache.find(7, value, token), "bounded cache empty find");
+                result.add_result(!token.is_valid(), "bounded cache empty insert token");
 
-                cache.insert(7, 11, insert_token);
+                cache.insert(7, 11, token);
                 result.add_result(find_value(cache, 7, 11), "bounded cache token insert");
                 result.add_result(find_value(cache, 7, 11), "bounded cache hot find");
 
@@ -40,7 +40,82 @@ namespace bq {
 
                 cache.insert(9, 17);
                 result.add_result(find_value(cache, 9, 17), "bounded cache direct insert");
-                result.add_result(!cache.find(10, value, insert_token), "bounded cache missing key");
+                result.add_result(!cache.find(10, value, token) && token.is_valid(), "bounded cache missing key token");
+            }
+
+            static void test_insert_token(test_result& result)
+            {
+                bq::bounded_hash_cache<64, 8> cache;
+                for (uint32_t i = 0; i < 3; ++i) {
+                    cache.insert(make_key(i), i + 1);
+                }
+
+                uint32_t value = 0;
+                bq::bounded_hash_cache<64, 8>::insert_token token;
+                const uint64_t token_key = make_key(100);
+                bool success = !cache.find(token_key, value, token) && token.is_valid();
+                cache.insert(token_key, 101, token);
+                success &= find_value(cache, token_key, 101);
+                result.add_result(success, "bounded cache reusable insert token");
+
+                bq::bounded_hash_cache<64, 8>::insert_token stale_token;
+                const uint64_t stale_key = make_key(101);
+                success = !cache.find(stale_key, value, stale_token) && stale_token.is_valid();
+                cache.insert(make_key(102), 103);
+                cache.insert(stale_key, 102, stale_token);
+                success &= find_value(cache, stale_key, 102);
+                result.add_result(success, "bounded cache stale insert token fallback");
+
+                bq::bounded_hash_cache<64, 8>::insert_token resize_token;
+                const uint64_t resize_key = make_key(103);
+                success = !cache.find(resize_key, value, resize_token) && resize_token.is_valid();
+                cache.insert(resize_key, 104, resize_token);
+                success &= find_value(cache, resize_key, 104);
+                result.add_result(success, "bounded cache resize invalidates token safely");
+            }
+
+            static void test_resize_allocation_failure(test_result& result)
+            {
+                bq::bounded_hash_cache<64, 8> cache;
+                for (uint32_t i = 0; i < 4; ++i) {
+                    cache.insert(make_key(i), i + 1);
+                }
+
+                uint32_t value = 0;
+                bq::bounded_hash_cache<64, 8>::insert_token token;
+                const uint64_t failed_key = make_key(1000);
+                bool success = !cache.find(failed_key, value, token);
+                cache.fail_allocation_after_for_test(0);
+                cache.insert(failed_key, 1001, token);
+                for (uint32_t i = 0; i < 4; ++i) {
+                    success &= find_value(cache, make_key(i), i + 1);
+                }
+                success &= !cache.find(failed_key, value, token);
+                result.add_result(success, "bounded cache resize first allocation failure preserves entries");
+
+                cache.fail_allocation_after_for_test(1);
+                cache.insert(failed_key, 1001, token);
+                for (uint32_t i = 0; i < 4; ++i) {
+                    success &= find_value(cache, make_key(i), i + 1);
+                }
+                success &= !cache.find(failed_key, value, token);
+                result.add_result(success, "bounded cache resize second allocation failure preserves entries");
+
+                cache.clear_allocation_failure_for_test();
+                cache.insert(failed_key, 1001, token);
+                result.add_result(find_value(cache, failed_key, 1001), "bounded cache resize recovers after allocation failure");
+            }
+
+            static void test_runtime_max_size(test_result& result)
+            {
+                bq::bounded_hash_cache<128, 8> cache(16);
+                result.add_result(cache.get_max_size() == 16, "bounded cache runtime max size");
+                result.add_result(cache.set_max_size(32) && cache.get_max_size() == 32, "bounded cache resize max while empty");
+                cache.insert(make_key(1), 1);
+                result.add_result(cache.set_max_size(64) && cache.get_max_size() == 64, "bounded cache increase max while populated");
+                result.add_result(!cache.set_max_size(16) && cache.get_max_size() == 64, "bounded cache reject shrink while populated");
+                cache.clear();
+                result.add_result(cache.set_max_size(16) && cache.get_max_size() == 16, "bounded cache max change after clear");
             }
 
             static void test_growth_and_collisions(test_result& result)
@@ -93,9 +168,9 @@ namespace bq {
                 for (uint32_t i = 0; i < 64; ++i) {
                     admitted_key = (static_cast<uint64_t>(1000 + i) << 32) | (1000 + i);
                     uint32_t value = 0;
-                    uint32_t insert_token = 0;
-                    success &= !eviction_cache.find(admitted_key, value, insert_token);
-                    eviction_cache.insert(admitted_key, 1000 + i, insert_token);
+                    bq::bounded_hash_cache<8, 8>::insert_token token;
+                    success &= !eviction_cache.find(admitted_key, value, token);
+                    eviction_cache.insert(admitted_key, 1000 + i, token);
                 }
                 result.add_result(success, "bounded cache admission misses");
                 result.add_result(find_value(eviction_cache, admitted_key, 1063), "bounded cache admitted key");
@@ -103,9 +178,9 @@ namespace bq {
                 uint32_t old_key_count = 0;
                 for (uint32_t i = 0; i < 8; ++i) {
                     uint32_t value = 0;
-                    uint32_t insert_token = 0;
+                    bq::bounded_hash_cache<8, 8>::insert_token token;
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
-                    old_key_count += eviction_cache.find(key, value, insert_token) ? 1 : 0;
+                    old_key_count += eviction_cache.find(key, value, token) ? 1 : 0;
                 }
                 result.add_result(old_key_count == 7, "bounded cache single eviction");
             }
@@ -130,10 +205,10 @@ namespace bq {
                 cache.clear();
                 cache.clear();
                 uint32_t value = 0;
-                uint32_t insert_token = 0;
+                bq::bounded_hash_cache<256, 8>::insert_token token;
                 success = true;
                 for (uint32_t i = 0; i < 200; ++i) {
-                    success &= !cache.find(make_key(i), value, insert_token);
+                    success &= !cache.find(make_key(i), value, token);
                 }
                 result.add_result(success, "bounded cache clear");
 
@@ -164,9 +239,9 @@ namespace bq {
                 for (uint32_t i = 0; i < 64; ++i) {
                     admitted_key = make_key(200000 + i);
                     uint32_t value = 0;
-                    uint32_t insert_token = 0;
-                    success &= !cache.find(admitted_key, value, insert_token);
-                    cache.insert(admitted_key, 200000 + i, insert_token);
+                    bq::bounded_hash_cache<100000, 4096>::insert_token token;
+                    success &= !cache.find(admitted_key, value, token);
+                    cache.insert(admitted_key, 200000 + i, token);
                 }
                 result.add_result(success, "bounded cache production admission");
                 result.add_result(find_value(cache, admitted_key, 200063), "bounded cache production eviction");
@@ -177,6 +252,9 @@ namespace bq {
             {
                 test_result result;
                 test_basic(result);
+                test_insert_token(result);
+                test_resize_allocation_failure(result);
+                test_runtime_max_size(result);
                 test_growth_and_collisions(result);
                 test_exact_limit_and_eviction(result);
                 test_hot_bypass_and_clear(result);

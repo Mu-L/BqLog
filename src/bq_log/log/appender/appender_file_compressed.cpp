@@ -44,9 +44,120 @@ namespace bq {
         return ((size_t)data & mask_8_bytes_align) == 0;
     }
 
+    static uint32_t get_cache_max_entries_config(
+        const bq::property_value& config_obj,
+        const bq::string& appender_name,
+        const char* config_name,
+        uint32_t default_value,
+        uint32_t min_value,
+        uint32_t max_value)
+    {
+        const auto& configured = config_obj[config_name];
+        if (configured.is_null()) {
+            return default_value;
+        }
+        if (!configured.is_integral()) {
+            bq::util::log_device_console(
+                bq::log_level::warning,
+                "compressed appender \"%s\": \"%s\" must be an integer, use default value %" PRIu32,
+                appender_name.c_str(),
+                config_name,
+                default_value);
+            return default_value;
+        }
+
+        const int64_t configured_value = static_cast<int64_t>(configured);
+        if (configured_value < static_cast<int64_t>(min_value)) {
+            bq::util::log_device_console(
+                bq::log_level::warning,
+                "compressed appender \"%s\": \"%s\" value %" PRId64 " is too small, clamp to %" PRIu32,
+                appender_name.c_str(),
+                config_name,
+                configured_value,
+                min_value);
+            return min_value;
+        }
+        if (static_cast<uint64_t>(configured_value) > static_cast<uint64_t>(max_value)) {
+            bq::util::log_device_console(
+                bq::log_level::warning,
+                "compressed appender \"%s\": \"%s\" value %" PRId64 " is too large, clamp to %" PRIu32,
+                appender_name.c_str(),
+                config_name,
+                configured_value,
+                max_value);
+            return max_value;
+        }
+        return static_cast<uint32_t>(configured_value);
+    }
+
     bool appender_file_compressed::init_impl(const bq::property_value& config_obj)
     {
+        format_template_cache_max_entries_ = get_cache_max_entries_config(
+            config_obj,
+            get_name(),
+            "format_template_cache_max_entries",
+            DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES,
+            CACHE_MIN_ENTRIES,
+            FORMAT_L2_MAX_CONFIG_ENTRIES);
+        thread_info_cache_max_entries_ = get_cache_max_entries_config(
+            config_obj,
+            get_name(),
+            "thread_info_cache_max_entries",
+            DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES,
+            CACHE_MIN_ENTRIES,
+            THREAD_L2_MAX_CONFIG_ENTRIES);
+        format_l2_.clear();
+        thread_l2_.clear();
+        const bool format_cache_configured = format_l2_.set_max_size(format_template_cache_max_entries_);
+        const bool thread_cache_configured = thread_l2_.set_max_size(thread_info_cache_max_entries_);
+        assert(format_cache_configured && thread_cache_configured);
+        (void)format_cache_configured;
+        (void)thread_cache_configured;
         return appender_file_binary::init_impl(config_obj);
+    }
+
+    bool appender_file_compressed::reset_impl(const bq::property_value& config_obj)
+    {
+        const uint32_t new_format_template_cache_max_entries = get_cache_max_entries_config(
+            config_obj,
+            get_name(),
+            "format_template_cache_max_entries",
+            DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES,
+            CACHE_MIN_ENTRIES,
+            FORMAT_L2_MAX_CONFIG_ENTRIES);
+        const uint32_t new_thread_info_cache_max_entries = get_cache_max_entries_config(
+            config_obj,
+            get_name(),
+            "thread_info_cache_max_entries",
+            DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES,
+            CACHE_MIN_ENTRIES,
+            THREAD_L2_MAX_CONFIG_ENTRIES);
+        if (!appender_file_binary::reset_impl(config_obj)) {
+            return false;
+        }
+        if (new_format_template_cache_max_entries != format_template_cache_max_entries_) {
+            if (!format_l2_.set_max_size(new_format_template_cache_max_entries)) {
+                format_l2_.clear();
+                const bool configured =
+                    format_l2_.set_max_size(new_format_template_cache_max_entries);
+                assert(configured);
+                (void)configured;
+            }
+            format_template_cache_max_entries_ =
+                new_format_template_cache_max_entries;
+        }
+        if (new_thread_info_cache_max_entries != thread_info_cache_max_entries_) {
+            if (!thread_l2_.set_max_size(new_thread_info_cache_max_entries)) {
+                thread_l2_.clear();
+                const bool configured =
+                    thread_l2_.set_max_size(new_thread_info_cache_max_entries);
+                assert(configured);
+                (void)configured;
+            }
+            thread_info_cache_max_entries_ =
+                new_thread_info_cache_max_entries;
+        }
+        return true;
     }
 
     void appender_file_compressed::on_file_open(bool is_new_created)
@@ -271,7 +382,7 @@ namespace bq {
             && format_l1_[format_l1_index].key == format_template_hash) {
             format_template_idx = format_l1_[format_l1_index].value;
         } else {
-            uint32_t format_insert_token;
+            decltype(format_l2_)::insert_token format_insert_token;
             const bool format_template_found = format_l2_.find(format_template_hash, format_template_idx, format_insert_token);
             // write format template
             if (!format_template_found) {
@@ -347,7 +458,7 @@ namespace bq {
                 && thread_l1_[thread_l1_index].key == current_thread_id) {
                 thread_info_idx = thread_l1_[thread_l1_index].value;
             } else {
-                uint32_t thread_insert_token;
+                decltype(thread_l2_)::insert_token thread_insert_token;
                 const bool thread_info_found = thread_l2_.find(current_thread_id, thread_info_idx, thread_insert_token);
                 // write thread_info template
                 if (!thread_info_found) {

@@ -5,6 +5,7 @@
 - **Performance gain**: Typical workloads improve by approximately **10%–20%**; actual gains vary with thread count, log format, argument types, and output mode.
 - **Bug fix**: Fixed parsing of `log.buffer_policy_when_full`; the configured `discard`, `block`, or `expand` policy is now applied correctly instead of silently falling back to the default `block` policy.
 - **Configuration**: Added `write_cache_size` for file Appenders, allowing the per-Appender write cache to be tuned from 64 KiB to 4 MiB.
+- **Configuration**: Added `format_template_cache_max_entries` and `thread_info_cache_max_entries` for compressed file Appenders. Defaults remain `100000` and `2048`; exceeding the configured entry limit keeps memory bounded but may emit repeated templates and increase compressed file size.
 
 ## [v2.3.2] - 2026-07-12
 - **Bug fix**: [Embedded null bytes were dropped in decoder output #69](https://github.com/Tencent/BqLog/issues/69) — the log decoder now preserves embedded null bytes intact.

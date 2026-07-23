@@ -19,7 +19,20 @@ namespace bq {
     template <uint32_t MAX_SIZE, uint32_t HOT_MAX_CAPACITY>
     class bounded_hash_cache {
     public:
-        bounded_hash_cache() = default;
+        struct insert_token {
+            uint32_t slot_index = UINT32_MAX;
+            uint32_t table_revision = 0;
+
+            bool is_valid() const
+            {
+                return slot_index != UINT32_MAX;
+            }
+        };
+
+        explicit bounded_hash_cache(uint32_t max_size = MAX_SIZE)
+            : max_size_(normalize_max_size(max_size))
+        {
+        }
 
         ~bounded_hash_cache()
         {
@@ -29,7 +42,7 @@ namespace bq {
             free(hot_values_);
         }
 
-        bq_forceinline bool find(uint64_t key, uint32_t& value, uint32_t& insert_token)
+        bq_forceinline bool find(uint64_t key, uint32_t& value, insert_token& token)
         {
             if (hot_values_ && !hot_bypassed_) {
                 const uint32_t hot_hash = get_hot_hash(key);
@@ -49,9 +62,11 @@ namespace bq {
                 }
             }
 
-            const uint32_t slot_index = find_slot(key);
-            if (slot_index == invalid_value) {
-                insert_token = 0;
+            bool found = false;
+            const uint32_t slot_index = find_slot_or_empty(key, found);
+            if (!found) {
+                token.slot_index = slot_index;
+                token.table_revision = table_revision_;
                 return false;
             }
             value = values_[slot_index];
@@ -64,17 +79,36 @@ namespace bq {
         bq_forceinline void insert(uint64_t key, uint32_t value)
         {
             update_hot(key, value);
-            const uint32_t slot_index = find_slot(key);
-            if (slot_index != invalid_value) {
+            bool found = false;
+            const uint32_t slot_index = find_slot_or_empty(key, found);
+            if (found) {
                 values_[slot_index] = value;
             } else {
-                insert_new(key, value);
+                insert_new(key, value, insert_token());
             }
         }
 
-        bq_forceinline void insert(uint64_t key, uint32_t value, uint32_t)
+        bq_forceinline void insert(uint64_t key, uint32_t value, const insert_token& token)
         {
-            insert_new(key, value);
+            insert_new(key, value, token);
+        }
+
+        bool set_max_size(uint32_t max_size)
+        {
+            const uint32_t normalized = normalize_max_size(max_size);
+            if (normalized == max_size_) {
+                return true;
+            }
+            if (size_ != 0 && normalized < max_size_) {
+                return false;
+            }
+            max_size_ = normalized;
+            return true;
+        }
+
+        uint32_t get_max_size() const
+        {
+            return max_size_;
         }
 
         void clear()
@@ -91,10 +125,30 @@ namespace bq {
             hot_queries_ = 0;
             hot_hits_ = 0;
             hot_bypassed_ = false;
+            ++table_revision_;
         }
+
+#if defined(BQ_UNIT_TEST)
+        void fail_allocation_after_for_test(int32_t successful_allocations_before_failure)
+        {
+            allocation_successes_before_failure_ = successful_allocations_before_failure;
+        }
+
+        void clear_allocation_failure_for_test()
+        {
+            allocation_successes_before_failure_ = -1;
+        }
+#endif
 
     private:
         static constexpr uint32_t invalid_value = static_cast<uint32_t>(-1);
+
+        static constexpr uint32_t normalize_max_size(uint32_t max_size)
+        {
+            return max_size < min_capacity
+                ? min_capacity
+                : (max_size > MAX_SIZE ? MAX_SIZE : max_size);
+        }
 
         static bq_forceinline uint32_t get_hot_hash(uint64_t key)
         {
@@ -106,72 +160,68 @@ namespace bq {
             return static_cast<uint32_t>(key ^ (key >> 32));
         }
 
-        bq_forceinline uint32_t find_slot(uint64_t key) const
+        bq_forceinline uint32_t find_slot_or_empty(uint64_t key, bool& found) const
         {
             if (!values_) {
+                found = false;
                 return invalid_value;
             }
             uint32_t slot_index = get_table_hash(key) & (capacity_ - 1);
             while (values_[slot_index] != invalid_value) {
                 if (keys_[slot_index] == key) {
+                    found = true;
                     return slot_index;
                 }
                 slot_index = (slot_index + 1) & (capacity_ - 1);
             }
-            return invalid_value;
+            found = false;
+            return slot_index;
+        }
+
+        void* allocate_bytes(size_t size)
+        {
+#if defined(BQ_UNIT_TEST)
+            if (allocation_successes_before_failure_ >= 0) {
+                if (allocation_successes_before_failure_ == 0) {
+                    allocation_successes_before_failure_ = -1;
+                    return nullptr;
+                }
+                --allocation_successes_before_failure_;
+            }
+#endif
+            return malloc(size);
         }
 
         bool resize(uint32_t new_capacity)
         {
-            uint8_t* old_entries = nullptr;
-            uint64_t* old_keys = nullptr;
-            uint32_t* old_values = nullptr;
-            const uint32_t old_size = size_;
-            if (old_size) {
-                old_entries = static_cast<uint8_t*>(malloc((sizeof(uint64_t) + sizeof(uint32_t)) * old_size));
-                if (!old_entries) {
-                    return false;
-                }
-                old_keys = reinterpret_cast<uint64_t*>(old_entries);
-                old_values = reinterpret_cast<uint32_t*>(old_entries + sizeof(uint64_t) * old_size);
-                uint32_t entry_index = 0;
-                for (uint32_t i = 0; i < capacity_; ++i) {
-                    if (values_[i] != invalid_value) {
-                        old_keys[entry_index] = keys_[i];
-                        old_values[entry_index] = values_[i];
-                        ++entry_index;
-                    }
-                }
-                free(keys_);
-                free(values_);
-                keys_ = nullptr;
-                values_ = nullptr;
-                capacity_ = 0;
+            uint64_t* new_keys = static_cast<uint64_t*>(allocate_bytes(sizeof(uint64_t) * new_capacity));
+            if (!new_keys) {
+                return false;
             }
-
-            uint64_t* new_keys = static_cast<uint64_t*>(malloc(sizeof(uint64_t) * new_capacity));
-            uint32_t* new_values = static_cast<uint32_t*>(malloc(sizeof(uint32_t) * new_capacity));
+            uint32_t* new_values = static_cast<uint32_t*>(allocate_bytes(sizeof(uint32_t) * new_capacity));
             if (!new_keys || !new_values) {
                 free(new_keys);
                 free(new_values);
-                free(old_entries);
-                size_ = 0;
                 return false;
             }
             memset(new_values, 0xFF, sizeof(uint32_t) * new_capacity);
-            for (uint32_t i = 0; i < old_size; ++i) {
-                uint32_t slot_index = get_table_hash(old_keys[i]) & (new_capacity - 1);
-                while (new_values[slot_index] != invalid_value) {
-                    slot_index = (slot_index + 1) & (new_capacity - 1);
+            for (uint32_t i = 0; i < capacity_; ++i) {
+                if (values_[i] != invalid_value) {
+                    uint32_t slot_index = get_table_hash(keys_[i]) & (new_capacity - 1);
+                    while (new_values[slot_index] != invalid_value) {
+                        slot_index = (slot_index + 1) & (new_capacity - 1);
+                    }
+                    new_keys[slot_index] = keys_[i];
+                    new_values[slot_index] = values_[i];
                 }
-                new_keys[slot_index] = old_keys[i];
-                new_values[slot_index] = old_values[i];
             }
-            free(old_entries);
+            free(keys_);
+            free(values_);
             keys_ = new_keys;
             values_ = new_values;
             capacity_ = new_capacity;
             victim_ = 0;
+            ++table_revision_;
             return true;
         }
 
@@ -191,19 +241,20 @@ namespace bq {
             }
             values_[empty] = invalid_value;
             --size_;
+            ++table_revision_;
         }
 
-        bq_forceinline void insert_new(uint64_t key, uint32_t value)
+        bq_forceinline void insert_new(uint64_t key, uint32_t value, const insert_token& token)
         {
             if (!values_) {
                 if (!resize(min_capacity)) {
                     return;
                 }
-            } else if (size_ < MAX_SIZE && size_ >= capacity_ / 2) {
+            } else if (size_ < max_size_ && size_ >= capacity_ / 2) {
                 if (!resize(capacity_ * 2)) {
                     return;
                 }
-            } else if (size_ >= MAX_SIZE) {
+            } else if (size_ >= max_size_) {
                 if ((++admission_ & 63) != 0) {
                     return;
                 }
@@ -215,13 +266,23 @@ namespace bq {
                 erase(old_victim);
             }
 
-            uint32_t slot_index = get_table_hash(key) & (capacity_ - 1);
-            while (values_[slot_index] != invalid_value) {
-                slot_index = (slot_index + 1) & (capacity_ - 1);
+            uint32_t slot_index = invalid_value;
+            if (token.table_revision == table_revision_
+                && token.slot_index < capacity_
+                && values_[token.slot_index] == invalid_value) {
+                slot_index = token.slot_index;
+            } else {
+                bool found = false;
+                slot_index = find_slot_or_empty(key, found);
+                if (found) {
+                    values_[slot_index] = value;
+                    return;
+                }
             }
             keys_[slot_index] = key;
             values_[slot_index] = value;
             ++size_;
+            ++table_revision_;
         }
 
         bq_forceinline bool find_hot(uint64_t key, uint32_t hot_hash, uint32_t& value) const
@@ -277,8 +338,11 @@ namespace bq {
 
         bool resize_hot(uint32_t new_capacity)
         {
-            uint64_t* new_keys = static_cast<uint64_t*>(malloc(sizeof(uint64_t) * new_capacity));
-            uint32_t* new_values = static_cast<uint32_t*>(malloc(sizeof(uint32_t) * new_capacity));
+            uint64_t* new_keys = static_cast<uint64_t*>(allocate_bytes(sizeof(uint64_t) * new_capacity));
+            if (!new_keys) {
+                return false;
+            }
+            uint32_t* new_values = static_cast<uint32_t*>(allocate_bytes(sizeof(uint32_t) * new_capacity));
             if (!new_keys || !new_values) {
                 free(new_keys);
                 free(new_values);
@@ -350,5 +414,11 @@ namespace bq {
         uint32_t hot_queries_ = 0;
         uint32_t hot_hits_ = 0;
         bool hot_bypassed_ = false;
+        uint32_t max_size_ = MAX_SIZE;
+        uint32_t table_revision_ = 0;
+
+#if defined(BQ_UNIT_TEST)
+        int32_t allocation_successes_before_failure_ = -1;
+#endif
     };
 }

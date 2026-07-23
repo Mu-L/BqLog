@@ -81,6 +81,8 @@ snapshot.categories_mask=[ModuleA.SystemA.ClassA,ModuleB]
 | `expire_time_days`          | No       | Positive integer or `0`                            | `0` (No clean)       | No               | Yes                | Yes                      |
 | `capacity_limit`            | No       | Positive integer or `0`                            | `0` (Unlimited)       | No               | Yes                | Yes                      |
 | `write_cache_size`          | No       | Positive integer (`65536` to `4194304`)            | `65536`               | No               | Yes                | Yes                      |
+| `format_template_cache_max_entries` | No | Positive integer (`8` to `16777216`)              | `100000`              | No               | No                 | Yes                      |
+| `thread_info_cache_max_entries` | No   | Positive integer (`8` to `1048576`)                | `2048`                | No               | No                 | Yes                      |
 | `categories_mask`           | No       | String array (`[]`)                       | Empty (No filtering)        | Yes               | Yes                | Yes                      |
 | `always_create_new_file`    | No       | `true` / `false`                        | `false`            | No               | Yes                | Yes                      |
 | `enable_rolling_log_file`    | No       | `true` / `false`                        | `true`            | No               | Yes                | Yes                      |
@@ -152,6 +154,8 @@ If it is relative path, it is based on directory corresponding to `base_dir_type
 - `expire_time_days`: Clean up expired files by days; `0` disables this function.
 - `capacity_limit`: Limit total size of files output by this Appender, delete from oldest files by time when exceeded.
 - `write_cache_size`: In-memory file write cache size in bytes. Values are clamped to 64 KiB–4 MiB and rounded up to a power of two. Larger values reduce write system-call frequency at the cost of memory usage per file Appender.
+- `format_template_cache_max_entries`: Maximum number of format-template lookup entries retained by a CompressedFileAppender. The default is `100000`; values are clamped to `8`–`16777216`. The main lookup table uses approximately `12 * next_power_of_two(2 * max_entries)` bytes, plus a small L1/hot cache. When a log file uses more distinct format templates than this limit, logging and decoding remain correct, but an evicted template may be written to the compressed file again and increase file size. Changes made through `reset_config` take effect immediately; shrinking the limit clears the current L2 lookup table.
+- `thread_info_cache_max_entries`: Maximum number of thread-info lookup entries retained by a CompressedFileAppender. The default is `2048`; values are clamped to `8`–`1048576`. Exceeding the limit does not drop logs, but an evicted thread-info template may be emitted again. Changes made through `reset_config` take effect immediately; shrinking the limit clears the corresponding L2 lookup table. Both compressed-cache limits are entry counts, not byte sizes.
 - `categories_mask`: Output logs only when log Category matches prefix in this array (see [Advanced Usage — Category](./ADVANCED_USAGE.md#2-log-objects-with-category-support)).
 - `always_create_new_file`: When `true`, create new file every time process restarts even within same day; default `false` is append write.
 - `enable_rolling_log_file`: When `true` (default), enable rolling file function by date.

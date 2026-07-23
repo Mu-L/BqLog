@@ -15,6 +15,7 @@
 #include "bq_common_test/test_array.h"
 #include "bq_common_test/test_hash_map.h"
 #include "test_bounded_hash_cache.h"
+#include "test_compressed_cache.h"
 #include "bq_common_test/test_string.h"
 #include "bq_common_test/test_file_manager.h"
 #include "bq_common_test/test_property.h"
@@ -107,6 +108,7 @@ int32_t main_logic()
 
     TEST_GROUP_BEGIN(Bq_Log_Test);
     TEST_GROUP(Bq_Log_Test, bq::test, test_bounded_hash_cache);
+    TEST_GROUP(Bq_Log_Test, bq::test, test_compressed_cache);
     bq::file_manager::remove_file_or_dir(TO_ABSOLUTE_PATH("bqlog_mmap", 0));
     TEST_GROUP(Bq_Log_Test, bq::test, test_log_buffer);
     TEST_GROUP(Bq_Log_Test, bq::test, test_log_appender);
