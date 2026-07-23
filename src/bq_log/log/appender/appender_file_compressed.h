@@ -50,7 +50,7 @@
 
  */
 #include "bq_log/log/appender/appender_file_binary.h"
-#include "bq_log/log/appender/fixed_set_cache.h"
+#include "bq_log/types/bounded_hash_cache.h"
 
 namespace bq {
     class appender_file_compressed : public appender_file_binary {
@@ -101,9 +101,10 @@ namespace bq {
         static constexpr uint32_t CACHE_EMPTY = static_cast<uint32_t>(-1);
         static constexpr uint32_t FORMAT_L1_SIZE = 256;
         static constexpr uint32_t THREAD_L1_SIZE = 64;
-        static constexpr uint32_t FORMAT_L2_SET_COUNT = 65536;
-        static constexpr uint32_t THREAD_L2_SET_COUNT = 512;
-        static constexpr uint32_t L2_WAY_COUNT = 4;
+        static constexpr uint32_t FORMAT_L2_MAX_SIZE = 100000;
+        static constexpr uint32_t FORMAT_L2_HOT_CAPACITY = 4096;
+        static constexpr uint32_t THREAD_L2_MAX_SIZE = 2048;
+        static constexpr uint32_t THREAD_L2_HOT_CAPACITY = 256;
 
         struct direct_cache_slot {
             uint64_t key;
@@ -112,8 +113,10 @@ namespace bq {
 
         direct_cache_slot format_l1_[FORMAT_L1_SIZE];
         direct_cache_slot thread_l1_[THREAD_L1_SIZE];
-        fixed_set_cache<FORMAT_L2_SET_COUNT, L2_WAY_COUNT> format_l2_;
-        fixed_set_cache<THREAD_L2_SET_COUNT, L2_WAY_COUNT> thread_l2_;
+        bounded_hash_cache<FORMAT_L2_MAX_SIZE, FORMAT_L2_HOT_CAPACITY> format_l2_;
+        bounded_hash_cache<THREAD_L2_MAX_SIZE, THREAD_L2_HOT_CAPACITY> thread_l2_;
+        uint64_t last_thread_id_;
+        uint32_t last_thread_info_idx_;
         uint32_t current_format_template_max_index_;
         uint32_t current_thread_info_max_index_;
         uint64_t last_log_entry_epoch_;

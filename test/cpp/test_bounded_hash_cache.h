@@ -1,0 +1,188 @@
+#pragma once
+
+#include "bq_log/types/bounded_hash_cache.h"
+#include "test_base.h"
+
+namespace bq {
+    namespace test {
+        class test_bounded_hash_cache : public test_base {
+        private:
+            static uint64_t make_key(uint64_t value)
+            {
+                value += UINT64_C(0x9E3779B97F4A7C15);
+                value = (value ^ (value >> 30)) * UINT64_C(0xBF58476D1CE4E5B9);
+                value = (value ^ (value >> 27)) * UINT64_C(0x94D049BB133111EB);
+                return value ^ (value >> 31);
+            }
+
+            template <typename CACHE>
+            static bool find_value(CACHE& cache, uint64_t key, uint32_t expected)
+            {
+                uint32_t value = 0;
+                uint32_t insert_token = 0;
+                return cache.find(key, value, insert_token) && value == expected;
+            }
+
+            static void test_basic(test_result& result)
+            {
+                bq::bounded_hash_cache<32, 8> cache;
+                uint32_t value = 0;
+                uint32_t insert_token = UINT32_MAX;
+                result.add_result(!cache.find(7, value, insert_token), "bounded cache empty find");
+                result.add_result(insert_token == 0, "bounded cache insert token");
+
+                cache.insert(7, 11, insert_token);
+                result.add_result(find_value(cache, 7, 11), "bounded cache token insert");
+                result.add_result(find_value(cache, 7, 11), "bounded cache hot find");
+
+                cache.insert(7, 29);
+                result.add_result(find_value(cache, 7, 29), "bounded cache update hot value");
+
+                cache.insert(9, 17);
+                result.add_result(find_value(cache, 9, 17), "bounded cache direct insert");
+                result.add_result(!cache.find(10, value, insert_token), "bounded cache missing key");
+            }
+
+            static void test_growth_and_collisions(test_result& result)
+            {
+                bq::bounded_hash_cache<128, 16> cache;
+                for (uint32_t i = 0; i < 100; ++i) {
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    cache.insert(key, i + 1);
+                }
+
+                bool success = true;
+                for (uint32_t i = 0; i < 100; ++i) {
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    success &= find_value(cache, key, i + 1);
+                }
+                result.add_result(success, "bounded cache collision growth");
+
+                for (uint32_t i = 0; i < 100; i += 3) {
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    cache.insert(key, i + 1000);
+                }
+                success = true;
+                for (uint32_t i = 0; i < 100; ++i) {
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    const uint32_t expected = (i % 3 == 0) ? (i + 1000) : (i + 1);
+                    success &= find_value(cache, key, expected);
+                }
+                result.add_result(success, "bounded cache collision update");
+            }
+
+            static void test_exact_limit_and_eviction(test_result& result)
+            {
+                bq::bounded_hash_cache<64, 8> exact_limit_cache;
+                for (uint32_t i = 0; i < 64; ++i) {
+                    exact_limit_cache.insert(make_key(i), i);
+                }
+                bool success = true;
+                for (uint32_t i = 0; i < 64; ++i) {
+                    success &= find_value(exact_limit_cache, make_key(i), i);
+                }
+                result.add_result(success, "bounded cache exact limit");
+
+                bq::bounded_hash_cache<8, 8> eviction_cache;
+                for (uint32_t i = 0; i < 8; ++i) {
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    eviction_cache.insert(key, i);
+                }
+
+                uint64_t admitted_key = 0;
+                for (uint32_t i = 0; i < 64; ++i) {
+                    admitted_key = (static_cast<uint64_t>(1000 + i) << 32) | (1000 + i);
+                    uint32_t value = 0;
+                    uint32_t insert_token = 0;
+                    success &= !eviction_cache.find(admitted_key, value, insert_token);
+                    eviction_cache.insert(admitted_key, 1000 + i, insert_token);
+                }
+                result.add_result(success, "bounded cache admission misses");
+                result.add_result(find_value(eviction_cache, admitted_key, 1063), "bounded cache admitted key");
+
+                uint32_t old_key_count = 0;
+                for (uint32_t i = 0; i < 8; ++i) {
+                    uint32_t value = 0;
+                    uint32_t insert_token = 0;
+                    const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
+                    old_key_count += eviction_cache.find(key, value, insert_token) ? 1 : 0;
+                }
+                result.add_result(old_key_count == 7, "bounded cache single eviction");
+            }
+
+            static void test_hot_bypass_and_clear(test_result& result)
+            {
+                bq::bounded_hash_cache<256, 8> cache;
+                for (uint32_t i = 0; i < 200; ++i) {
+                    cache.insert(make_key(i), i + 1);
+                }
+
+                bool success = find_value(cache, make_key(0), 1);
+                for (uint32_t i = 0; i < 8192; ++i) {
+                    const uint32_t key_index = i % 200;
+                    success &= find_value(cache, make_key(key_index), key_index + 1);
+                }
+                for (uint32_t i = 0; i < 200; ++i) {
+                    success &= find_value(cache, make_key(i), i + 1);
+                }
+                result.add_result(success, "bounded cache hot bypass");
+
+                cache.clear();
+                cache.clear();
+                uint32_t value = 0;
+                uint32_t insert_token = 0;
+                success = true;
+                for (uint32_t i = 0; i < 200; ++i) {
+                    success &= !cache.find(make_key(i), value, insert_token);
+                }
+                result.add_result(success, "bounded cache clear");
+
+                for (uint32_t i = 0; i < 128; ++i) {
+                    cache.insert(make_key(1000 + i), i + 7);
+                }
+                success = true;
+                for (uint32_t i = 0; i < 128; ++i) {
+                    success &= find_value(cache, make_key(1000 + i), i + 7);
+                }
+                result.add_result(success, "bounded cache reuse after clear");
+            }
+
+            static void test_production_capacity(test_result& result)
+            {
+                bq::bounded_hash_cache<100000, 4096> cache;
+                for (uint32_t i = 0; i < 100000; ++i) {
+                    cache.insert(make_key(i), i);
+                }
+
+                bool success = true;
+                for (uint32_t i = 0; i < 100000; ++i) {
+                    success &= find_value(cache, make_key(i), i);
+                }
+                result.add_result(success, "bounded cache production capacity");
+
+                uint64_t admitted_key = 0;
+                for (uint32_t i = 0; i < 64; ++i) {
+                    admitted_key = make_key(200000 + i);
+                    uint32_t value = 0;
+                    uint32_t insert_token = 0;
+                    success &= !cache.find(admitted_key, value, insert_token);
+                    cache.insert(admitted_key, 200000 + i, insert_token);
+                }
+                result.add_result(success, "bounded cache production admission");
+                result.add_result(find_value(cache, admitted_key, 200063), "bounded cache production eviction");
+            }
+
+        public:
+            virtual test_result test() override
+            {
+                test_result result;
+                test_basic(result);
+                test_growth_and_collisions(result);
+                test_exact_limit_and_eviction(result);
+                test_hot_bypass_and_clear(result);
+                test_production_capacity(result);
+                return result;
+            }
+        };
+    }
+}
