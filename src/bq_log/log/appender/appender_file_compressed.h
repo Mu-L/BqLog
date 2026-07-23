@@ -50,6 +50,7 @@
 
  */
 #include "bq_log/log/appender/appender_file_binary.h"
+#include "bq_log/log/appender/fixed_set_cache.h"
 
 namespace bq {
     class appender_file_compressed : public appender_file_binary {
@@ -97,25 +98,24 @@ namespace bq {
         void reset();
 
     private:
-        bq::hash_map_inline<uint64_t, uint32_t> format_templates_hash_cache_;
-        uint32_t current_format_template_max_index_;
-        bq::hash_map_inline<uint64_t, uint32_t> thread_info_hash_cache_;
-        uint32_t current_thread_info_max_index_;
-        uint64_t last_thread_info_id_;
-        uint32_t last_thread_info_idx_;
-        uint64_t last_log_entry_epoch_;
+        static constexpr uint32_t CACHE_EMPTY = static_cast<uint32_t>(-1);
+        static constexpr uint32_t FORMAT_L1_SIZE = 256;
+        static constexpr uint32_t THREAD_L1_SIZE = 64;
+        static constexpr uint32_t FORMAT_L2_SET_COUNT = 65536;
+        static constexpr uint32_t THREAD_L2_SET_COUNT = 512;
+        static constexpr uint32_t L2_WAY_COUNT = 4;
 
-        // Direct-mapped MRU cache in front of format_templates_hash_cache_ to skip
-        // the hash_map_inline::find on the hot path. Read-through only; no log
-        // file / protocol impact.
-        // Sized as an empirical L1 hot-set estimate for a typical ~30 high-frequency
-        // templates (direct-mapped needs headroom above the working set).
-        static constexpr uint32_t FMT_TEMPLATE_MRU_SIZE = 256; // must be a power of two
-        static constexpr uint32_t FMT_TEMPLATE_MRU_EMPTY = static_cast<uint32_t>(-1);
-        struct format_template_mru_slot {
+        struct direct_cache_slot {
             uint64_t key;
-            uint32_t idx;
+            uint32_t value;
         };
-        format_template_mru_slot format_template_mru_[FMT_TEMPLATE_MRU_SIZE];
+
+        direct_cache_slot format_l1_[FORMAT_L1_SIZE];
+        direct_cache_slot thread_l1_[THREAD_L1_SIZE];
+        fixed_set_cache<FORMAT_L2_SET_COUNT, L2_WAY_COUNT> format_l2_;
+        fixed_set_cache<THREAD_L2_SET_COUNT, L2_WAY_COUNT> thread_l2_;
+        uint32_t current_format_template_max_index_;
+        uint32_t current_thread_info_max_index_;
+        uint64_t last_log_entry_epoch_;
     };
 }

@@ -46,12 +46,7 @@ namespace bq {
 
     bool appender_file_compressed::init_impl(const bq::property_value& config_obj)
     {
-        if (!appender_file_binary::init_impl(config_obj)) {
-            return false;
-        }
-        thread_info_hash_cache_.set_expand_rate(4);
-        format_templates_hash_cache_.set_expand_rate(4);
-        return true;
+        return appender_file_binary::init_impl(config_obj);
     }
 
     void appender_file_compressed::on_file_open(bool is_new_created)
@@ -212,7 +207,7 @@ namespace bq {
         }
 
         uint64_t format_template_hash = get_format_template_hash((bq::log_level)level_byte, category_idx, fmt_str_hash);
-        format_templates_hash_cache_[format_template_hash] = current_format_template_max_index_;
+        format_l2_.insert(format_template_hash, current_format_template_max_index_);
         ++current_format_template_max_index_;
         return true;
     }
@@ -228,15 +223,16 @@ namespace bq {
 
     void appender_file_compressed::reset()
     {
-        format_templates_hash_cache_.clear();
-        thread_info_hash_cache_.clear();
+        format_l2_.clear();
+        thread_l2_.clear();
         current_format_template_max_index_ = 0;
         current_thread_info_max_index_ = 0;
-        last_thread_info_id_ = UINT64_MAX;
-        last_thread_info_idx_ = static_cast<uint32_t>(-1);
         last_log_entry_epoch_ = 0;
-        for (uint32_t i = 0; i < FMT_TEMPLATE_MRU_SIZE; ++i) {
-            format_template_mru_[i].idx = FMT_TEMPLATE_MRU_EMPTY;
+        for (uint32_t i = 0; i < FORMAT_L1_SIZE; ++i) {
+            format_l1_[i].value = CACHE_EMPTY;
+        }
+        for (uint32_t i = 0; i < THREAD_L1_SIZE; ++i) {
+            thread_l1_[i].value = CACHE_EMPTY;
         }
     }
 
@@ -268,15 +264,15 @@ namespace bq {
         uint64_t format_template_hash = get_format_template_hash(handle.get_level(), handle.get_log_head().category_idx, fmt_hash);
 
         uint32_t format_template_idx = (uint32_t)-1;
-        const uint32_t fmt_mru_slot = (uint32_t)(format_template_hash & (FMT_TEMPLATE_MRU_SIZE - 1));
-        if (format_template_mru_[fmt_mru_slot].idx != FMT_TEMPLATE_MRU_EMPTY
-            && format_template_mru_[fmt_mru_slot].key == format_template_hash) {
-            // MRU hit: skip the hash_map lookup entirely.
-            format_template_idx = format_template_mru_[fmt_mru_slot].idx;
+        const uint32_t format_l1_index = static_cast<uint32_t>(format_template_hash & (FORMAT_L1_SIZE - 1));
+        if (format_l1_[format_l1_index].value != CACHE_EMPTY
+            && format_l1_[format_l1_index].key == format_template_hash) {
+            format_template_idx = format_l1_[format_l1_index].value;
         } else {
-            auto format_template_iter = format_templates_hash_cache_.find(format_template_hash);
+            uint32_t format_insert_token;
+            const bool format_template_found = format_l2_.find(format_template_hash, format_template_idx, format_insert_token);
             // write format template
-            if (format_template_iter == format_templates_hash_cache_.end()) {
+            if (!format_template_found) {
                 constexpr size_t VLQ_MAX_SIZE = bq::log_utils::vlq::vlq_max_bytes_count<uint32_t>();
                 uint32_t fmt_size_calculated = 0;
                 bool success = true;
@@ -331,25 +327,25 @@ namespace bq {
                     success = true;
                 } while (!success);
 
-                format_templates_hash_cache_[format_template_hash] = current_format_template_max_index_;
                 format_template_idx = current_format_template_max_index_;
+                format_l2_.insert(format_template_hash, format_template_idx, format_insert_token);
                 ++current_format_template_max_index_;
-            } else {
-                format_template_idx = format_template_iter->value();
             }
-            // Populate the MRU slot for both the newly-written and existing-template cases.
-            format_template_mru_[fmt_mru_slot].key = format_template_hash;
-            format_template_mru_[fmt_mru_slot].idx = format_template_idx;
+            format_l1_[format_l1_index].key = format_template_hash;
+            format_l1_[format_l1_index].value = format_template_idx;
         }
 
         uint32_t thread_info_idx = (uint32_t)-1;
         const uint64_t current_thread_id = handle.get_log_head().log_thread_id;
-        if (current_thread_id == last_thread_info_id_) {
-            thread_info_idx = last_thread_info_idx_;
+        const uint32_t thread_l1_index = static_cast<uint32_t>((current_thread_id * UINT64_C(11400714819323198485)) >> 58);
+        if (thread_l1_[thread_l1_index].value != CACHE_EMPTY
+            && thread_l1_[thread_l1_index].key == current_thread_id) {
+            thread_info_idx = thread_l1_[thread_l1_index].value;
         } else {
-            auto thread_info__iter = thread_info_hash_cache_.find(current_thread_id);
+            uint32_t thread_insert_token;
+            const bool thread_info_found = thread_l2_.find(current_thread_id, thread_info_idx, thread_insert_token);
             // write thread_info template
-            if (thread_info__iter == thread_info_hash_cache_.end()) {
+            if (!thread_info_found) {
                 const auto& ext_info = handle.get_ext_head();
                 constexpr size_t VLQ_MAX_SIZE = bq::log_utils::vlq::vlq_max_bytes_count<decltype(current_thread_info_max_index_)>();
                 constexpr size_t VLQ_MAX_SIZE_64 = bq::log_utils::vlq::vlq_max_bytes_count<decltype(handle.get_log_head().log_thread_id)>();
@@ -374,14 +370,12 @@ namespace bq {
                 auto real_body_len_size = bq::log_utils::vlq::vlq_encode(real_body_len, write_handle.data() + 1, 1);
                 assert(real_body_len_size == 1 && "thread info template size encoding error");
                 return_write_cache(write_handle);
-                thread_info_hash_cache_[current_thread_id] = current_thread_info_max_index_;
                 thread_info_idx = current_thread_info_max_index_;
+                thread_l2_.insert(current_thread_id, thread_info_idx, thread_insert_token);
                 ++current_thread_info_max_index_;
-            } else {
-                thread_info_idx = thread_info__iter->value();
             }
-            last_thread_info_id_ = current_thread_id;
-            last_thread_info_idx_ = thread_info_idx;
+            thread_l1_[thread_l1_index].key = current_thread_id;
+            thread_l1_[thread_l1_index].value = thread_info_idx;
         }
 
         // write log entry
