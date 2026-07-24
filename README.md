@@ -26,8 +26,8 @@
 
 ## 📋 What's New in v2.4.0
 
-- **Performance — Raising the bar once again** — Added `thread_info` caching, accelerated TLS access, inlined critical hot paths, optimized integer formatting, and improved L1 cache utilization for compressed logging.
-- Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
+- **Performance — Raising the bar once again** — Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
+- **Bug fix** — [Completely resolved the issue where memory usage could keep growing in certain cases when logging with compressed file Appenders (#70)](https://github.com/Tencent/BqLog/issues/70).
 - **Bug fix** — Fixed `log.buffer_policy_when_full` parsing so `discard`, `block`, and `expand` are applied correctly.
 - **Configuration** — Added the `write_cache_size` option for tuning each file Appender's write cache from 64 KiB to 4 MiB.
 

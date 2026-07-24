@@ -21,7 +21,7 @@ Test Cases:
 
 Comparison Objects:
 
-- BqLog 2.x (C++, TextFileAppender, CompressedFileAppender, and CompressedFileAppender with Encryption)
+- BqLog 2.4.0 (C++, TextFileAppender, CompressedFileAppender, and CompressedFileAppender with Encryption)
 - spdlog 1.17.0 (synchronous file logger)
 - glog 0.7.1 (synchronous file logger, stream-based API)
 - fmtlog (async file logger, compiled with `FMTLOG_BLOCK=1` to prevent log dropping)
@@ -36,9 +36,9 @@ All time costs are in milliseconds, smaller values mean higher performance.
 
 |                              | 1 Thread | 2 Threads | 3 Threads | 4 Threads | 5 Threads | 6 Threads | 7 Threads | 8 Threads | 9 Threads | 10 Threads |
 |------------------------------|----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|
-| BqLog Compress (C++)         | 79       | 99        | 115       | 170       | 222       | 311       | 324       | 372       | 484       | 759        |
-| BqLog Compress+Encrypt (C++) | 83       | 106       | 134       | 189       | 223       | 328       | 337       | 390       | 532       | 995        |
-| BqLog Text (C++)             | 202      | 417       | 648       | 910       | 1167      | 1425      | 1718      | 1969      | 2281      | 2718       |
+| BqLog Compress (C++)         | 64       | 105       | 122       | 163       | 251       | 313       | 372       | 413       | 496       | 729        |
+| BqLog Compress+Encrypt (C++) | 71       | 114       | 127       | 176       | 250       | 313       | 370       | 428       | 502       | 744        |
+| BqLog Text (C++)             | 198      | 399       | 618       | 880       | 1137      | 1405      | 1692      | 1931      | 2244      | 2685       |
 | fmtlog                       | 248      | 489       | 765       | 1059      | 1341      | 1588      | 1906      | 2234      | 2379      | 2818       |
 | quill                        | 425      | 805       | 1222      | 1700      | 2108      | 2592      | 2951      | 3458      | 3957      | 4316       |
 | spdlog                       | 434      | 1366      | 3133      | 4779      | 6228      | 9241      | 10829     | 11348     | 11197     | 12003      |
@@ -51,9 +51,9 @@ Measured with `/usr/bin/time -l` on macOS (peak resident set size). Each benchma
 
 |                              | 1 Thread | 4 Threads | 10 Threads |
 |------------------------------|----------|-----------|------------|
-| BqLog Compress (C++)         | 2.7      | 3.0       | 3.9        |
-| BqLog Compress+Encrypt (C++) | 2.8      | 3.2       | 4.2        |
-| BqLog Text (C++)             | 2.7      | 3.5       | 4.4        |
+| BqLog Compress (C++)         | 2.3      | 2.7       | 3.4        |
+| BqLog Compress+Encrypt (C++) | 2.7      | 3.4       | 3.8        |
+| BqLog Text (C++)             | 2.6      | 2.9       | 3.8        |
 | spdlog                       | 2.1      | 2.2       | 2.4        |
 | glog                         | 2.1      | 2.5       | 3.2        |
 | fmtlog                       | 3.9      | 6.1       | 12.7       |
@@ -74,10 +74,10 @@ Measured with `/usr/bin/time -l` on macOS (peak resident set size). Each benchma
 
 #### 2.4 Summary
 
-- **BqLog Compress** achieves the highest throughput — **2–3x faster than fmtlog**, **3–16x faster than spdlog**, **25–60x faster than glog**
+- **BqLog Compress** achieves the highest throughput — **4–7x faster than fmtlog**, **7–30x faster than spdlog**, **33–85x faster than glog**
 - Even **BqLog Text** outperforms all other text-based loggers at every thread count
 - **Encryption adds near-zero overhead** — BqLog Compress vs Compress+Encrypt performance is nearly identical
-- **Memory efficient** — BqLog uses only **2.7–4.4 MB** regardless of mode
+- **Memory efficient** — BqLog uses only **2.3–3.8 MB** regardless of mode
 - **Compressed format is 6.7x smaller** than text output, reducing storage and I/O costs
 
 > Note: glog does not support `{fmt}`-style formatting; it uses stream-based `operator<<` in the parameterized test. fmtlog was compiled with `FMTLOG_BLOCK=1` to prevent silent log dropping (its default behavior). quill was configured per its official benchmark with busy-spin backend for maximum performance.
