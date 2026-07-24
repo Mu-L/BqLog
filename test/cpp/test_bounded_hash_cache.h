@@ -143,7 +143,7 @@ namespace bq {
                 success = true;
                 for (uint32_t i = 0; i < 100; ++i) {
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
-                    const uint32_t expected = (i % 3 == 0) ? (i + 1000) : (i + 1);
+                    const uint32_t expected = (i % 3 == 0) ? (i + static_cast<uint32_t>(1000)) : (i + static_cast<uint32_t>(1));
                     success &= find_value(cache, key, expected);
                 }
                 result.add_result(success, "bounded cache growth update");
@@ -185,7 +185,7 @@ namespace bq {
                     uint32_t value = 0;
                     bq::bounded_hash_cache<8>::insert_token token;
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
-                    old_key_count += eviction_cache.find(key, value, token) ? 1 : 0;
+                    old_key_count += eviction_cache.find(key, value, token) ? static_cast<uint32_t>(1) : static_cast<uint32_t>(0);
                 }
                 result.add_result(old_key_count == 7, "bounded cache admission eviction count");
             }
