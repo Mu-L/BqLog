@@ -118,8 +118,11 @@ namespace bq {
                 result.add_result(cache.set_max_size(16) && cache.get_max_size() == 16, "bounded cache max change after clear");
             }
 
-            static void test_growth_and_collisions(test_result& result)
+            static void test_growth_and_update(test_result& result)
             {
+                // This key family targeted the old XOR-fold table hash; the
+                // fmix64 hash spreads it, so the test now covers plain growth
+                // and in-place updates (natural collisions still occur).
                 bq::bounded_hash_cache<128> cache;
                 for (uint32_t i = 0; i < 100; ++i) {
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
@@ -131,7 +134,7 @@ namespace bq {
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
                     success &= find_value(cache, key, i + 1);
                 }
-                result.add_result(success, "bounded cache collision growth");
+                result.add_result(success, "bounded cache growth");
 
                 for (uint32_t i = 0; i < 100; i += 3) {
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
@@ -143,7 +146,7 @@ namespace bq {
                     const uint32_t expected = (i % 3 == 0) ? (i + 1000) : (i + 1);
                     success &= find_value(cache, key, expected);
                 }
-                result.add_result(success, "bounded cache collision update");
+                result.add_result(success, "bounded cache growth update");
             }
 
             static void test_exact_limit_and_eviction(test_result& result)
@@ -164,8 +167,8 @@ namespace bq {
                     eviction_cache.insert(key, i);
                 }
 
-                // The admission gate is 1/16: attempts 16/32/48/64 are admitted,
-                // each evicting one clock-hand victim (4 evictions in total).
+                // The admission gate is 1/64: only attempt 64 is admitted and
+                // evicts one clock-hand victim (1 eviction in total).
                 uint64_t admitted_key = 0;
                 for (uint32_t i = 0; i < 64; ++i) {
                     admitted_key = (static_cast<uint64_t>(1000 + i) << 32) | (1000 + i);
@@ -184,7 +187,7 @@ namespace bq {
                     const uint64_t key = (static_cast<uint64_t>(i) << 32) | i;
                     old_key_count += eviction_cache.find(key, value, token) ? 1 : 0;
                 }
-                result.add_result(old_key_count == 4, "bounded cache admission eviction count");
+                result.add_result(old_key_count == 7, "bounded cache admission eviction count");
             }
 
             static void test_clear_and_reuse(test_result& result)
@@ -257,7 +260,7 @@ namespace bq {
                 test_insert_token(result);
                 test_resize_allocation_failure(result);
                 test_runtime_max_size(result);
-                test_growth_and_collisions(result);
+                test_growth_and_update(result);
                 test_exact_limit_and_eviction(result);
                 test_clear_and_reuse(result);
                 test_production_capacity(result);

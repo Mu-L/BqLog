@@ -21,17 +21,23 @@ namespace bq {
      * \brief Open-addressing (linear probing) uint64 -> uint32 cache with a hard
      *        entry limit, used by the compressed file appender.
      *
-     * Design notes (validated by artifacts/cache_review micro benchmarks):
+     * Design notes:
      * - Table grows by doubling at 50% load, up to max_size entries.
-     * - The slot hash mixes the whole key with a multiplicative (Fibonacci)
-     *   constant and takes the HIGH bits of the product. Plain low-bit masking
-     *   collapses for low-entropy keys (e.g. Windows thread ids are 4-aligned,
-     *   or keys whose entropy lives only in the high 32 bits).
-     * - Once full, a missed insert is admitted with probability 1/16 and evicts
-     *   the entry under a clock hand. The sampled admission keeps the resident
-     *   set stable under scans and over-capacity cyclic workloads (always-admit
-     *   and second-chance variants were measured to be much worse there), while
-     *   1/16 still re-admits a renewed hot set about 4x faster than 1/64.
+     * - The slot hash runs the key through the murmur3 fmix64 finalizer and
+     *   takes the HIGH bits of the result. Plain low-bit masking or XOR folding
+     *   collapses for structured key families (e.g. 4-aligned Windows thread
+     *   ids, keys whose entropy lives only in the high 32 bits, or keys built
+     *   to cancel a fixed XOR/multiplier). fmix64 avalanches every input bit
+     *   into every output bit, which removes those known degenerate families;
+     *   like any fixed-seed hash it is not a formal worst-case guarantee, but
+     *   the keys here are internal CRC64 format hashes and thread ids.
+     * - Once full, a missed insert is admitted once every admission_divisor
+     *   attempts and evicts the entry under a clock hand. The sampled
+     *   admission keeps the resident set stable under scans and over-capacity
+     *   cyclic workloads (always-admit and second-chance variants were
+     *   measured to be much worse there). Lower gates (1/32, 1/16) re-admit a
+     *   renewed hot set faster but cost measurably more CPU on cyclic and
+     *   scan workloads, so the default stays at 1/64.
      * - resize() allocates the new table before releasing the old one, so an
      *   allocation failure never loses the existing cache content.
      */
@@ -143,7 +149,13 @@ namespace bq {
 
         static bq_forceinline uint32_t get_table_hash(uint64_t key)
         {
-            return static_cast<uint32_t>((key * UINT64_C(11400714819323198485)) >> 32);
+            // murmur3 fmix64 finalizer.
+            key ^= key >> 33;
+            key *= UINT64_C(0xff51afd7ed558ccd);
+            key ^= key >> 33;
+            key *= UINT64_C(0xc4ceb9fe1a85ec53);
+            key ^= key >> 33;
+            return static_cast<uint32_t>(key >> 32);
         }
 
         bq_forceinline uint32_t find_slot_or_empty(uint64_t key, bool& found) const
@@ -273,7 +285,7 @@ namespace bq {
 
         static constexpr uint32_t min_capacity = 8;
         // A missed insert is admitted once every admission_divisor attempts when full.
-        static constexpr uint32_t admission_divisor = 16;
+        static constexpr uint32_t admission_divisor = 64;
 
         static_assert(MAX_SIZE >= min_capacity, "MAX_SIZE is too small");
 
