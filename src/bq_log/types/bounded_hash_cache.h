@@ -16,7 +16,26 @@
 #include "bq_common/platform/macros.h"
 
 namespace bq {
-    template <uint32_t MAX_SIZE, uint32_t HOT_MAX_CAPACITY>
+    /*!
+     * \class bounded_hash_cache
+     * \brief Open-addressing (linear probing) uint64 -> uint32 cache with a hard
+     *        entry limit, used by the compressed file appender.
+     *
+     * Design notes (validated by artifacts/cache_review micro benchmarks):
+     * - Table grows by doubling at 50% load, up to max_size entries.
+     * - The slot hash mixes the whole key with a multiplicative (Fibonacci)
+     *   constant and takes the HIGH bits of the product. Plain low-bit masking
+     *   collapses for low-entropy keys (e.g. Windows thread ids are 4-aligned,
+     *   or keys whose entropy lives only in the high 32 bits).
+     * - Once full, a missed insert is admitted with probability 1/16 and evicts
+     *   the entry under a clock hand. The sampled admission keeps the resident
+     *   set stable under scans and over-capacity cyclic workloads (always-admit
+     *   and second-chance variants were measured to be much worse there), while
+     *   1/16 still re-admits a renewed hot set about 4x faster than 1/64.
+     * - resize() allocates the new table before releasing the old one, so an
+     *   allocation failure never loses the existing cache content.
+     */
+    template <uint32_t MAX_SIZE>
     class bounded_hash_cache {
     public:
         struct insert_token {
@@ -38,30 +57,10 @@ namespace bq {
         {
             free(keys_);
             free(values_);
-            free(hot_keys_);
-            free(hot_values_);
         }
 
         bq_forceinline bool find(uint64_t key, uint32_t& value, insert_token& token)
         {
-            if (hot_values_ && !hot_bypassed_) {
-                const uint32_t hot_hash = get_hot_hash(key);
-                const bool hot_found = find_hot(key, hot_hash, value);
-                ++hot_queries_;
-                hot_hits_ += hot_found ? 1 : 0;
-                if (hot_queries_ == hot_sample_size) {
-                    if (hot_hits_ < hot_sample_size / 2) {
-                        free_hot();
-                        hot_bypassed_ = true;
-                    }
-                    hot_queries_ = 0;
-                    hot_hits_ = 0;
-                }
-                if (hot_found) {
-                    return true;
-                }
-            }
-
             bool found = false;
             const uint32_t slot_index = find_slot_or_empty(key, found);
             if (!found) {
@@ -70,15 +69,11 @@ namespace bq {
                 return false;
             }
             value = values_[slot_index];
-            if (!hot_bypassed_) {
-                insert_hot(key, get_hot_hash(key), value);
-            }
             return true;
         }
 
         bq_forceinline void insert(uint64_t key, uint32_t value)
         {
-            update_hot(key, value);
             bool found = false;
             const uint32_t slot_index = find_slot_or_empty(key, found);
             if (found) {
@@ -121,10 +116,6 @@ namespace bq {
             capacity_ = 0;
             victim_ = 0;
             admission_ = 0;
-            free_hot();
-            hot_queries_ = 0;
-            hot_hits_ = 0;
-            hot_bypassed_ = false;
             ++table_revision_;
         }
 
@@ -150,14 +141,9 @@ namespace bq {
                 : (max_size > MAX_SIZE ? MAX_SIZE : max_size);
         }
 
-        static bq_forceinline uint32_t get_hot_hash(uint64_t key)
-        {
-            return static_cast<uint32_t>((key * UINT64_C(11400714819323198485)) >> 32);
-        }
-
         static bq_forceinline uint32_t get_table_hash(uint64_t key)
         {
-            return static_cast<uint32_t>(key ^ (key >> 32));
+            return static_cast<uint32_t>((key * UINT64_C(11400714819323198485)) >> 32);
         }
 
         bq_forceinline uint32_t find_slot_or_empty(uint64_t key, bool& found) const
@@ -199,7 +185,7 @@ namespace bq {
                 return false;
             }
             uint32_t* new_values = static_cast<uint32_t*>(allocate_bytes(sizeof(uint32_t) * new_capacity));
-            if (!new_keys || !new_values) {
+            if (!new_values) {
                 free(new_keys);
                 free(new_values);
                 return false;
@@ -255,7 +241,7 @@ namespace bq {
                     return;
                 }
             } else if (size_ >= max_size_) {
-                if ((++admission_ & 63) != 0) {
+                if ((++admission_ & (admission_divisor - 1)) != 0) {
                     return;
                 }
                 while (values_[victim_] == invalid_value) {
@@ -285,116 +271,11 @@ namespace bq {
             ++table_revision_;
         }
 
-        bq_forceinline bool find_hot(uint64_t key, uint32_t hot_hash, uint32_t& value) const
-        {
-            uint32_t slot_index = hot_hash >> hot_index_shift_;
-            while (hot_values_[slot_index] != invalid_value) {
-                if (hot_keys_[slot_index] == key) {
-                    value = hot_values_[slot_index];
-                    return true;
-                }
-                slot_index = (slot_index + 1) & (hot_capacity_ - 1);
-            }
-            return false;
-        }
-
-        bq_forceinline void insert_hot(uint64_t key, uint32_t hot_hash, uint32_t value)
-        {
-            if (!hot_values_) {
-                if (!resize_hot(hot_min_capacity)) {
-                    return;
-                }
-            } else if (hot_capacity_ < HOT_MAX_CAPACITY && hot_size_ >= hot_capacity_ / 2) {
-                if (!resize_hot(hot_capacity_ * 2)) {
-                    return;
-                }
-            } else if (hot_size_ >= hot_capacity_ / 2) {
-                return;
-            }
-
-            uint32_t slot_index = hot_hash >> hot_index_shift_;
-            while (hot_values_[slot_index] != invalid_value) {
-                slot_index = (slot_index + 1) & (hot_capacity_ - 1);
-            }
-            hot_keys_[slot_index] = key;
-            hot_values_[slot_index] = value;
-            ++hot_size_;
-        }
-
-        bq_forceinline void update_hot(uint64_t key, uint32_t value)
-        {
-            if (!hot_values_ || hot_bypassed_) {
-                return;
-            }
-            uint32_t slot_index = get_hot_hash(key) >> hot_index_shift_;
-            while (hot_values_[slot_index] != invalid_value) {
-                if (hot_keys_[slot_index] == key) {
-                    hot_values_[slot_index] = value;
-                    return;
-                }
-                slot_index = (slot_index + 1) & (hot_capacity_ - 1);
-            }
-        }
-
-        bool resize_hot(uint32_t new_capacity)
-        {
-            uint64_t* new_keys = static_cast<uint64_t*>(allocate_bytes(sizeof(uint64_t) * new_capacity));
-            if (!new_keys) {
-                return false;
-            }
-            uint32_t* new_values = static_cast<uint32_t*>(allocate_bytes(sizeof(uint32_t) * new_capacity));
-            if (!new_keys || !new_values) {
-                free(new_keys);
-                free(new_values);
-                return false;
-            }
-            memset(new_values, 0xFF, sizeof(uint32_t) * new_capacity);
-
-            uint32_t new_size = 0;
-            uint32_t new_index_shift = 32;
-            for (uint32_t count = new_capacity; count > 1; count >>= 1) {
-                --new_index_shift;
-            }
-            for (uint32_t i = 0; i < hot_capacity_; ++i) {
-                if (hot_values_[i] == invalid_value) {
-                    continue;
-                }
-                uint32_t slot_index = get_hot_hash(hot_keys_[i]) >> new_index_shift;
-                while (new_values[slot_index] != invalid_value) {
-                    slot_index = (slot_index + 1) & (new_capacity - 1);
-                }
-                new_keys[slot_index] = hot_keys_[i];
-                new_values[slot_index] = hot_values_[i];
-                ++new_size;
-            }
-
-            free(hot_keys_);
-            free(hot_values_);
-            hot_keys_ = new_keys;
-            hot_values_ = new_values;
-            hot_size_ = new_size;
-            hot_capacity_ = new_capacity;
-            hot_index_shift_ = new_index_shift;
-            return true;
-        }
-
-        void free_hot()
-        {
-            free(hot_keys_);
-            free(hot_values_);
-            hot_keys_ = nullptr;
-            hot_values_ = nullptr;
-            hot_size_ = 0;
-            hot_capacity_ = 0;
-            hot_index_shift_ = 0;
-        }
-
         static constexpr uint32_t min_capacity = 8;
-        static constexpr uint32_t hot_min_capacity = 8;
-        static constexpr uint32_t hot_sample_size = 8192;
+        // A missed insert is admitted once every admission_divisor attempts when full.
+        static constexpr uint32_t admission_divisor = 16;
 
         static_assert(MAX_SIZE >= min_capacity, "MAX_SIZE is too small");
-        static_assert(HOT_MAX_CAPACITY >= hot_min_capacity && (HOT_MAX_CAPACITY & (HOT_MAX_CAPACITY - 1)) == 0, "HOT_MAX_CAPACITY must be a power of two");
 
         bounded_hash_cache(const bounded_hash_cache&) = delete;
         bounded_hash_cache& operator=(const bounded_hash_cache&) = delete;
@@ -405,15 +286,6 @@ namespace bq {
         uint32_t capacity_ = 0;
         uint32_t victim_ = 0;
         uint32_t admission_ = 0;
-
-        uint64_t* hot_keys_ = nullptr;
-        uint32_t* hot_values_ = nullptr;
-        uint32_t hot_size_ = 0;
-        uint32_t hot_capacity_ = 0;
-        uint32_t hot_index_shift_ = 0;
-        uint32_t hot_queries_ = 0;
-        uint32_t hot_hits_ = 0;
-        bool hot_bypassed_ = false;
         uint32_t max_size_ = MAX_SIZE;
         uint32_t table_revision_ = 0;
 

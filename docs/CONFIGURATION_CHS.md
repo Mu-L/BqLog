@@ -154,7 +154,7 @@ appenders_config.appender_3.file_name=~/bqLog/compress_log
 - `expire_time_days`：按天清理超时文件；`0` 关闭该功能。
 - `capacity_limit`：限制该 Appender 输出的文件的总大小，超过时按时间从旧文件开始删除。
 - `write_cache_size`：文件写入内存缓存大小（字节）。配置值会限制在 64 KiB～4 MiB，并向上取整为 2 的幂。增大该值可以减少写系统调用次数，但会增加每个文件 Appender 的内存占用。
-- `format_template_cache_max_entries`：CompressedFileAppender 保留的 format template 查找缓存最大条目数。默认 `100000`，配置值会限制在 `8`～`16777216`。主查找表内存大致为 `12 * next_power_of_two(2 * max_entries)` 字节，另外还有较小的 L1/hot cache。单个日志文件使用的不同 format template 超过该值时，不会丢日志，也不影响解码正确性，但被淘汰的 template 再次出现时可能会重新写入压缩文件，从而增加文件体积。通过 `reset_config` 修改后会立即生效；缩小上限时会清空当前 L2 查找表。
+- `format_template_cache_max_entries`：CompressedFileAppender 保留的 format template 查找缓存最大条目数。默认 `100000`，配置值会限制在 `8`～`16777216`。主查找表内存大致为 `12 * next_power_of_two(2 * max_entries)` 字节，另外还有较小的 L1 cache。单个日志文件使用的不同 format template 超过该值时，不会丢日志，也不影响解码正确性，但被淘汰的 template 再次出现时可能会重新写入压缩文件，从而增加文件体积。通过 `reset_config` 修改后会立即生效；缩小上限时会清空当前 L2 查找表。
 - `thread_info_cache_max_entries`：CompressedFileAppender 保留的 thread info 查找缓存最大条目数。默认 `2048`，配置值会限制在 `8`～`1048576`。超过上限不会丢日志，但被淘汰的 thread info template 可能会再次写入。通过 `reset_config` 修改后会立即生效；缩小上限时会清空对应的 L2 查找表。这里两个 cache 配置的单位都是“条目数”，不是字节数。
 - `categories_mask`：仅当日志 Category 匹配该数组中的前缀时，才会输出日志（参见 [高级用法 — Category](./ADVANCED_USAGE_CHS.md#2-支持分类category的-log-对象)）。
 - `always_create_new_file`：`true` 时，即使同一天内，每次进程重启也新开一个文件；默认 `false` 为追加写。

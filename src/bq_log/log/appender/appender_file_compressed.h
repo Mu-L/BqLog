@@ -107,9 +107,7 @@ namespace bq {
         static constexpr uint32_t THREAD_L1_SIZE = 64;
         static constexpr uint32_t CACHE_MIN_ENTRIES = 8;
         static constexpr uint32_t FORMAT_L2_MAX_CONFIG_ENTRIES = 16 * 1024 * 1024;
-        static constexpr uint32_t FORMAT_L2_HOT_CAPACITY = 4096;
         static constexpr uint32_t THREAD_L2_MAX_CONFIG_ENTRIES = 1024 * 1024;
-        static constexpr uint32_t THREAD_L2_HOT_CAPACITY = 256;
 
         struct direct_cache_slot {
             uint64_t key;
@@ -118,8 +116,8 @@ namespace bq {
 
         direct_cache_slot format_l1_[FORMAT_L1_SIZE];
         direct_cache_slot thread_l1_[THREAD_L1_SIZE];
-        bounded_hash_cache<FORMAT_L2_MAX_CONFIG_ENTRIES, FORMAT_L2_HOT_CAPACITY> format_l2_ { DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES };
-        bounded_hash_cache<THREAD_L2_MAX_CONFIG_ENTRIES, THREAD_L2_HOT_CAPACITY> thread_l2_ { DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES };
+        bounded_hash_cache<FORMAT_L2_MAX_CONFIG_ENTRIES> format_l2_ { DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES };
+        bounded_hash_cache<THREAD_L2_MAX_CONFIG_ENTRIES> thread_l2_ { DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES };
         uint32_t format_template_cache_max_entries_ = DEFAULT_FORMAT_TEMPLATE_CACHE_MAX_ENTRIES;
         uint32_t thread_info_cache_max_entries_ = DEFAULT_THREAD_INFO_CACHE_MAX_ENTRIES;
         uint64_t last_thread_id_;
