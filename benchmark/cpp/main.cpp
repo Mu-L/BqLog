@@ -4,6 +4,7 @@
 #include "bq_log/bq_log.h"
 #include "multi_format_templates.h"
 #include <cstdint>
+#include <cstdlib>
 #include <stdio.h>
 #include <thread>
 #include <chrono>
@@ -95,6 +96,18 @@ public:
     }
 };
 
+static size_t get_template_pool_size()
+{
+    const char* env = getenv("BENCH_POOL_SIZE");
+    if (env && env[0]) {
+        long long v = atoll(env);
+        if (v > 0 && (unsigned long long)v <= (unsigned long long)logs_count) {
+            return (size_t)v;
+        }
+    }
+    return 50000;
+}
+
 static void prepare_datas()
 {
     ascii_charset.fill_uninitialized(character_pool_size);
@@ -125,14 +138,15 @@ void test_compress_ascii_utf8(int32_t thread_count)
     std::cout << "============================================================" << std::endl;
     std::cout << "=========Begin Test Compressed File Log ASCII UTF8=========" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_ascii_u8");
+    const size_t template_pool_ = get_template_pool_size();
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
     for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
-        std::thread* st = new std::thread([&log_obj]() {
+        std::thread* st = new std::thread([&log_obj, template_pool_]() {
             for (size_t log_index = 0; log_index < logs_count; ++log_index) {
-                log_obj.info(benchmark_string_view<char>(ascii_charset.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
+                log_obj.info(benchmark_string_view<char>(ascii_charset.begin() + bq::get<0>(positions[log_index % template_pool_]), bq::get<1>(positions[log_index % template_pool_])));
             }
         });
         threads[thread_index] = st;
@@ -153,14 +167,15 @@ void test_compress_ascii_utf16(int32_t thread_count)
     std::cout << "============================================================" << std::endl;
     std::cout << "=========Begin Test Compressed File Log ASCII UTF16=========" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_ascii_u16");
+    const size_t template_pool_ = get_template_pool_size();
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
     for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
-        std::thread* st = new std::thread([&log_obj]() {
+        std::thread* st = new std::thread([&log_obj, template_pool_]() {
             for (size_t log_index = 0; log_index < logs_count; ++log_index) {
-                log_obj.info(benchmark_string_view<char16_t>(ascii_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
+                log_obj.info(benchmark_string_view<char16_t>(ascii_charset_u16.begin() + bq::get<0>(positions[log_index % template_pool_]), bq::get<1>(positions[log_index % template_pool_])));
             }
         });
         threads[thread_index] = st;
@@ -181,14 +196,15 @@ void test_compress_chinese_utf16(int32_t thread_count)
     std::cout << "============================================================" << std::endl;
     std::cout << "=========Begin Test Compressed File Log CHINESE UTF16=========" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_chinese_u16");
+    const size_t template_pool_ = get_template_pool_size();
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
     for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
-        std::thread* st = new std::thread([&log_obj]() {
+        std::thread* st = new std::thread([&log_obj, template_pool_]() {
             for (size_t log_index = 0; log_index < logs_count; ++log_index) {
-                log_obj.info(benchmark_string_view<char16_t>(chinese_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
+                log_obj.info(benchmark_string_view<char16_t>(chinese_charset_u16.begin() + bq::get<0>(positions[log_index % template_pool_]), bq::get<1>(positions[log_index % template_pool_])));
             }
         });
         threads[thread_index] = st;
@@ -209,14 +225,15 @@ void test_compress_mixed_utf16(int32_t thread_count)
     std::cout << "============================================================" << std::endl;
     std::cout << "=========Begin Test Compressed File Log MIXED(ASCII + CHINESE) UTF16=========" << std::endl;
     bq::log log_obj = bq::log::get_log_by_name("test_mixed_u16");
+    const size_t template_pool_ = get_template_pool_size();
     std::vector<std::thread*> threads;
     threads.resize(thread_count);
     uint64_t start_time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     std::cout << "Now Begin, each thread will write 2000000 log entries, please wait the result..." << std::endl;
     for (int32_t thread_index = 0; thread_index < thread_count; ++thread_index) {
-        std::thread* st = new std::thread([&log_obj]() {
+        std::thread* st = new std::thread([&log_obj, template_pool_]() {
             for (size_t log_index = 0; log_index < logs_count; ++log_index) {
-                log_obj.info(benchmark_string_view<char16_t>(mixed_charset_u16.begin() + bq::get<0>(positions[log_index]), bq::get<1>(positions[log_index])));
+                log_obj.info(benchmark_string_view<char16_t>(mixed_charset_u16.begin() + bq::get<0>(positions[log_index % template_pool_]), bq::get<1>(positions[log_index % template_pool_])));
             }
         });
         threads[thread_index] = st;

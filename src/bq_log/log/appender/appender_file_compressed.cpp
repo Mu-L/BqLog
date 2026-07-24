@@ -44,6 +44,16 @@ namespace bq {
         return ((size_t)data & mask_8_bytes_align) == 0;
     }
 
+    static bq_forceinline uint64_t mix_cache_key(uint64_t key)
+    {
+        key ^= key >> 33;
+        key *= UINT64_C(0xff51afd7ed558ccd);
+        key ^= key >> 33;
+        key *= UINT64_C(0xc4ceb9fe1a85ec53);
+        key ^= key >> 33;
+        return key;
+    }
+
     static uint32_t get_cache_max_entries_config(
         const bq::property_value& config_obj,
         const bq::string& appender_name,
@@ -377,7 +387,7 @@ namespace bq {
         uint64_t format_template_hash = get_format_template_hash(handle.get_level(), handle.get_log_head().category_idx, fmt_hash);
 
         uint32_t format_template_idx = (uint32_t)-1;
-        const uint32_t format_l1_index = static_cast<uint32_t>(format_template_hash & (FORMAT_L1_SIZE - 1));
+        const uint32_t format_l1_index = static_cast<uint32_t>(mix_cache_key(format_template_hash) >> 32) & (FORMAT_L1_SIZE - 1);
         if (format_l1_[format_l1_index].value != CACHE_EMPTY
             && format_l1_[format_l1_index].key == format_template_hash) {
             format_template_idx = format_l1_[format_l1_index].value;
@@ -453,7 +463,7 @@ namespace bq {
         if (current_thread_id == last_thread_id_) {
             thread_info_idx = last_thread_info_idx_;
         } else {
-            const uint32_t thread_l1_index = static_cast<uint32_t>(current_thread_id ^ (current_thread_id >> 3)) & (THREAD_L1_SIZE - 1);
+            const uint32_t thread_l1_index = static_cast<uint32_t>(mix_cache_key(current_thread_id) >> 32) & (THREAD_L1_SIZE - 1);
             if (thread_l1_[thread_l1_index].value != CACHE_EMPTY
                 && thread_l1_[thread_l1_index].key == current_thread_id) {
                 thread_info_idx = thread_l1_[thread_l1_index].value;
