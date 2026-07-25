@@ -30,7 +30,8 @@ namespace bq {
                 for (size_t i = 0; i < loop_count; ++i) {
                     size_t offset = i % vernam::DEFAULT_BUFFER_ALIGNMENT;
                     bq::util::srand(static_cast<uint32_t>(bq::platform::high_performance_epoch_ms()));
-                    size_t buff_size = bq::util::rand() % (static_cast<size_t>(1024 * 1024 * 16)) + static_cast<size_t>(offset);
+                    // +1 to make sure the encrypted length (buff_size - offset) is never 0
+                    size_t buff_size = bq::util::rand() % (static_cast<size_t>(1024 * 1024 * 16)) + static_cast<size_t>(offset) + static_cast<size_t>(1);
                     size_t key_size = static_cast<size_t>(1) << (bq::util::rand() % static_cast<size_t>(12) + 6);
                     uint8_t* key = static_cast<uint8_t*>(bq::platform::aligned_alloc(vernam::DEFAULT_BUFFER_ALIGNMENT, key_size));
                     uint8_t* src = static_cast<uint8_t*>(bq::platform::aligned_alloc(vernam::DEFAULT_BUFFER_ALIGNMENT, buff_size));
