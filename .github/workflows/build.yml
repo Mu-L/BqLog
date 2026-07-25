@@ -5410,6 +5410,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5501,6 +5506,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5609,6 +5619,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5698,6 +5713,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5799,6 +5819,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5889,6 +5914,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5996,6 +6026,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -6086,6 +6121,11 @@ jobs:
 
             pkgin -y install openjdk17 || true
             pkgin -y install nodejs npm || true
+            if ! command -v node >/dev/null 2>&1; then
+              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
+              pkgin -y update || true
+              pkgin -y install nodejs || true
+            fi
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
