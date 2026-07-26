@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.4.1] - 2026-07-26
+- **Compatibility**: [Python wheel requires glibc 2.38+ #72](https://github.com/Tencent/BqLog/issues/72) — all release artifacts are now built on Ubuntu 22.04 (glibc 2.35), Windows Server 2022, and the lowest supported BSD releases (FreeBSD 13.2/13.5, OpenBSD 7.7, NetBSD 10.1, DragonFlyBSD 6.4.2, OmniOS r151054), so older Linux distros and BSD systems work out of the box.
+- **Build/CI**: BSD build-time dependencies are now installed from self-hosted, immutable dependency snapshots instead of upstream package repos (which delete packages for EOL releases), making the release pipeline reproducible.
+
 ## [v2.4.0] - 2026-07-21
 - **Performance — Raising the bar once again**: Typical workloads improve by approximately **10%–20%**; actual gains vary with thread count, log format, argument types, and output mode.
 - **Bug fix**: [Slight memory leak #70](https://github.com/Tencent/BqLog/issues/70) — internal caches of the compressed file Appender are now strictly bounded, completely resolving the issue where memory usage could keep growing in certain cases.

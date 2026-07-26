@@ -2,13 +2,13 @@
   <img src="banner.jpg" alt="BqLog Banner" width="100%">
 </p>
 
-# BqLog (BianQue Log) V 2.4.0
+# BqLog (BianQue Log) V 2.4.1
 
 **English** | [简体中文](./README_CHS.md)
 
 [![license](https://img.shields.io/badge/license-APACHE2.0-brightgreen.svg?style=flat)](LICENSE.txt)
-[![Release Version](https://img.shields.io/badge/release-2.4.0-red.svg)](https://github.com/Tencent/BqLog/releases)
-[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.4.0-orange.svg?style=flat)](CHANGELOG.md)
+[![Release Version](https://img.shields.io/badge/release-2.4.1-red.svg)](https://github.com/Tencent/BqLog/releases)
+[![ChangeLog](https://img.shields.io/badge/📋_ChangeLog-v2.4.1-orange.svg?style=flat)](CHANGELOG.md)
 [![GitHub Stars](https://img.shields.io/github/stars/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Tencent/BqLog?style=flat&logo=github)](https://github.com/Tencent/BqLog/issues)
@@ -22,14 +22,12 @@
 
 ---
 
-[![Download](https://img.shields.io/badge/⬇_Download-Release_2.4.0-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.4.0)
+[![Download](https://img.shields.io/badge/⬇_Download-Release_2.4.1-blue.svg?style=for-the-badge)](https://github.com/Tencent/BqLog/releases/tag/Release_2.4.1)
 
-## 📋 What's New in v2.4.0
+## 📋 What's New in v2.4.1
 
-- **Performance — Raising the bar once again** — Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
-- **Bug fix** — [Completely resolved the issue where memory usage could keep growing in certain cases when logging with compressed file Appenders (#70)](https://github.com/Tencent/BqLog/issues/70).
-- **Bug fix** — Fixed `log.buffer_policy_when_full` parsing so `discard`, `block`, and `expand` are applied correctly.
-- **Configuration** — Added the `write_cache_size` option for tuning each file Appender's write cache from 64 KiB to 4 MiB.
+- **Compatibility** — [Fixed Linux artifacts requiring glibc 2.38+ (#72)](https://github.com/Tencent/BqLog/issues/72): everything is now built on Ubuntu 22.04 (glibc 2.35), Windows Server 2022, and the lowest supported BSD releases, so older distros and BSD systems work out of the box.
+- **Build/CI** — BSD build-time dependencies are now served from self-hosted, immutable snapshots, making releases reproducible and immune to upstream package removal.
 
 > Full changelog → [CHANGELOG.md](CHANGELOG.md)
 
