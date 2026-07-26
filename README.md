@@ -26,12 +26,12 @@
 
 ## 📋 What's New in v2.4.1
 
+- **Performance — Raising the bar once again** — Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
 - **Compatibility** — [Fixed Linux artifacts requiring glibc 2.38+ (#72)](https://github.com/Tencent/BqLog/issues/72): everything is now built on Ubuntu 22.04 (glibc 2.35), Windows Server 2022, and the lowest supported BSD releases, so older distros and BSD systems work out of the box.
 - **Build/CI** — BSD build-time dependencies are now served from self-hosted, immutable snapshots, making releases reproducible and immune to upstream package removal.
 
 **v2.4.0 highlights:**
 
-- **Performance — Raising the bar once again** — Typical workloads see an approximately **10%–20% performance improvement**. Actual gains vary with thread count, log format, argument types, and output mode.
 - **Bug fix** — [Completely resolved the issue where memory usage could keep growing in certain cases when logging with compressed file Appenders (#70)](https://github.com/Tencent/BqLog/issues/70).
 - **Bug fix** — Fixed `log.buffer_policy_when_full` parsing so `discard`, `block`, and `expand` are applied correctly.
 - **Configuration** — Added the `write_cache_size` option for tuning each file Appender's write cache from 64 KiB to 4 MiB.
