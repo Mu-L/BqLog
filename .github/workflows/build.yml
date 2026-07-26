@@ -13,7 +13,7 @@ permissions:
 jobs:
   #########################################################Extract Version######################################################
   extract_version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.extract.outputs.version }}
     steps:
@@ -34,7 +34,7 @@ jobs:
   #########################################################Common Libs Build####################################################
   #Windows
   build_windows_x86_64_lib_MSVC:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -58,7 +58,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_windows_x86_64_lib_Clang:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -76,7 +76,7 @@ jobs:
           .\build_all_and_pack.bat native clang YES NO NO
 
   build_windows_x86_64_lib_MinGW:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -135,7 +135,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_windows_x86_64_tools:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -159,7 +159,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_windows_arm64_lib_MSVC:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -183,7 +183,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_windows_arm64_lib_Clang:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -260,7 +260,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_windows_arm64_tools:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -285,7 +285,7 @@ jobs:
 
   #Android
   build_windows_android:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -361,7 +361,7 @@ jobs:
           ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
 
   build_linux_android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -401,7 +401,7 @@ jobs:
 
   #Linux-ubuntu-x86_64
   build_ubuntu_x86_64_lib_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -426,7 +426,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_ubuntu_x86_64_lib_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -445,7 +445,7 @@ jobs:
           ./build_all_and_pack.sh native gcc YES NO NO
 
   build_ubuntu_x86_64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -472,7 +472,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_ubuntu_x86_64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -495,7 +495,7 @@ jobs:
 
   #Linux-ubuntu-arm64
   build_ubuntu_arm64_lib_Clang:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -520,7 +520,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_ubuntu_arm64_lib_GCC:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -539,7 +539,7 @@ jobs:
           ./build_all_and_pack.sh native gcc YES NO NO
 
   build_ubuntu_arm64_tools_Clang:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -566,7 +566,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_ubuntu_arm64_tools_GCC:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -588,7 +588,7 @@ jobs:
 
   #Linux-debian-x86
   build_debian_x86_lib_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -637,7 +637,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_debian_x86_lib_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -680,7 +680,7 @@ jobs:
           ./build_all_and_pack.sh native gcc YES NO NO
 
   build_debian_x86_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -731,7 +731,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_debian_x86_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -820,21 +820,33 @@ jobs:
 
   #freebsd_x86_64
   build_freebsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -855,10 +867,16 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -886,21 +904,33 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_freebsd_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -922,10 +952,16 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -948,21 +984,33 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
   build_freebsd_x86_64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -985,10 +1033,16 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1018,21 +1072,33 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_freebsd_x86_64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1056,10 +1122,16 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1085,22 +1157,34 @@ jobs:
           exit 1
   #freebsd_arm64
   build_freebsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1121,11 +1205,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1153,22 +1243,34 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_freebsd_arm64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1190,11 +1292,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1217,22 +1325,34 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
   build_freebsd_arm64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1255,11 +1375,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1289,22 +1415,34 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_freebsd_arm64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1329,11 +1467,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc
 
           run: |
             set -e -x
@@ -1360,21 +1504,29 @@ jobs:
           exit 1
   #openbsd_x86_64
   build_openbsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSD
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -1397,10 +1549,12 @@ jobs:
         if: steps.RunInOpenBSD.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -1430,21 +1584,29 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_openbsd_x86_64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSD
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1468,10 +1630,12 @@ jobs:
         if: steps.RunInOpenBSD.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1503,22 +1667,30 @@ jobs:
 
   #openbsd_arm64
   build_openbsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # host only runs QEMU; 8.x required to boot the openbsd aarch64 image (artifact is built inside the VM)
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSD
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1542,11 +1714,13 @@ jobs:
         if: steps.RunInOpenBSD.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1577,22 +1751,30 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_openbsd_arm64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # host only runs QEMU; 8.x required to boot the openbsd aarch64 image (artifact is built inside the VM)
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSD
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1617,11 +1799,13 @@ jobs:
         if: steps.RunInOpenBSD.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add  cmake bash jdk%11
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
 
           run: |
             set -e -x
@@ -1654,7 +1838,7 @@ jobs:
 
   # solaris_x86_64
   build_solaris_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -1778,7 +1962,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_solaris_x86_64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -1851,21 +2035,32 @@ jobs:
 
   # DragonFlyBSD
   build_dragonflybsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibs
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             # Java
@@ -1893,10 +2088,15 @@ jobs:
         if: steps.RunInDragonFlyBSDLibs.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             # Java
@@ -1931,21 +2131,32 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_dragonflybsd_x86_64_libs_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibs
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             # Java
@@ -1973,10 +2184,15 @@ jobs:
         if: steps.RunInDragonFlyBSDLibs.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             # Java
@@ -2005,21 +2221,32 @@ jobs:
           echo "::error::Run in DragonFlyBSD failed after retry"
           exit 1
   build_dragonflybsd_x86_64_tools_clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDTools
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             export JAVA_HOME="/usr/local/openjdk11"
@@ -2047,10 +2274,15 @@ jobs:
         if: steps.RunInDragonFlyBSDTools.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             export JAVA_HOME="/usr/local/openjdk11"
@@ -2085,21 +2317,32 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_dragonflybsd_x86_64_tools_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDTools
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             export JAVA_HOME="/usr/local/openjdk11"
@@ -2127,10 +2370,15 @@ jobs:
         if: steps.RunInDragonFlyBSDTools.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm
           run: |
             set -e -x
             export JAVA_HOME="/usr/local/openjdk11"
@@ -2160,7 +2408,7 @@ jobs:
           exit 1
   # OmniOS
   build_omnios_x86_64_libs_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -2177,6 +2425,7 @@ jobs:
         continue-on-error: true
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -2227,6 +2476,7 @@ jobs:
         if: steps.RunInOmniOSLibs.outcome == 'failure'
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -2283,7 +2533,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_omnios_x86_64_tools_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -2300,6 +2550,7 @@ jobs:
         continue-on-error: true
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -2350,6 +2601,7 @@ jobs:
         if: steps.RunInOmniOSTools.outcome == 'failure'
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -2408,11 +2660,18 @@ jobs:
 
   # netbsd_x86_64
   build_netbsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_1
         continue-on-error: true
@@ -2430,29 +2689,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2483,7 +2725,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2519,29 +2761,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2572,7 +2797,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2603,11 +2828,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_netbsd_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_2
         continue-on-error: true
@@ -2625,29 +2857,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2678,7 +2893,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2711,29 +2926,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2764,7 +2962,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2786,11 +2984,18 @@ jobs:
           echo "::error::Run in NetBSD (GCC, x86_64) failed after retry"
           exit 1
   build_netbsd_x86_64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_3
         continue-on-error: true
@@ -2808,29 +3013,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2861,7 +3049,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2896,29 +3084,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -2949,7 +3120,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -2979,11 +3150,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_netbsd_x86_64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_4
         continue-on-error: true
@@ -3001,29 +3179,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3054,7 +3215,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3089,29 +3250,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3142,7 +3286,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3167,11 +3311,18 @@ jobs:
           exit 1
   # netbsd_arm64 (aarch64)
   build_netbsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_5
         continue-on-error: true
@@ -3190,29 +3341,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3243,7 +3377,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3277,29 +3411,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3330,7 +3447,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3358,11 +3475,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_netbsd_arm64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_6
         continue-on-error: true
@@ -3381,29 +3505,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3434,7 +3541,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3468,29 +3575,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3521,7 +3611,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3543,11 +3633,18 @@ jobs:
           echo "::error::Run in NetBSD (GCC, arm64) failed after retry"
           exit 1
   build_netbsd_arm64_tools_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_7
         continue-on-error: true
@@ -3566,29 +3663,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3619,7 +3699,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3655,29 +3735,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3708,7 +3771,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3738,11 +3801,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   build_netbsd_arm64_tools_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_8
         continue-on-error: true
@@ -3761,29 +3831,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3814,7 +3867,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -3850,29 +3903,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -3903,7 +3939,7 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
+            /usr/sbin/pkg_add -u openjdk17
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -4006,7 +4042,7 @@ jobs:
 
   #Java wrapper
   build_windows_java11_wrapper:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4031,7 +4067,7 @@ jobs:
 
   #C# wrapper
   build_windows_csharp_wrapper:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4060,7 +4096,7 @@ jobs:
   #########################################################NodeJS Build####################################################
   #Windows
   nodejs_build_windows_x86_64_lib_MSVC:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4095,7 +4131,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_windows_x86_64_lib_Clang:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4124,7 +4160,7 @@ jobs:
           .\build_all_and_pack.bat native clang YES YES NO dynamic_lib
 
   nodejs_build_windows_arm64_lib_MSVC:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4159,7 +4195,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_windows_arm64_lib_Clang:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4189,7 +4225,7 @@ jobs:
 
   #Linux-ubuntu-x86_64
   nodejs_build_ubuntu_x86_64_lib_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4225,7 +4261,7 @@ jobs:
 
   #Linux-ubuntu-x86_64
   nodejs_build_ubuntu_x86_64_lib_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4255,7 +4291,7 @@ jobs:
 
   #Linux-ubuntu-arm64
   nodejs_build_ubuntu_arm64_lib_Clang:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4290,7 +4326,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_ubuntu_arm64_lib_GCC:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -4320,7 +4356,7 @@ jobs:
 
   #Linux-debian-x86
   nodejs_build_debian_x86_lib_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -4374,7 +4410,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_debian_x86_lib_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     container:
       image: ghcr.io/pippocao/bqlog/i386_debian:latest
@@ -4454,22 +4490,34 @@ jobs:
 
   #freebsd_x86_64
   nodejs_build_freebsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4493,11 +4541,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4529,22 +4583,34 @@ jobs:
 
   #freebsd_x86_64
   nodejs_build_freebsd_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSD
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4568,11 +4634,17 @@ jobs:
         if: steps.RunInFreeBSD.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4597,23 +4669,35 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
   nodejs_build_freebsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSDArmClang
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4636,12 +4720,18 @@ jobs:
         if: steps.RunInFreeBSDArmClang.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4671,23 +4761,35 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_freebsd_arm64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD
         id: RunInFreeBSDArmGcc
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4710,12 +4812,18 @@ jobs:
         if: steps.RunInFreeBSDArmGcc.outcome == 'failure'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.5"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y llvm cmake bash openjdk11 gdb gcc node
-            pkg install -y npm-node22 || pkg install -y npm-node20 || pkg install -y npm
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-aarch64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash openjdk11 gdb gcc node
+            pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node22 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm-node20 || pkg -o REPOS_DIR=/tmp/repoconf install -y npm
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -4739,22 +4847,30 @@ jobs:
           echo "::error::Run in FreeBSD failed after retry"
           exit 1
   nodejs_build_openbsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSDLibsClang
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add cmake bash jdk%11
-            pkg_add node || pkg_add node-22.* || pkg_add node-20.* || pkg_add node-18.*
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
+            TRUSTED_PKG_PATH=/deps pkg_add node-22.* || TRUSTED_PKG_PATH=/deps pkg_add node-20.* || TRUSTED_PKG_PATH=/deps pkg_add node-18.* || TRUSTED_PKG_PATH=/deps pkg_add node
           run: |
             set -e -x
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -4778,11 +4894,13 @@ jobs:
         if: steps.RunInOpenBSDLibsClang.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add cmake bash jdk%11
-            pkg_add node || pkg_add node-22.* || pkg_add node-20.* || pkg_add node-18.*
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-amd64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
+            TRUSTED_PKG_PATH=/deps pkg_add node-22.* || TRUSTED_PKG_PATH=/deps pkg_add node-20.* || TRUSTED_PKG_PATH=/deps pkg_add node-18.* || TRUSTED_PKG_PATH=/deps pkg_add node
           run: |
             set -e -x
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -4813,23 +4931,31 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_openbsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # host only runs QEMU; 8.x required to boot the openbsd aarch64 image (artifact is built inside the VM)
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download OpenBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/openbsd-7.7-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-openbsd-7.7-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in OpenBSD
         id: RunInOpenBSDArmLibsClang
         continue-on-error: true
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add cmake bash jdk%11
-            pkg_add node || pkg_add node-22.* || pkg_add node-20.* || pkg_add node-18.*
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
+            TRUSTED_PKG_PATH=/deps pkg_add node-22.* || TRUSTED_PKG_PATH=/deps pkg_add node-20.* || TRUSTED_PKG_PATH=/deps pkg_add node-18.* || TRUSTED_PKG_PATH=/deps pkg_add node
           run: |
             set -e -x
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -4853,12 +4979,14 @@ jobs:
         if: steps.RunInOpenBSDArmLibsClang.outcome == 'failure'
         uses: vmactions/openbsd-vm@v1
         with:
+          release: "7.7"
           arch: aarch64
           usesh: true
           mem: 8192
           prepare: |
-            pkg_add cmake bash jdk%11
-            pkg_add node || pkg_add node-22.* || pkg_add node-20.* || pkg_add node-18.*
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-openbsd-7.7-aarch64.tar.gz" -C /deps
+            TRUSTED_PKG_PATH=/deps pkg_add cmake bash jdk%11
+            TRUSTED_PKG_PATH=/deps pkg_add node-22.* || TRUSTED_PKG_PATH=/deps pkg_add node-20.* || TRUSTED_PKG_PATH=/deps pkg_add node-18.* || TRUSTED_PKG_PATH=/deps pkg_add node
           run: |
             set -e -x
             test -x /usr/local/jdk-11/bin/java || { echo "java not found; did you pkg_add jdk%11?"; exit 1; }
@@ -4889,7 +5017,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_solaris_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -5053,7 +5181,7 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_omnios_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -5070,6 +5198,7 @@ jobs:
         continue-on-error: true
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -5121,6 +5250,7 @@ jobs:
         if: steps.RunInOmniOSLibsNode.outcome == 'failure'
         uses: vmactions/omnios-vm@v1
         with:
+          release: "r151054"
           envs: 'PKG_OMNIOS_IP'
           usesh: true
           mem: 8192
@@ -5179,21 +5309,32 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_dragonflybsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibsClang
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -5221,10 +5362,15 @@ jobs:
         if: steps.RunInDragonFlyBSDLibsClang.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -5259,21 +5405,32 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_dragonflybsd_x86_64_libs_gcc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/dragonflybsd-6.4.2-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-dragonflybsd-6.4.2-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in DragonFlyBSD
         id: RunInDragonFlyBSDLibsGcc
         continue-on-error: true
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -5301,10 +5458,15 @@ jobs:
         if: steps.RunInDragonFlyBSDLibsGcc.outcome == 'failure'
         uses: vmactions/dragonflybsd-vm@v1
         with:
+          release: "6.4.2"
           usesh: true
           mem: 8192
           prepare: |
-            pkg install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-dragonflybsd-6.4.2-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y cmake bash gmake gdb openjdk11 gcc llvm node20 npm-node20
           run: |
             set -e -x
             pkg info -l openjdk11 | grep 'bin/java'
@@ -5333,11 +5495,18 @@ jobs:
           echo "::error::Run in DragonFlyBSD failed after retry"
           exit 1
   nodejs_build_netbsd_x86_64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, x86_64)
         id: vm_step_9
         continue-on-error: true
@@ -5355,29 +5524,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5408,13 +5560,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5451,29 +5598,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5504,13 +5634,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5542,11 +5667,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_netbsd_x86_64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, x86_64)
         id: vm_step_10
         continue-on-error: true
@@ -5564,29 +5696,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5617,13 +5732,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5658,29 +5768,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5711,13 +5804,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5741,11 +5829,18 @@ jobs:
           echo "::error::Run in NetBSD (GCC, x86_64) failed after retry"
           exit 1
   nodejs_build_netbsd_arm64_libs_Clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (Clang, arm64)
         id: vm_step_11
         continue-on-error: true
@@ -5764,29 +5859,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5817,13 +5895,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5859,29 +5932,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -5912,13 +5968,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -5948,11 +5999,18 @@ jobs:
           path: ${{ github.workspace }}/dist
 
   nodejs_build_netbsd_arm64_libs_GCC:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download BSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/netbsd-10.1-aarch64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-netbsd-10.1-aarch64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in NetBSD (GCC, arm64)
         id: vm_step_12
         continue-on-error: true
@@ -5971,29 +6029,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -6024,13 +6065,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -6066,29 +6102,12 @@ jobs:
               evbarm|aarch64|arm64) PKG_ARCH="aarch64" ;;
               *) PKG_ARCH="$ARCH" ;;
             esac
-            PKG_MIRRORS="
-              https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://ftp.jaist.ac.jp/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-              https://mirrors.nju.edu.cn/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.1/All
-            "
-            pkg_installed=0
-            for mirror in $PKG_MIRRORS; do
-              echo "=== Trying package mirror: $mirror ==="
-              export PKG_PATH="$mirror"
-              if /usr/sbin/pkg_add -v pkgin; then
-                echo "$mirror" | sed 's|/All$|/All|' > /usr/pkg/etc/pkgin/repositories.conf || true
-                pkgin -y update || true
-                pkgin -y install cmake gmake bash gdb || true
-                pkgin -y install clang || true
-                pkgin -y install gcc12 || pkgin -y install gcc13 || pkgin -y install gcc10 || true
-                pkg_installed=1
-                break
-              fi
-              echo "Mirror $mirror failed, trying next..."
-            done
-            if [ "$pkg_installed" -ne 1 ]; then
-              echo "WARNING: All package mirrors failed, continuing anyway..." >&2
-            fi
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-netbsd-10.1-${PKG_ARCH}.tar.gz" -C /deps
+            export PKG_PATH=/deps
+            /usr/sbin/pkg_add -u cmake gmake bash
+            /usr/sbin/pkg_add gdb || echo "gdb unavailable, skipping"
+            /usr/sbin/pkg_add -u clang
+            /usr/sbin/pkg_add -u gcc12
 
             URLS=""
             case "$ARCH" in
@@ -6119,13 +6138,8 @@ jobs:
             fi
             ls /usr/X11R7/lib/libX11.so.* >/dev/null 2>&1 || { echo "xbase extracted but libX11 missing"; exit 1; }
 
-            pkgin -y install openjdk17 || true
-            pkgin -y install nodejs npm || true
-            if ! command -v node >/dev/null 2>&1; then
-              echo "https://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/${PKG_ARCH}/10.0_2026Q1/All" > /usr/pkg/etc/pkgin/repositories.conf
-              pkgin -y update || true
-              pkgin -y install nodejs || true
-            fi
+            /usr/sbin/pkg_add -u openjdk17
+            /usr/sbin/pkg_add -u nodejs
           run: |
             set -e -x
             export JAVA_HOME="/usr/pkg/java/openjdk17"
@@ -6149,7 +6163,7 @@ jobs:
           echo "::error::Run in NetBSD (GCC, arm64) failed after retry"
           exit 1
   nodejs_collect_and_stage_prebuilds:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - extract_version
       - nodejs_build_windows_x86_64_lib_MSVC
@@ -6304,7 +6318,7 @@ jobs:
 
   # Unreal plugin
   unreal_plugin_build_on_linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -6508,7 +6522,7 @@ jobs:
   # release.yml — which also publishes to BqLogFabRelease — never fires this.
   # Remove this job once the Fab flow is verified end to end.
 #  fab_sources_only_release:
-#    runs-on: ubuntu-latest
+#    runs-on: ubuntu-22.04
 #    if: ${{ github.event_name == 'workflow_dispatch' }}
 #    needs:
 #      - extract_version
@@ -6557,7 +6571,7 @@ jobs:
 #          files: fab_release_assets/*
 
   unreal_plugin_build_on_win64:
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs: extract_version
     steps:
       - name: Checkout repository
@@ -6582,7 +6596,7 @@ jobs:
           ./mac_build_all_and_pack.sh
 
   unreal_plugin_pack_prebuilt:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - extract_version
       - build_windows_x86_64_lib_MSVC
@@ -6896,7 +6910,7 @@ jobs:
 
   # Unity & Tuanjie packages (shared logic via matrix)
   engine_package_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         engine: [unity, tuanjie]
@@ -7142,17 +7156,17 @@ jobs:
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: linux_x86_64
-            runner: ubuntu-latest
+            runner: ubuntu-22.04
             build_cmd: |
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: linux_arm64
-            runner: ubuntu-24.04-arm
+            runner: ubuntu-22.04-arm
             build_cmd: |
               chmod +x build/wrapper/python/build_all_and_pack.sh
               bash build/wrapper/python/build_all_and_pack.sh
           - name: windows_x86_64
-            runner: windows-latest
+            runner: windows-2022
             build_cmd: build\wrapper\python\build_all_and_pack.bat
           - name: windows_arm64
             runner: windows-11-arm
@@ -7180,34 +7194,34 @@ jobs:
   #FreeBSD Python Wrapper (requires VM, cannot use matrix)
   build_python_wrapper_freebsd_x86_64:
     name: python_build_(freebsd_x86_64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: extract_version
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Download FreeBSD dep snapshot (host)
+        run: |
+          T=$(curl -fsSL "https://ghcr.io/token?scope=repository:pippocao/bqlog-ci-deps/bsd:pull" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+          M=$(curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.oci.image.manifest.v1+json" "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/manifests/freebsd-13-amd64")
+          D=$(echo "$M" | tr ',' '\n' | sed -n 's/.*"digest":"\(sha256:[^"]*\)".*/\1/p' | tail -n1)
+          curl -fsSL -H "Authorization: Bearer $T" -o deps-freebsd-13-amd64.tar.gz "https://ghcr.io/v2/pippocao/bqlog-ci-deps/bsd/blobs/$D"
       - name: Run in FreeBSD(Attempt 1)
         continue-on-error: true
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            for i in 1 2 3 4 5; do
-              if pkg install -y llvm cmake bash python3; then
-                PYVER=$(python3 -c 'import sys; print(f"{sys.version_info[0]}{sys.version_info[1]}")')
-                if pkg install -y "py${PYVER}-pip" "py${PYVER}-setuptools" "py${PYVER}-wheel"; then
-                  exit 0
-                fi
-                echo "py${PYVER}-pip package unavailable, bootstrapping with ensurepip..."
-                if python3 -m ensurepip --upgrade && python3 -m pip install --upgrade pip setuptools wheel; then
-                  exit 0
-                fi
-              fi
-              echo "Install failed, retrying in 60s... ($i/5)"
-              sleep 60
-            done
-            exit 1
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash python3
+            PYVER=$(python3 -c 'import sys; print(f"{sys.version_info[0]}{sys.version_info[1]}")')
+            pkg -o REPOS_DIR=/tmp/repoconf install -y "py${PYVER}-pip" "py${PYVER}-setuptools" "py${PYVER}-wheel" || { python3 -m ensurepip --upgrade && python3 -m pip install --upgrade pip setuptools wheel; }
           run: |
             touch BUILD_STARTED
             set -e -x
@@ -7249,24 +7263,18 @@ jobs:
         if: steps.CheckRetry.outputs.retry == 'true'
         uses: vmactions/freebsd-vm@v1
         with:
+          release: "13.2"
           usesh: true
           mem: 8192
           prepare: |
-            for i in 1 2 3 4 5; do
-              if pkg install -y llvm cmake bash python3; then
-                PYVER=$(python3 -c 'import sys; print(f"{sys.version_info[0]}{sys.version_info[1]}")')
-                if pkg install -y "py${PYVER}-pip" "py${PYVER}-setuptools" "py${PYVER}-wheel"; then
-                  exit 0
-                fi
-                echo "py${PYVER}-pip package unavailable, bootstrapping with ensurepip..."
-                if python3 -m ensurepip --upgrade && python3 -m pip install --upgrade pip setuptools wheel; then
-                  exit 0
-                fi
-              fi
-              echo "Install failed, retrying in 60s... ($i/5)"
-              sleep 60
-            done
-            exit 1
+            mkdir -p /deps && tar xzf "$GITHUB_WORKSPACE/deps-freebsd-13-amd64.tar.gz" -C /deps
+            export IGNORE_OSVERSION=yes
+            pkg repo /deps
+            mkdir -p /tmp/repoconf && echo 'local: { url: "file:///deps", enabled: true }' > /tmp/repoconf/local.conf
+            pkg -o REPOS_DIR=/tmp/repoconf update -f
+            pkg -o REPOS_DIR=/tmp/repoconf install -y llvm cmake bash python3
+            PYVER=$(python3 -c 'import sys; print(f"{sys.version_info[0]}{sys.version_info[1]}")')
+            pkg -o REPOS_DIR=/tmp/repoconf install -y "py${PYVER}-pip" "py${PYVER}-setuptools" "py${PYVER}-wheel" || { python3 -m ensurepip --upgrade && python3 -m pip install --upgrade pip setuptools wheel; }
           run: |
             touch BUILD_STARTED
             set -e -x
@@ -7282,7 +7290,7 @@ jobs:
 
   ####################################################### Java Fat JAR (Maven Central) ########################################
   java_maven_fat_jar_collect:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - extract_version
       - build_windows_java11_wrapper
